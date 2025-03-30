@@ -81,4 +81,4 @@ make clean
 
 本项目采用 MIT 许可证，详情请参阅 [LICENSE](LICENSE) 文件。
 
-> 本仓库代码是「长林啊」学习「孔令飞」大佬的《云原生AI实战营》专栏的实践，如果想的深入理解本仓库项目功能设计背后的设计理念与实现逻辑，可以访问 ![https://t.zsxq.com/k1cHj](https://t.zsxq.com/k1cHj) 链接！
+> 本仓库代码是「长林啊」学习「孔令飞」大佬的《云原生AI实战营》专栏的实践，如果想的深入理解本仓库项目功能设计背后的设计理念与实现逻辑，可以访问 [https://t.zsxq.com/k1cHj](https://t.zsxq.com/k1cHj) 链接！
