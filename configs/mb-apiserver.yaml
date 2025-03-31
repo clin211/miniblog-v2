@@ -1,0 +1,22 @@
+# 服务器类型，可选值有：
+#   grpc：启动一个 gRPC 服务器
+#   grpc-gateway: 启动一个 gRPC 服务器 + HTTP 反向代理服务器
+#   gin：基于 gin 框架启动一个 HTTP 服务器
+# 服务器模式选择：
+#   - 应用内调用选择 grpc
+#   - 如果有外部服务调用选择 grpc-gateway
+#   - 学习 Gin 框架时选择 gin
+server-mode: grpc-gateway
+# JWT 签发密钥
+jwt-key: Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5
+
+# MySQL
+mysql:
+  # MySQL 机器 IP 和端口
+  host: 127.0.0.1:3306
+  # MySQL 用户名
+  user: miniblog
+  # MySQL 密码
+  password: CueD7wbmJHxY
+  # MySQL 数据库名
+  database: miniblog

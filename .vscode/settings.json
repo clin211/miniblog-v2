@@ -1,7 +1,10 @@
 {
-    "cSpell.words": [
-        "apiserver",
-        "automaxprocs",
-        "miniblog"
-    ]
+  "cSpell.words": [
+    "apimachinery",
+    "apiserver",
+    "automaxprocs",
+    "miniblog",
+    "pflag",
+    "utilerrors"
+  ]
 }
