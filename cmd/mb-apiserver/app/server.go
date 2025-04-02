@@ -1,10 +1,13 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
 package app
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/clin211/miniblog-v2/cmd/mb-apiserver/app/options"
+	"github.com/clin211/miniblog-v2/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -29,23 +32,7 @@ func NewMiniBlogCommand() *cobra.Command {
 		SilenceUsage: true,
 		// 指定调用 cmd.Execute() 时，执行的 Run 函数
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// 将 viper 中的配置解析到选项 opts 变量中.
-			if err := viper.Unmarshal(opts); err != nil {
-				return err
-			}
-
-			// 对命令行选项值进行校验.
-			if err := opts.Validate(); err != nil {
-				return err
-			}
-
-			fmt.Printf("ServerMode from ServerOptions: %s\n", opts.JWTKey)
-			fmt.Printf("ServerMode from Viper: %s\n\n", viper.GetString("jwt-key"))
-
-			jsonData, _ := json.MarshalIndent(opts, "", "  ")
-			fmt.Println(string(jsonData))
-
-			return nil
+			return run(opts)
 		},
 		// 设置命令运行时的参数检查，不需要指定命令行参数。例如：./miniblog param1 param2
 		Args: cobra.NoArgs,
@@ -60,5 +47,41 @@ func NewMiniBlogCommand() *cobra.Command {
 	// 将 ServerOptions 中的选项绑定到命令标志
 	opts.AddFlags(cmd.PersistentFlags())
 
+	// 添加 --version 标志
+	version.AddFlags(cmd.PersistentFlags())
+
 	return cmd
+}
+
+// run 是主运行逻辑，负责初始化日志、解析配置、校验选项并启动服务器。
+func run(opts *options.ServerOptions) error {
+	// 如果传入 --version，则打印版本信息并退出
+	version.PrintAndExitIfRequested()
+
+	// 将 viper 中的配置解析到 opts.
+	if err := viper.Unmarshal(opts); err != nil {
+		return err
+	}
+
+	// 校验命令行选项
+	if err := opts.Validate(); err != nil {
+		return err
+	}
+
+	// 获取应用配置.
+	// 将命令行选项和应用配置分开，可以更加灵活的处理 2 种不同类型的配置.
+	cfg, err := opts.Config()
+	if err != nil {
+		return err
+	}
+
+	// 创建服务器实例.
+	// 注意这里是联合服务器，因为可能同时启动多个不同类型的服务器.
+	server, err := cfg.NewUnionServer()
+	if err != nil {
+		return err
+	}
+
+	// 启动服务器
+	return server.Run()
 }

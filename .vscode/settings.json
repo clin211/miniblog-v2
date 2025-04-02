@@ -6,5 +6,6 @@
     "miniblog",
     "pflag",
     "utilerrors"
-  ]
+  ],
+  "liveServer.settings.port": 5502
 }
