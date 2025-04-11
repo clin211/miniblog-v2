@@ -3,9 +3,16 @@
     "apimachinery",
     "apiserver",
     "automaxprocs",
+    "Debugw",
+    "Errorw",
+    "Fatalw",
+    "Infow",
     "miniblog",
+    "Panicw",
     "pflag",
-    "utilerrors"
+    "stretchr",
+    "utilerrors",
+    "Warnw"
   ],
   "liveServer.settings.port": 5502
 }

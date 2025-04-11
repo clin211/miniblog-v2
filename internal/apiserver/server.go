@@ -6,11 +6,11 @@
 package apiserver
 
 import (
-	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/spf13/viper"
+
+	"github.com/clin211/miniblog-v2/internal/pkg/log"
 )
 
 // Config 配置结构体，用于存储应用相关的配置。
@@ -33,11 +33,8 @@ func (cfg *Config) NewUnionServer() (*UnionServer, error) {
 
 // Run 运行应用。
 func (s *UnionServer) Run() error {
-	fmt.Printf("ServerMode from ServerOptions: %s\n", s.cfg.JWTKey)
-	fmt.Printf("ServerMode from Viper: %s\n\n", viper.GetString("jwt-key"))
-
-	jsonData, _ := json.MarshalIndent(s.cfg, "", "  ")
-	fmt.Println(string(jsonData))
+	log.Infow("ServerMode from ServerOptions: %s\n", s.cfg.JWTKey)
+	log.Infow("ServerMode from Viper: %s\n\n", viper.GetString("jwt-key"))
 
 	select {}
 }
