@@ -1,0 +1,19 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
+syntax = "proto3"; // 告诉编译器此文件使用什么版本的语法
+
+package v1;
+
+import "google/protobuf/empty.proto";       // 导入空消息
+import "apiserver/v1/healthz.proto";        // 健康检查消息定义
+
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
+
+// MiniBlog 定义了一个 MiniBlog RPC 服务
+service MiniBlog {
+    // Healthz 健康检查
+    rpc Healthz(google.protobuf.Empty) returns (HealthzResponse) {}
+}

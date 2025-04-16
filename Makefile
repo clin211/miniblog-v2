@@ -2,6 +2,8 @@
 # 定义全局 Makefile 变量方便后面引用
 
 COMMON_SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+# Protobuf 文件存放路径
+APIROOT=$(PROJ_ROOT_DIR)/pkg/api
 # 项目根目录
 PROJ_ROOT_DIR := $(abspath $(shell cd $(COMMON_SELF_DIR)/ && pwd -P))
 # 构建产物、临时文件存放目录
@@ -51,7 +53,7 @@ format: # 格式化 Go 源码.
 
 .PHONY: add-copyright
 add-copyright: # 添加版权头信息.
-	@addlicense -v -f $(PROJ_ROOT_DIR)/scripts/boilerplate.txt $(PROJ_ROOT_DIR) --skip-dirs=third_party,vendor,$(OUTPUT_DIR)
+	@addlicense -v -f $(PROJ_ROOT_DIR)/scripts/boilerplate.txt $(PROJ_ROOT_DIR) --skip-dirs=third_party,vendor,$(OUTPUT_DIR) --skip-files=\.pb\.go$
 
 .PHONY: tidy
 tidy: # 自动添加/移除依赖包.
@@ -60,3 +62,13 @@ tidy: # 自动添加/移除依赖包.
 .PHONY: clean
 clean: # 清理构建产物、临时文件等.
 	@-rm -vrf $(OUTPUT_DIR)
+
+.PHONY: protoc
+protoc: # 编译 protobuf 文件.
+	@echo "===========> Generate protobuf files"
+	@protoc \
+        --proto_path=$(APIROOT) \
+        --proto_path=$(PROJ_ROOT_DIR)/third_party/protobuf \
+        --go_out=paths=source_relative:$(APIROOT) \
+        --go-grpc_out=paths=source_relative:$(APIROOT) \
+        $(shell find $(APIROOT) -name *.proto)
