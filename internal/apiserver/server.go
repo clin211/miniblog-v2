@@ -6,22 +6,12 @@
 package apiserver
 
 import (
-	"context"
-	"errors"
-	"net"
-	"net/http"
 	"time"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	genericoptions "github.com/onexstack/onexstack/pkg/options"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
-	"google.golang.org/protobuf/encoding/protojson"
 
-	handler "github.com/clin211/miniblog-v2/internal/apiserver/handler/grpc"
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
-	apiv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
+	"github.com/clin211/miniblog-v2/pkg/server"
 )
 
 const (
@@ -46,64 +36,62 @@ type Config struct {
 	GRPCOptions *genericoptions.GRPCOptions
 }
 
-// UnionServer 定义一个联合服务器。 根据 ServerMode 决定要启动的服务器类型。
+// UnionServer 定义一个联合服务器. 根据 ServerMode 决定要启动的服务器类型.
+//
+// 联合服务器分为以下 2 大类：
+//  1. Gin 服务器：由 Gin 框架创建的标准的 REST 服务器。根据是否开启 TLS，
+//     来判断启动 HTTP 或者 HTTPS；
+//  2. GRPC 服务器：由 gRPC 框架创建的标准 RPC 服务器
+//  3. HTTP 反向代理服务器：由 grpc-gateway 框架创建的 HTTP 反向代理服务器。
+//     根据是否开启 TLS，来判断启动 HTTP 或者 HTTPS；
+//
+// HTTP 反向代理服务器依赖 gRPC 服务器，所以在开启 HTTP 反向代理服务器时，会先启动 gRPC 服务器.
 type UnionServer struct {
-	cfg *Config
-	srv *grpc.Server
-	lis net.Listener
+	srv server.Server
 }
 
-// NewUnionServer 根据配置创建联合服务器。
+// ServerConfig 包含服务器的核心依赖和配置.
+type ServerConfig struct {
+	cfg *Config
+}
+
+// NewUnionServer 根据配置创建联合服务器.
 func (cfg *Config) NewUnionServer() (*UnionServer, error) {
-	lis, err := net.Listen("tcp", cfg.GRPCOptions.Addr)
+	// 一些初始化代码
+
+	// 创建服务配置，这些配置可用来创建服务器
+	serverConfig, err := cfg.NewServerConfig()
 	if err != nil {
-		log.Fatalw("Failed to listen", "err", err)
 		return nil, err
 	}
 
-	// 创建 GRPC Server 实例
-	grpcsrv := grpc.NewServer()
-	apiv1.RegisterMiniBlogServer(grpcsrv, handler.NewHandler())
-	reflection.Register(grpcsrv)
+	log.Infow("Initializing federation server", "server-mode", cfg.ServerMode)
 
-	return &UnionServer{cfg: cfg, srv: grpcsrv, lis: lis}, nil
+	// 根据服务模式创建对应的服务实例
+	// 实际企业开发中，可以根据需要只选择一种服务器模式.
+	// 这里为了方便给你展示，通过 cfg.ServerMode 同时支持了 Gin 和 GRPC 2 种服务器模式.
+	var srv server.Server
+	switch cfg.ServerMode {
+	case GinServerMode:
+		srv, err = serverConfig.NewGinServer(), nil
+	default:
+		srv, err = serverConfig.NewGRPCServerOr()
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &UnionServer{srv: srv}, nil
 }
 
-// Run 运行应用。
+// Run 启动服务并处理优雅关闭.
 func (s *UnionServer) Run() error {
-	// 打印一条日志，用来提示 GRPC 服务已经起来，方便排障
-	log.Infow("Start to listening the incoming requests on grpc address", "addr", s.cfg.GRPCOptions.Addr)
-	// nolint: errcheck
-	go s.srv.Serve(s.lis)
-
-	//nolint: staticcheck
-	dialOptions := []grpc.DialOption{grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials())}
-
-	conn, err := grpc.NewClient(s.cfg.GRPCOptions.Addr, dialOptions...)
-	if err != nil {
-		return err
-	}
-
-	gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
-		MarshalOptions: protojson.MarshalOptions{
-			// 设置序列化 protobuf 数据时，枚举类型的字段以数字格式输出.
-			// 否则，默认会以字符串格式输出，跟枚举类型定义不一致，带来理解成本.
-			UseEnumNumbers: true,
-		},
-	}))
-	if err := apiv1.RegisterMiniBlogHandler(context.Background(), gwmux, conn); err != nil {
-		return err
-	}
-
-	log.Infow("Start to listening the incoming requests", "protocol", "http", "addr", s.cfg.HTTPOptions.Addr)
-	httpsrv := &http.Server{
-		Addr:    s.cfg.HTTPOptions.Addr,
-		Handler: gwmux,
-	}
-
-	if err := httpsrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return err
-	}
-
+	s.srv.RunOrDie()
 	return nil
+}
+
+// NewServerConfig 创建一个 *ServerConfig 实例.
+// 进阶：这里其实可以使用依赖注入的方式，来创建 *ServerConfig.
+func (cfg *Config) NewServerConfig() (*ServerConfig, error) {
+	return &ServerConfig{cfg: cfg}, nil
 }
