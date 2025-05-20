@@ -7,13 +7,33 @@ syntax = "proto3"; // 告诉编译器此文件使用什么版本的语法
 
 package v1;
 
-import "google/protobuf/empty.proto";       // 导入空消息
-import "apiserver/v1/healthz.proto";        // 健康检查消息定义
+// 提供用于定义 HTTP 映射的功能，比如通过 option (google.api.http) 实现 gRPC 到 HTTP 的映射
+import "google/api/annotations.proto";
+// 提供了一个标准的空消息类型 google.protobuf.Empty，适用于 RPC 方法不需要输入消息或输出消息的场景
+import "google/protobuf/empty.proto";
+// 定义当前服务所依赖的健康检查消息
+import "apiserver/v1/healthz.proto";
+// 为生成 OpenAPI 文档提供相关注释（如标题、版本、作者、许可证等信息）
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 
 // MiniBlog 定义了一个 MiniBlog RPC 服务
 service MiniBlog {
     // Healthz 健康检查
-    rpc Healthz(google.protobuf.Empty) returns (HealthzResponse) {}
+    rpc Healthz(google.protobuf.Empty) returns (HealthzResponse) {
+        // 通过 google.api.http 注释，指定 HTTP 方法为 GET、URL路径为 /healthz
+        option (google.api.http) = {
+            get: "/healthz",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // 在 OpenAPI 文档中的接口简要描述，为“服务健康检查”
+            summary: "服务健康检查";
+            // 标识该操作的唯一ID，为“Healthz”
+            operation_id: "Healthz";
+            // 将该接口归类为“服务治理”
+            tags: "服务治理";
+        };
+    }
 }

@@ -17,6 +17,11 @@ grpc:
   # GRPC 服务器监听地址
   addr: :6666
 
+# HTTP 服务器相关配置
+http:
+  # HTTP 服务器监听地址
+  addr: :5555
+
 server-mode: grpc-gateway
 # JWT 签发密钥
 jwt-key: Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5
