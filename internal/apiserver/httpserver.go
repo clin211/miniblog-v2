@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	handler "github.com/clin211/miniblog-v2/internal/apiserver/handler/http"
+	mw "github.com/clin211/miniblog-v2/internal/pkg/middleware/gin"
 	"github.com/clin211/miniblog-v2/pkg/server"
 )
 
@@ -28,6 +29,9 @@ var _ server.Server = (*ginServer)(nil)
 func (c *ServerConfig) NewGinServer() server.Server {
 	// 创建 Gin 引擎
 	engine := gin.New()
+
+	// 注册全局中间件，用于恢复 panic、设置 HTTP 头、添加请求 ID 等
+	engine.Use(gin.Recovery(), mw.RequestIDMiddleware(), mw.NoCache, mw.Cors, mw.Secure)
 
 	// 注册 REST API 路由
 	c.InstallRESTAPI(engine)

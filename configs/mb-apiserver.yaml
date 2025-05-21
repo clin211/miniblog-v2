@@ -11,7 +11,7 @@
 #   - 应用内调用选择 grpc
 #   - 如果有外部服务调用选择 grpc-gateway
 #   - 学习 Gin 框架时选择 gin
-server-mode: grpc
+server-mode: gin
 
 # GRPC 服务器相关配置
 grpc:
