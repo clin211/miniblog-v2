@@ -6,11 +6,15 @@
 package log
 
 import (
+	"context"
 	"sync"
 	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
+	"github.com/clin211/miniblog-v2/internal/pkg/known"
 )
 
 // Logger 定义了 miniblog 项目的日志接口。
@@ -183,4 +187,34 @@ func Fatalw(msg string, kvs ...any) {
 
 func (l *zapLogger) Fatalw(msg string, kvs ...any) {
 	l.z.Sugar().Fatalw(msg, kvs...)
+}
+
+// W 解析传入的 context，尝试提取关注的键值，并添加到 zap.Logger 结构化日志中.
+func W(ctx context.Context) Logger {
+	return std.W(ctx)
+}
+
+func (l *zapLogger) W(ctx context.Context) Logger {
+	lc := l.clone()
+
+	// 定义一个映射，关联 context 提取函数和日志字段名。
+	contextExtractors := map[string]func(context.Context) string{
+		known.XRequestID: contextx.RequestID, // 提取请求 ID
+		known.XUserID:    contextx.UserID,    // 提取用户 ID
+	}
+
+	// 遍历映射，从 context 中提取值并添加到日志中。
+	for fieldName, extractor := range contextExtractors {
+		if val := extractor(ctx); val != "" {
+			lc.z = lc.z.With(zap.String(fieldName, val))
+		}
+	}
+
+	return lc
+}
+
+// clone 深度拷贝 zapLogger.
+func (l *zapLogger) clone() *zapLogger {
+	newLogger := *l
+	return &newLogger
 }
