@@ -1,0 +1,95 @@
+// Post API 定义，包含博客文章的请求和响应消息
+syntax = "proto3"; // 告诉编译器此文件使用什么版本的语法
+
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1";
+
+// Post 表示博客文章
+message Post {
+    // postID 表示博文 ID
+    string postID = 1;
+    // userID 表示用户 ID
+    string userID = 2;
+    // title 表示博客标题
+    string title = 3;
+    // content 表示博客内容
+    string content = 4;
+    // createdAt 表示博客创建时间
+    google.protobuf.Timestamp createdAt = 5;
+    // updatedAt 表示博客最后更新时间
+    google.protobuf.Timestamp updatedAt = 6;
+}
+
+// CreatePostRequest 表示创建文章请求
+message CreatePostRequest {
+    // title 表示博客标题
+    string title = 1;
+    // content 表示博客内容
+    string content = 2;
+}
+
+// CreatePostResponse 表示创建文章响应
+message CreatePostResponse {
+    // postID 表示创建的文章 ID
+    string postID = 1;
+}
+
+// UpdatePostRequest 表示更新文章请求
+message UpdatePostRequest {
+    // postID 表示要更新的文章 ID，对应 {postID}
+    string postID = 1;
+    // title 表示更新后的博客标题
+    optional string title = 2;
+    // content 表示更新后的博客内容
+    optional string content = 3;
+}
+
+// UpdatePostResponse 表示更新文章响应
+message UpdatePostResponse {
+}
+
+// DeletePostRequest 表示删除文章请求
+message DeletePostRequest {
+    // postIDs 表示要删除的文章 ID 列表
+    repeated string postIDs = 1;
+}
+
+// DeletePostResponse 表示删除文章响应
+message DeletePostResponse {
+}
+
+// GetPostRequest 表示获取文章请求
+message GetPostRequest {
+    // postID 表示要获取的文章 ID
+    // @gotags: uri:"postID"
+    string postID = 1;
+}
+
+// GetPostResponse 表示获取文章响应
+message GetPostResponse {
+    // post 表示返回的文章信息
+    Post post = 1;
+}
+
+// ListPostRequest 表示获取文章列表请求
+message ListPostRequest {
+    // offset 表示偏移量
+    // @gotags: form:"offset"
+    int64 offset = 1;
+    // limit 表示每页数量
+    // @gotags: form:"limit"
+    int64 limit = 2;
+    // title 表示可选的标题过滤
+    optional string title = 3;
+}
+
+// ListPostResponse 表示获取文章列表响应
+message ListPostResponse {
+    // total_count 表示总文章数
+    int64 total_count = 1;
+    // posts 表示文章列表
+    repeated Post posts = 2;
+}

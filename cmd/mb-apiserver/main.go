@@ -19,7 +19,6 @@ import (
 )
 
 func main() {
-	fmt.Println("hello world")
 	// 创建 miniblog 程序命令行
 	command := app.NewMiniBlogCommand()
 

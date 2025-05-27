@@ -32,24 +32,117 @@ var File_apiserver_v1_apiserver_proto protoreflect.FileDescriptor
 
 const file_apiserver_v1_apiserver_proto_rawDesc = "" +
 	"\n" +
-	"\x1capiserver/v1/apiserver.proto\x12\x02v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1aapiserver/v1/healthz.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\x82\x01\n" +
+	"\x1capiserver/v1/apiserver.proto\x12\x02v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1aapiserver/v1/healthz.proto\x1a\x17apiserver/v1/post.proto\x1a\x17apiserver/v1/user.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\xa0\x0e\n" +
 	"\bMiniBlog\x12v\n" +
 	"\aHealthz\x12\x16.google.protobuf.Empty\x1a\x13.v1.HealthzResponse\">\x92A+\n" +
 	"\f服务治理\x12\x12服务健康检查*\aHealthz\x82\xd3\xe4\x93\x02\n" +
-	"\x12\b/healthzB8Z6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
+	"\x12\b/healthz\x12e\n" +
+	"\x05Login\x12\x10.v1.LoginRequest\x1a\x11.v1.LoginResponse\"7\x92A#\n" +
+	"\f用户管理\x12\f用户登录*\x05Login\x82\xd3\xe4\x93\x02\v:\x01*\"\x06/login\x12\x89\x01\n" +
+	"\fRefreshToken\x12\x17.v1.RefreshTokenRequest\x1a\x18.v1.RefreshTokenResponse\"F\x92A*\n" +
+	"\f用户管理\x12\f刷新令牌*\fRefreshToken\x82\xd3\xe4\x93\x02\x13:\x01*\x1a\x0e/refresh-token\x12\xa5\x01\n" +
+	"\x0eChangePassword\x12\x19.v1.ChangePasswordRequest\x1a\x1a.v1.ChangePasswordResponse\"\\\x92A,\n" +
+	"\f用户管理\x12\f修改密码*\x0eChangePassword\x82\xd3\xe4\x93\x02':\x01*\x1a\"/v1/users/{userID}/change-password\x12|\n" +
+	"\n" +
+	"CreateUser\x12\x15.v1.CreateUserRequest\x1a\x16.v1.CreateUserResponse\"?\x92A(\n" +
+	"\f用户管理\x12\f创建用户*\n" +
+	"CreateUser\x82\xd3\xe4\x93\x02\x0e:\x01*\"\t/v1/users\x12\x8b\x01\n" +
+	"\n" +
+	"UpdateUser\x12\x15.v1.UpdateUserRequest\x1a\x16.v1.UpdateUserResponse\"N\x92A.\n" +
+	"\f用户管理\x12\x12更新用户信息*\n" +
+	"UpdateUser\x82\xd3\xe4\x93\x02\x17:\x01*\x1a\x12/v1/users/{userID}\x12\x82\x01\n" +
+	"\n" +
+	"DeleteUser\x12\x15.v1.DeleteUserRequest\x1a\x16.v1.DeleteUserResponse\"E\x92A(\n" +
+	"\f用户管理\x12\f删除用户*\n" +
+	"DeleteUser\x82\xd3\xe4\x93\x02\x14*\x12/v1/users/{userID}\x12|\n" +
+	"\aGetUser\x12\x12.v1.GetUserRequest\x1a\x13.v1.GetUserResponse\"H\x92A+\n" +
+	"\f用户管理\x12\x12获取用户信息*\aGetUser\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/users/{userID}\x12w\n" +
+	"\bListUser\x12\x13.v1.ListUserRequest\x1a\x14.v1.ListUserResponse\"@\x92A,\n" +
+	"\f用户管理\x12\x12列出所有用户*\bListUser\x82\xd3\xe4\x93\x02\v\x12\t/v1/users\x12|\n" +
+	"\n" +
+	"CreatePost\x12\x15.v1.CreatePostRequest\x1a\x16.v1.CreatePostResponse\"?\x92A(\n" +
+	"\f博客管理\x12\f创建文章*\n" +
+	"CreatePost\x82\xd3\xe4\x93\x02\x0e:\x01*\"\t/v1/posts\x12\x85\x01\n" +
+	"\n" +
+	"UpdatePost\x12\x15.v1.UpdatePostRequest\x1a\x16.v1.UpdatePostResponse\"H\x92A(\n" +
+	"\f博客管理\x12\f更新文章*\n" +
+	"UpdatePost\x82\xd3\xe4\x93\x02\x17:\x01*\x1a\x12/v1/posts/{postID}\x12|\n" +
+	"\n" +
+	"DeletePost\x12\x15.v1.DeletePostRequest\x1a\x16.v1.DeletePostResponse\"?\x92A(\n" +
+	"\f博客管理\x12\f删除文章*\n" +
+	"DeletePost\x82\xd3\xe4\x93\x02\x0e:\x01**\t/v1/posts\x12|\n" +
+	"\aGetPost\x12\x12.v1.GetPostRequest\x1a\x13.v1.GetPostResponse\"H\x92A+\n" +
+	"\f博客管理\x12\x12获取文章信息*\aGetPost\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/posts/{postID}\x12w\n" +
+	"\bListPost\x12\x13.v1.ListPostRequest\x1a\x14.v1.ListPostResponse\"@\x92A,\n" +
+	"\f博客管理\x12\x12列出所有文章*\bListPost\x82\xd3\xe4\x93\x02\v\x12\t/v1/postsB\x9c\x02\x92A\xe0\x01\x12\xb6\x01\n" +
+	"\fminiblog API\"W\n" +
+	"\x18小而美的博客项目\x12%https://github.com/onexstack/miniblog\x1a\x14colin404@foxmail.com*H\n" +
+	"\vMIT License\x129https://github.com/onexstack/miniblog/blob/master/LICENSE2\x031.0*\x01\x022\x10application/json:\x10application/jsonZ6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
 
 var file_apiserver_v1_apiserver_proto_goTypes = []any{
-	(*emptypb.Empty)(nil),   // 0: google.protobuf.Empty
-	(*HealthzResponse)(nil), // 1: v1.HealthzResponse
+	(*emptypb.Empty)(nil),          // 0: google.protobuf.Empty
+	(*LoginRequest)(nil),           // 1: v1.LoginRequest
+	(*RefreshTokenRequest)(nil),    // 2: v1.RefreshTokenRequest
+	(*ChangePasswordRequest)(nil),  // 3: v1.ChangePasswordRequest
+	(*CreateUserRequest)(nil),      // 4: v1.CreateUserRequest
+	(*UpdateUserRequest)(nil),      // 5: v1.UpdateUserRequest
+	(*DeleteUserRequest)(nil),      // 6: v1.DeleteUserRequest
+	(*GetUserRequest)(nil),         // 7: v1.GetUserRequest
+	(*ListUserRequest)(nil),        // 8: v1.ListUserRequest
+	(*CreatePostRequest)(nil),      // 9: v1.CreatePostRequest
+	(*UpdatePostRequest)(nil),      // 10: v1.UpdatePostRequest
+	(*DeletePostRequest)(nil),      // 11: v1.DeletePostRequest
+	(*GetPostRequest)(nil),         // 12: v1.GetPostRequest
+	(*ListPostRequest)(nil),        // 13: v1.ListPostRequest
+	(*HealthzResponse)(nil),        // 14: v1.HealthzResponse
+	(*LoginResponse)(nil),          // 15: v1.LoginResponse
+	(*RefreshTokenResponse)(nil),   // 16: v1.RefreshTokenResponse
+	(*ChangePasswordResponse)(nil), // 17: v1.ChangePasswordResponse
+	(*CreateUserResponse)(nil),     // 18: v1.CreateUserResponse
+	(*UpdateUserResponse)(nil),     // 19: v1.UpdateUserResponse
+	(*DeleteUserResponse)(nil),     // 20: v1.DeleteUserResponse
+	(*GetUserResponse)(nil),        // 21: v1.GetUserResponse
+	(*ListUserResponse)(nil),       // 22: v1.ListUserResponse
+	(*CreatePostResponse)(nil),     // 23: v1.CreatePostResponse
+	(*UpdatePostResponse)(nil),     // 24: v1.UpdatePostResponse
+	(*DeletePostResponse)(nil),     // 25: v1.DeletePostResponse
+	(*GetPostResponse)(nil),        // 26: v1.GetPostResponse
+	(*ListPostResponse)(nil),       // 27: v1.ListPostResponse
 }
 var file_apiserver_v1_apiserver_proto_depIdxs = []int32{
-	0, // 0: v1.MiniBlog.Healthz:input_type -> google.protobuf.Empty
-	1, // 1: v1.MiniBlog.Healthz:output_type -> v1.HealthzResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: v1.MiniBlog.Healthz:input_type -> google.protobuf.Empty
+	1,  // 1: v1.MiniBlog.Login:input_type -> v1.LoginRequest
+	2,  // 2: v1.MiniBlog.RefreshToken:input_type -> v1.RefreshTokenRequest
+	3,  // 3: v1.MiniBlog.ChangePassword:input_type -> v1.ChangePasswordRequest
+	4,  // 4: v1.MiniBlog.CreateUser:input_type -> v1.CreateUserRequest
+	5,  // 5: v1.MiniBlog.UpdateUser:input_type -> v1.UpdateUserRequest
+	6,  // 6: v1.MiniBlog.DeleteUser:input_type -> v1.DeleteUserRequest
+	7,  // 7: v1.MiniBlog.GetUser:input_type -> v1.GetUserRequest
+	8,  // 8: v1.MiniBlog.ListUser:input_type -> v1.ListUserRequest
+	9,  // 9: v1.MiniBlog.CreatePost:input_type -> v1.CreatePostRequest
+	10, // 10: v1.MiniBlog.UpdatePost:input_type -> v1.UpdatePostRequest
+	11, // 11: v1.MiniBlog.DeletePost:input_type -> v1.DeletePostRequest
+	12, // 12: v1.MiniBlog.GetPost:input_type -> v1.GetPostRequest
+	13, // 13: v1.MiniBlog.ListPost:input_type -> v1.ListPostRequest
+	14, // 14: v1.MiniBlog.Healthz:output_type -> v1.HealthzResponse
+	15, // 15: v1.MiniBlog.Login:output_type -> v1.LoginResponse
+	16, // 16: v1.MiniBlog.RefreshToken:output_type -> v1.RefreshTokenResponse
+	17, // 17: v1.MiniBlog.ChangePassword:output_type -> v1.ChangePasswordResponse
+	18, // 18: v1.MiniBlog.CreateUser:output_type -> v1.CreateUserResponse
+	19, // 19: v1.MiniBlog.UpdateUser:output_type -> v1.UpdateUserResponse
+	20, // 20: v1.MiniBlog.DeleteUser:output_type -> v1.DeleteUserResponse
+	21, // 21: v1.MiniBlog.GetUser:output_type -> v1.GetUserResponse
+	22, // 22: v1.MiniBlog.ListUser:output_type -> v1.ListUserResponse
+	23, // 23: v1.MiniBlog.CreatePost:output_type -> v1.CreatePostResponse
+	24, // 24: v1.MiniBlog.UpdatePost:output_type -> v1.UpdatePostResponse
+	25, // 25: v1.MiniBlog.DeletePost:output_type -> v1.DeletePostResponse
+	26, // 26: v1.MiniBlog.GetPost:output_type -> v1.GetPostResponse
+	27, // 27: v1.MiniBlog.ListPost:output_type -> v1.ListPostResponse
+	14, // [14:28] is the sub-list for method output_type
+	0,  // [0:14] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_apiserver_v1_apiserver_proto_init() }
@@ -58,6 +151,8 @@ func file_apiserver_v1_apiserver_proto_init() {
 		return
 	}
 	file_apiserver_v1_healthz_proto_init()
+	file_apiserver_v1_post_proto_init()
+	file_apiserver_v1_user_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

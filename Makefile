@@ -45,7 +45,7 @@ all: tidy format build add-copyright
 
 .PHONY: build
 build: tidy # 编译源码，依赖 tidy 目标自动添加/移除依赖包.
-	@go build -v -ldflags "$(GO_LDFLAGS)" -o $(OUTPUT_DIR)/mb-apiserver $(PROJ_ROOT_DIR)/cmd/mb-apiserver/main.go
+	@go build -v -ldflags "$(GO_LDFLAGS)" -o $(OUTPUT_DIR)/mb-apiserver $(PROJ_ROOT_DIR)/cmd/mb-apiserver/main.go --config $(PROJ_ROOT_DIR)/configs/mb-apiserver.yaml
 
 .PHONY: format
 format: # 格式化 Go 源码.
@@ -78,3 +78,4 @@ protoc: # 编译 protobuf 文件.
 		--openapiv2_out=$(PROJ_ROOT_DIR)/api/openapi \
 		--openapiv2_opt=allow_delete_body=true,logtostderr=true \
         $(shell find $(APIROOT) -name "*.proto")
+	@find $(PROJ_ROOT_DIR) -name "*.pb.go" -exec protoc-go-inject-tag -input={} \;

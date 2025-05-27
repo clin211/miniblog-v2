@@ -36,16 +36,19 @@ type ServerOptions struct {
 	HTTPOptions *genericoptions.HTTPOptions `json:"http" mapstructure:"http"`
 	// GRPCOptions 包含 gRPC 配置选项.
 	GRPCOptions *genericoptions.GRPCOptions `json:"grpc" mapstructure:"grpc"`
+	// MySQLOptions 包含 MySQL 配置选项.
+	MySQLOptions *genericoptions.MySQLOptions `json:"mysql" mapstructure:"mysql"`
 }
 
 // NewServerOptions 创建带有默认值的 ServerOptions 实例
 func NewServerOptions() *ServerOptions {
 	opts := &ServerOptions{
-		ServerMode:  "grpc-gateway",
-		JWTKey:      "Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5",
-		Expiration:  time.Hour * 2,
-		HTTPOptions: genericoptions.NewHTTPOptions(),
-		GRPCOptions: genericoptions.NewGRPCOptions(),
+		ServerMode:   apiserver.GRPCGatewayServerMode,
+		JWTKey:       "Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5",
+		Expiration:   2 * time.Hour,
+		HTTPOptions:  genericoptions.NewHTTPOptions(),
+		GRPCOptions:  genericoptions.NewGRPCOptions(),
+		MySQLOptions: genericoptions.NewMySQLOptions(),
 	}
 	opts.HTTPOptions.Addr = ":5555"
 	opts.GRPCOptions.Addr = ":6666"
@@ -61,6 +64,7 @@ func (o *ServerOptions) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.Expiration, "expiration", o.Expiration, "JWT expiration")
 	o.HTTPOptions.AddFlags(fs)
 	o.GRPCOptions.AddFlags(fs)
+	o.MySQLOptions.AddFlags(fs)
 }
 
 // Validate 检验 ServerOptions 中的选项是否合法
@@ -79,6 +83,7 @@ func (o *ServerOptions) Validate() error {
 
 	// 校验子选项
 	errs = append(errs, o.HTTPOptions.Validate()...)
+	errs = append(errs, o.MySQLOptions.Validate()...)
 
 	// 如果是 gRPC 或 gRPC-Gateway 模式，校验 gRPC 配置
 	if stringsutil.StringIn(o.ServerMode, []string{apiserver.GRPCServerMode, apiserver.GRPCGatewayServerMode}) {
@@ -92,10 +97,11 @@ func (o *ServerOptions) Validate() error {
 // Config 基于 ServerOptions 创建新的 apiserver.Config。
 func (o *ServerOptions) Config() (*apiserver.Config, error) {
 	return &apiserver.Config{
-		ServerMode:  o.ServerMode,
-		JWTKey:      o.JWTKey,
-		Expiration:  o.Expiration,
-		HTTPOptions: o.HTTPOptions,
-		GRPCOptions: o.GRPCOptions,
+		ServerMode:   o.ServerMode,
+		JWTKey:       o.JWTKey,
+		Expiration:   o.Expiration,
+		HTTPOptions:  o.HTTPOptions,
+		GRPCOptions:  o.GRPCOptions,
+		MySQLOptions: o.MySQLOptions,
 	}, nil
 }
