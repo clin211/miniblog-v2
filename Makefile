@@ -45,7 +45,7 @@ all: tidy format build add-copyright
 
 .PHONY: build
 build: tidy # 编译源码，依赖 tidy 目标自动添加/移除依赖包.
-	@go build -v -ldflags "$(GO_LDFLAGS)" -o $(OUTPUT_DIR)/mb-apiserver $(PROJ_ROOT_DIR)/cmd/mb-apiserver/main.go --config $(PROJ_ROOT_DIR)/configs/mb-apiserver.yaml
+	@go build -v -ldflags "$(GO_LDFLAGS)" -o $(OUTPUT_DIR)/mb-apiserver $(PROJ_ROOT_DIR)/cmd/mb-apiserver/main.go
 
 .PHONY: format
 format: # 格式化 Go 源码.

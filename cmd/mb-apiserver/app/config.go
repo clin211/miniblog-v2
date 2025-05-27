@@ -77,8 +77,10 @@ func searchDirs() []string {
 
 // filePath 获取默认配置文件的完整路径.
 func filePath() string {
-	home, err := os.UserHomeDir()
+	// home, err := os.UserHomeDir()
+	home, err := os.Getwd()
 	// 如果不能获取用户主目录，则记录错误并返回空路径
 	cobra.CheckErr(err)
-	return filepath.Join(home, defaultHomeDir, defaultConfigName)
+	// return filepath.Join(home, defaultHomeDir, defaultConfigName)
+	return filepath.Join(home, "configs", defaultConfigName)
 }

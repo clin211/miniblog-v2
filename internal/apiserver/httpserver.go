@@ -48,15 +48,13 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 	InstallGenericAPI(engine)
 
 	// 创建核心业务处理器
-	handler := handler.NewHandler(c.biz)
+	handler := handler.NewHandler(c.biz, c.val)
 
 	// 注册健康检查接口
 	engine.GET("/healthz", handler.Healthz)
 
 	// 注册用户登录和令牌刷新接口。这2个接口比较简单，所以没有 API 版本
 	engine.POST("/login", handler.Login)
-	engine.PUT("/refresh-token", handler.RefreshToken)
-
 	// 注意：认证中间件要在 handler.RefreshToken 之前加载
 	engine.PUT("/refresh-token", mw.AuthnBypasswMiddleware(), handler.RefreshToken)
 

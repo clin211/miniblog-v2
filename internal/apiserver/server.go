@@ -16,6 +16,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
+	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/validation"
 	"github.com/clin211/miniblog-v2/internal/apiserver/store"
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
@@ -64,6 +65,7 @@ type UnionServer struct {
 type ServerConfig struct {
 	cfg *Config
 	biz biz.IBiz
+	val *validation.Validator
 }
 
 // NewUnionServer 根据配置创建联合服务器.
@@ -136,6 +138,7 @@ func (cfg *Config) NewServerConfig() (*ServerConfig, error) {
 	return &ServerConfig{
 		cfg: cfg,
 		biz: biz.NewBiz(store),
+		val: validation.New(store),
 	}, nil
 }
 

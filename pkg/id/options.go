@@ -1,3 +1,8 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
 // Package id 提供了两种 ID 生成方案：基于 Sony 的分布式 ID 生成器 Sonyflake 和基于编码的字符串 ID 生成器
 package id
 
