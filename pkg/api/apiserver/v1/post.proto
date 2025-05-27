@@ -10,9 +10,8 @@ package v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1";
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 
-// Post 表示博客文章
 // Post 表示博客文章
 message Post {
     // postID 表示博文 ID
