@@ -8,6 +8,7 @@ package store
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
@@ -45,6 +46,8 @@ func newPostStore(store *datastore) *postStore {
 
 // Create 插入一条帖子记录.
 func (s *postStore) Create(ctx context.Context, obj *model.PostM) error {
+	obj.CreatedAt = time.Now()
+	obj.UpdatedAt = time.Now()
 	if err := s.store.DB(ctx).Create(&obj).Error; err != nil {
 		log.Errorw("Failed to insert post into database", "err", err, "post", obj)
 		return errno.ErrDBWrite.WithMessage("%s", err.Error())
