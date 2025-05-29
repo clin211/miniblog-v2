@@ -51,6 +51,7 @@ type Config struct {
 	HTTPOptions  *genericoptions.HTTPOptions
 	GRPCOptions  *genericoptions.GRPCOptions
 	MySQLOptions *genericoptions.MySQLOptions
+	TLSOptions   *genericoptions.TLSOptions
 }
 
 // UnionServer 定义一个联合服务器. 根据 ServerMode 决定要启动的服务器类型.
