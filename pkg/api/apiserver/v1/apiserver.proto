@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file. The original repo for
 // this file is https://github.com/clin211/miniblog-v2.git.
 
-syntax = "proto3"; // 告诉编译器此文件使用什么版本的语法
+syntax = "proto3";
 
 package v1;
 
@@ -34,13 +34,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         // 开发者的联系方式，包括项目名称、网址和电子邮件
         contact: {
             name: "小而美的博客项目";
-            url: "https://github.com/onexstack/miniblog";
-            email: "colin404@foxmail.com";
+            url: "https://github.com/clin211/miniblog-v2";
+            email: "76742542lin@gmail.com";
         };
         // 可信息和链接（这里使用 MIT License）
         license: {
             name: "MIT License";
-            url: "https://github.com/onexstack/miniblog/blob/master/LICENSE";
+            url: "https://github.com/clin211/miniblog-v2/blob/master/LICENSE";
         };
     };
     //  指定访问协议为 HTTPS

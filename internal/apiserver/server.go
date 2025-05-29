@@ -22,6 +22,7 @@ import (
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
 	"github.com/clin211/miniblog-v2/internal/pkg/known"
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
+	"github.com/clin211/miniblog-v2/pkg/auth"
 	"github.com/clin211/miniblog-v2/pkg/server"
 	"github.com/clin211/miniblog-v2/pkg/token"
 	"github.com/clin211/miniblog-v2/pkg/where"
@@ -72,6 +73,7 @@ type ServerConfig struct {
 	biz       biz.IBiz
 	val       *validation.Validator
 	retriever mw.UserRetriever
+	authz     *auth.Authz
 }
 
 // NewUnionServer 根据配置创建联合服务器.
@@ -144,11 +146,18 @@ func (cfg *Config) NewServerConfig() (*ServerConfig, error) {
 	}
 	store := store.NewStore(db)
 
+	// 初始化权限认证模块
+	authz, err := auth.NewAuthz(store.DB(context.TODO()))
+	if err != nil {
+		return nil, err
+	}
+
 	return &ServerConfig{
 		cfg:       cfg,
-		biz:       biz.NewBiz(store),
+		biz:       biz.NewBiz(store, authz),
 		val:       validation.New(store),
 		retriever: &UserRetriever{store: store},
+		authz:     authz,
 	}, nil
 }
 

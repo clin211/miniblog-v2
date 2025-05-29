@@ -4,7 +4,7 @@
 // this file is https://github.com/clin211/miniblog-v2.git.
 
 // Healthz API 定义，包含健康检查响应的相关消息和状态
-syntax = "proto3"; // 告诉编译器此文件使用什么版本的语法
+syntax = "proto3";
 
 package v1;
 

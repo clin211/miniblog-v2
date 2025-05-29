@@ -4,7 +4,7 @@
 // this file is https://github.com/clin211/miniblog-v2.git.
 
 // ModifierExample 示例 API 定义，用于展示 Protobuf 修饰符和字段类型
-syntax = "proto3"; // 告诉编译器此文件使用什么版本的语法
+syntax = "proto3";
 
 package v1;
 
