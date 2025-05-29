@@ -56,9 +56,9 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 	// 注册用户登录和令牌刷新接口。这2个接口比较简单，所以没有 API 版本
 	engine.POST("/login", handler.Login)
 	// 注意：认证中间件要在 handler.RefreshToken 之前加载
-	engine.PUT("/refresh-token", mw.AuthnBypasswMiddleware(), handler.RefreshToken)
+	engine.PUT("/refresh-token", mw.AuthnMiddleware(c.retriever), handler.RefreshToken)
 
-	authMiddlewares := []gin.HandlerFunc{mw.AuthnBypasswMiddleware()}
+	authMiddlewares := []gin.HandlerFunc{mw.AuthnMiddleware(c.retriever)}
 
 	// 注册 v1 版本 API 路由分组
 	v1 := engine.Group("/v1")

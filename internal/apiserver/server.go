@@ -16,12 +16,17 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
+	"github.com/clin211/miniblog-v2/internal/apiserver/model"
 	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/validation"
 	"github.com/clin211/miniblog-v2/internal/apiserver/store"
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
+	"github.com/clin211/miniblog-v2/internal/pkg/known"
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
 	"github.com/clin211/miniblog-v2/pkg/server"
+	"github.com/clin211/miniblog-v2/pkg/token"
 	"github.com/clin211/miniblog-v2/pkg/where"
+
+	mw "github.com/clin211/miniblog-v2/internal/pkg/middleware/gin"
 )
 
 const (
@@ -63,9 +68,10 @@ type UnionServer struct {
 
 // ServerConfig 包含服务器的核心依赖和配置.
 type ServerConfig struct {
-	cfg *Config
-	biz biz.IBiz
-	val *validation.Validator
+	cfg       *Config
+	biz       biz.IBiz
+	val       *validation.Validator
+	retriever mw.UserRetriever
 }
 
 // NewUnionServer 根据配置创建联合服务器.
@@ -74,6 +80,9 @@ func (cfg *Config) NewUnionServer() (*UnionServer, error) {
 	where.RegisterTenant("userID", func(ctx context.Context) string {
 		return contextx.UserID(ctx)
 	})
+
+	// 初始化 token 包的签名密钥、认证 Key 及 Token 默认过期时间
+	token.Init(cfg.JWTKey, known.XUserID, cfg.Expiration)
 
 	// 创建服务配置，这些配置可用来创建服务器
 	serverConfig, err := cfg.NewServerConfig()
@@ -136,13 +145,24 @@ func (cfg *Config) NewServerConfig() (*ServerConfig, error) {
 	store := store.NewStore(db)
 
 	return &ServerConfig{
-		cfg: cfg,
-		biz: biz.NewBiz(store),
-		val: validation.New(store),
+		cfg:       cfg,
+		biz:       biz.NewBiz(store),
+		val:       validation.New(store),
+		retriever: &UserRetriever{store: store},
 	}, nil
 }
 
 // NewDB 创建一个 *gorm.DB 实例.
 func (cfg *Config) NewDB() (*gorm.DB, error) {
 	return cfg.MySQLOptions.NewDB()
+}
+
+// UserRetriever 定义一个用户数据获取器. 用来获取用户信息.
+type UserRetriever struct {
+	store store.IStore
+}
+
+// GetUser 根据用户 ID 获取用户信息.
+func (r *UserRetriever) GetUser(ctx context.Context, userID string) (*model.UserM, error) {
+	return r.store.User().Get(ctx, where.F("userID", userID))
 }

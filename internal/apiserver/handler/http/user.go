@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/clin211/miniblog-v2/internal/pkg/core"
+	"github.com/clin211/miniblog-v2/internal/pkg/log"
 )
 
 // Login 用户登录并返回 JWT Token.
@@ -28,6 +29,7 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 
 // CreateUser 创建新用户.
 func (h *Handler) CreateUser(c *gin.Context) {
+	log.Infow("CreateUser handler is called", "method", "CreateUser")
 	core.HandleJSONRequest(c, h.biz.UserV1().Create, h.val.ValidateCreateUserRequest)
 }
 
