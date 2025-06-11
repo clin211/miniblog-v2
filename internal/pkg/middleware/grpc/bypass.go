@@ -31,7 +31,7 @@ func AuthnBypasswInterceptor() grpc.UnaryServerInterceptor {
 		log.Debugw("Simulated authentication successful", "userID", userID)
 
 		// 将默认的用户信息存入上下文
-		ctx = context.WithValue(ctx, known.XUserID, userID)
+		ctx = context.WithValue(ctx, known.XUserID, userID) //nolint:staticcheck
 
 		// 为 log 和 contextx 提供用户上下文支持
 		ctx = contextx.WithUserID(ctx, userID)

@@ -41,8 +41,8 @@ func AuthnInterceptor(retriever UserRetriever) grpc.UnaryServerInterceptor {
 		}
 
 		// 将用户信息存入上下文
-		ctx = context.WithValue(ctx, known.XUsername, user.Username)
-		ctx = context.WithValue(ctx, known.XUserID, userID)
+		ctx = context.WithValue(ctx, known.XUsername, user.Username) //nolint:staticcheck
+		ctx = context.WithValue(ctx, known.XUserID, userID)          //nolint:staticcheck
 
 		// 供 log 和 contextx 使用
 		ctx = contextx.WithUserID(ctx, user.UserID)

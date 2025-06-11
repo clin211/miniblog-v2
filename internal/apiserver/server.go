@@ -80,7 +80,7 @@ type ServerConfig struct {
 // NewUnionServer 根据配置创建联合服务器.
 func (cfg *Config) NewUnionServer() (*UnionServer, error) {
 	// 注册租户解析函数，通过上下文获取用户 ID
-	where.RegisterTenant("userID", func(ctx context.Context) string {
+	where.RegisterTenant("userID", func(ctx context.Context) string { //nolint:gocritic
 		return contextx.UserID(ctx)
 	})
 

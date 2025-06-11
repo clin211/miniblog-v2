@@ -8,14 +8,13 @@ package id
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/sony/sonyflake"
 )
 
-// Sonyflake 结构体封装了 Sony 的分布式 ID 生成器
-// 它可以生成分布式环境下的唯一 ID，可用于数据库主键等场景
+// Sonyflake 结构体封装了 Sony 的分布式 ID 生成器，它可以生成分布式环境下的唯一 ID，可用于数据库主键等场景
 type Sonyflake struct {
 	ops   SonyflakeOptions     // Sonyflake 的配置选项
 	sf    *sonyflake.Sonyflake // 内部的 Sonyflake 实例
@@ -51,11 +50,11 @@ func NewSonyflake(options ...func(*SonyflakeOptions)) *Sonyflake {
 	}
 	ins := sonyflake.NewSonyflake(st)
 	if ins == nil {
-		sf.Error = fmt.Errorf("create snoyflake failed")
+		sf.Error = errors.New("create snoyflake failed")
 	}
 	_, err := ins.NextID()
 	if err != nil {
-		sf.Error = fmt.Errorf("invalid start time")
+		sf.Error = errors.New("invalid start time")
 	}
 	sf.sf = ins
 	return sf
@@ -70,14 +69,15 @@ func NewSonyflake(options ...func(*SonyflakeOptions)) *Sonyflake {
 //
 // 备注:
 //   - 如果生成失败会进行指数退避重试
-func (s *Sonyflake) Id(ctx context.Context) (id uint64) {
+func (s *Sonyflake) Id(ctx context.Context) uint64 {
+	var id uint64
 	if s.Error != nil {
-		return
+		return id
 	}
 	var err error
 	id, err = s.sf.NextID()
 	if err == nil {
-		return
+		return id
 	}
 
 	sleep := 1
@@ -85,7 +85,7 @@ func (s *Sonyflake) Id(ctx context.Context) (id uint64) {
 		time.Sleep(time.Duration(sleep) * time.Millisecond)
 		id, err = s.sf.NextID()
 		if err == nil {
-			return
+			return id
 		}
 		sleep *= 2
 	}

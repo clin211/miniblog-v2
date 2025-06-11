@@ -28,7 +28,6 @@ func (m *UserM) AfterCreate(tx *gorm.DB) error {
 
 // BeforeCreate 在创建数据库记录之前加密明文密码.
 func (m *UserM) BeforeCreate(tx *gorm.DB) error {
-
 	var err error
 	m.Password, err = auth.Encrypt(m.Password)
 	if err != nil {

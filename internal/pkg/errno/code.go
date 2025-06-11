@@ -15,7 +15,7 @@ var (
 	OK = &ErrorX{Code: http.StatusOK, Message: ""}
 
 	// OKWithMsg 代表请求成功.
-	OKWithMsg = &ErrorX{Code: http.StatusOK, Message: "success"}
+	OKWithMsg = &ErrorX{Code: http.StatusOK, Message: "success"} //nolint:errname
 
 	// ErrInternal 表示所有未知的服务器端错误.
 	ErrInternal = &ErrorX{Code: http.StatusInternalServerError, Reason: "InternalError", Message: "Internal server error."}
