@@ -27,7 +27,7 @@ http:
 tls:
   # 是否启动 HTTPS 安全服务器
   # 生产环境建议开启 HTTPS。并使用 HTTPS 协议访问 API 接口
-  use-tls: true
+  use-tls: false
   # 证书
   cert: ./cert/server.crt
   # 证书 Key 文件
