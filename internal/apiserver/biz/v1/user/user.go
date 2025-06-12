@@ -117,7 +117,6 @@ func (b *userBiz) ChangePassword(ctx context.Context, rq *apiv1.ChangePasswordRe
 // Create 实现 UserBiz 接口中的 Create 方法.
 func (b *userBiz) Create(ctx context.Context, rq *apiv1.CreateUserRequest) (*apiv1.CreateUserResponse, error) {
 	var userM model.UserM
-	log.Infow("Creating user", "user", rq)
 	_ = copier.Copy(&userM, rq)
 
 	if err := b.store.User().Create(ctx, &userM); err != nil {
