@@ -5,12 +5,12 @@
     "version": "1.0",
     "contact": {
       "name": "小而美的博客项目",
-      "url": "https://github.com/onexstack/miniblog",
-      "email": "colin404@foxmail.com"
+      "url": "https://github.com/clin211/miniblog-v2",
+      "email": "76742542lin@gmail.com"
     },
     "license": {
       "name": "MIT License",
-      "url": "https://github.com/onexstack/miniblog/blob/master/LICENSE"
+      "url": "https://github.com/clin211/miniblog-v2/blob/master/LICENSE"
     }
   },
   "tags": [

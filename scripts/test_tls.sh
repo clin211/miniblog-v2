@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Copyright 2025 长林啊 &lt;767425412@qq.com>. All rights reserved.
+# Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
 # Use of this source code is governed by a MIT style
 # license that can be found in the LICENSE file. The original repo for
 # this file is https://github.com/clin211/miniblog-v2.git.
-
 
 # 1. 通过 HTTP 协议访问 /healthz，协议不对报错
 curl http://127.0.0.1:5555/healthz

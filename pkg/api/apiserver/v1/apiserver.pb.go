@@ -74,10 +74,10 @@ const file_apiserver_v1_apiserver_proto_rawDesc = "" +
 	"\aGetPost\x12\x12.v1.GetPostRequest\x1a\x13.v1.GetPostResponse\"H\x92A+\n" +
 	"\f博客管理\x12\x12获取文章信息*\aGetPost\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/posts/{postID}\x12w\n" +
 	"\bListPost\x12\x13.v1.ListPostRequest\x1a\x14.v1.ListPostResponse\"@\x92A,\n" +
-	"\f博客管理\x12\x12列出所有文章*\bListPost\x82\xd3\xe4\x93\x02\v\x12\t/v1/postsB\x9c\x02\x92A\xe0\x01\x12\xb6\x01\n" +
-	"\fminiblog API\"W\n" +
-	"\x18小而美的博客项目\x12%https://github.com/onexstack/miniblog\x1a\x14colin404@foxmail.com*H\n" +
-	"\vMIT License\x129https://github.com/onexstack/miniblog/blob/master/LICENSE2\x031.0*\x01\x022\x10application/json:\x10application/jsonZ6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
+	"\f博客管理\x12\x12列出所有文章*\bListPost\x82\xd3\xe4\x93\x02\v\x12\t/v1/postsB\x9f\x02\x92A\xe3\x01\x12\xb9\x01\n" +
+	"\fminiblog API\"Y\n" +
+	"\x18小而美的博客项目\x12&https://github.com/clin211/miniblog-v2\x1a\x1576742542lin@gmail.com*I\n" +
+	"\vMIT License\x12:https://github.com/clin211/miniblog-v2/blob/master/LICENSE2\x031.0*\x01\x022\x10application/json:\x10application/jsonZ6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
 
 var file_apiserver_v1_apiserver_proto_goTypes = []any{
 	(*emptypb.Empty)(nil),          // 0: google.protobuf.Empty
