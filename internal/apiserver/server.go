@@ -87,24 +87,26 @@ func (cfg *Config) NewUnionServer() (*UnionServer, error) {
 	// 初始化 token 包的签名密钥、认证 Key 及 Token 默认过期时间
 	token.Init(cfg.JWTKey, known.XUserID, cfg.Expiration)
 
-	// 创建服务配置，这些配置可用来创建服务器
-	serverConfig, err := cfg.NewServerConfig()
-	if err != nil {
-		return nil, err
-	}
-
 	log.Infow("Initializing federation server", "server-mode", cfg.ServerMode)
+	// 创建服务配置，这些配置可用来创建服务器
+	// serverConfig, err := cfg.NewServerConfig()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	// 根据服务模式创建对应的服务实例
-	// 实际企业开发中，可以根据需要只选择一种服务器模式.
-	// 这里为了方便给你展示，通过 cfg.ServerMode 同时支持了 Gin 和 GRPC 2 种服务器模式.
-	var srv server.Server
-	switch cfg.ServerMode {
-	case GinServerMode:
-		srv, err = serverConfig.NewGinServer(), nil
-	default:
-		srv, err = serverConfig.NewGRPCServerOr()
-	}
+	// // 根据服务模式创建对应的服务实例
+	// // 实际企业开发中，可以根据需要只选择一种服务器模式.
+	// // 这里为了方便给你展示，通过 cfg.ServerMode 同时支持了 Gin 和 GRPC 2 种服务器模式.
+	// var srv server.Server
+	// switch cfg.ServerMode {
+	// case GinServerMode:
+	// 	srv, err = serverConfig.NewGinServer(), nil
+	// default:
+	// 	srv, err = serverConfig.NewGRPCServerOr()
+	// }
+
+	// 创建服务配置，这些配置可用来创建服务器Add commentMore actions
+	srv, err := InitializeWebServer(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -175,4 +177,22 @@ type UserRetriever struct {
 // GetUser 根据用户 ID 获取用户信息.
 func (r *UserRetriever) GetUser(ctx context.Context, userID string) (*model.UserM, error) {
 	return r.store.User().Get(ctx, where.F("userID", userID))
+}
+
+// ProvideDB 根据配置提供一个数据库实例。Add commentMore actions
+func ProvideDB(cfg *Config) (*gorm.DB, error) {
+	return cfg.NewDB()
+}
+
+func NewWebServer(serverMode string, serverConfig *ServerConfig) (server.Server, error) {
+	// 根据服务模式创建对应的服务实例
+	// 实际企业开发中，可以根据需要只选择一种服务器模式.
+	// 这里为了方便给你展示，通过 cfg.ServerMode 同时支持了 Gin 和 GRPC 2 种服务器模式.
+	// 默认为 gRPC 服务器模式.
+	switch serverMode {
+	case GinServerMode:
+		return serverConfig.NewGinServer(), nil
+	default:
+		return serverConfig.NewGRPCServerOr()
+	}
 }

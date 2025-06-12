@@ -18,6 +18,7 @@
     "genericoptions",
     "genericvalidation",
     "genproto",
+    "ginmw",
     "gofmt",
     "gotags",
     "grpcsrv",
