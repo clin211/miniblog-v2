@@ -16,6 +16,7 @@
     "Errorw",
     "Fatalw",
     "genericoptions",
+    "genericstore",
     "genericvalidation",
     "genproto",
     "ginmw",
