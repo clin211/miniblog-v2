@@ -55,6 +55,59 @@ make build
 
 ## 开发指南
 
+### 开发流程
+
+本项目的开发流程遵循分层架构设计，以下是新增功能（以 Comment 资源为例）的完整开发流程：
+
+1. **定义 API 接口**
+   - 设计 RESTful API 接口规范
+   - 定义 Proto 文件中的接口结构
+
+2. **编译 Protobuf 文件**
+   - 使用 protoc 编译 .proto 文件
+   - 生成 Go 代码和相关接口定义
+
+3. **数据库设计与 Model 生成**
+   - 在数据库中创建对应的数据表（如 comment 表）
+   - 修改 `cmd/gen-gorm-model/gen_gorm_model.go` 文件，添加新表的 GORM Model 生成代码
+   - 运行 `go run cmd/gen-gorm-model/gen_gorm_model.go` 命令生成 GORM Model
+
+4. **请求参数处理**
+   - 完善 API 接口请求参数的默认值设置方法
+   - 修改 `pkg/api/apiserver/v1/*.pb.defaults.go` 文件
+
+5. **参数校验**
+   - 实现 API 接口的请求参数校验方法
+   - 在 `internal/apiserver/pkg/validation/` 目录中实现对应的校验逻辑
+
+6. **Store 层实现**
+   - 实现资源的 Store 层代码（数据访问层）
+   - 在 `internal/apiserver/store/` 目录中实现数据库操作逻辑
+
+7. **数据转换**
+   - 实现资源的 Model 和 Proto 的转换函数
+   - 在 `internal/apiserver/pkg/conversion/` 目录中实现转换逻辑
+
+8. **Biz 层实现**
+   - 实现资源的 Biz 层代码（业务逻辑层）
+   - 在 `internal/apiserver/biz/v1/` 目录中实现业务逻辑
+
+9. **Handler 层实现**
+   - 实现资源的 Handler 层代码（控制器层）
+   - 在 `internal/apiserver/handler/` 目录中实现 HTTP 请求处理
+
+#### 架构层次
+
+本项目采用清晰的分层架构：
+
+```txt
+Handler 层 -> Biz 层 -> Store 层 -> 数据库
+     ↑           ↑         ↑
+   HTTP请求    业务逻辑   数据访问
+```
+
+每一层都有明确的职责分工，确保代码的可维护性和可扩展性。
+
 ### 常用命令
 
 ```bash
@@ -76,6 +129,38 @@ make tidy
 # 清理构建产物
 make clean
 ```
+
+### 生成 GORM Model
+
+因为编写了 gen-gorm-model 工具用来快速生成 Model 文件，所以，在每次数据库有字段增删改的时候，都可以运行 gen-gorm-model 来生成 Model 文件。运行以下命令，可以查看 gen-gorm-model 的使用方式：
+
+```sh
+$ go run cmd/gen-gorm-model/gen_gorm_model.go -h
+Usage: main [flags] arg [arg...]
+
+This is a pflag example.
+
+Flags:
+  -a, --addr string             MySQL host address. (default "127.0.0.1:3306")
+      --component strings       Generated model code's for specified component. (default [mb])
+  -d, --db string               Database name to connect to. (default "miniblog")
+  -h, --help                    Show this help message.
+      --model-pkg-path string   Generated model code's package name.
+  -p, --password string         Password to use when connecting to the database. (default "miniblog1234")
+  -u, --username string         Username to connect to the database. (default "miniblog")
+```
+
+使用方式：
+
+```sh
+go run cmd/gen-gorm-model/gen_gorm_model.go -a <host>:<port> -u <username> -p <password>
+```
+
+> 以 docker-compose 中 MySQL 配置为例！生成 GORM Model 的命令如下：
+>
+> ```sh
+> go run cmd/gen-gorm-model/gen_gorm_model.go -a 127.0.0.1:3306 -u 'miniblog' -p 'CueD7wbmJHxY'
+> ```
 
 ## 开源许可
 
