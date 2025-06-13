@@ -16,8 +16,8 @@ type DBProvider interface {
 
 // IStore 定义了通用存储接口，包含 CRUD 操作
 type IStore[T any] interface {
-	Create(ctx context.Context, obj *T) error
-	Update(ctx context.Context, obj *T) error
+	Create(ctx context.Context, data *T) error
+	Update(ctx context.Context, data *T) error
 	Delete(ctx context.Context, opts *where.Options) error
 	Get(ctx context.Context, opts *where.Options) (*T, error)
 	List(ctx context.Context, opts *where.Options) (count int64, ret []*T, err error)
@@ -66,18 +66,18 @@ func (s *Store[T]) db(ctx context.Context, wheres ...where.Where) *gorm.DB {
 }
 
 // Create 向数据库插入一个新对象
-func (s *Store[T]) Create(ctx context.Context, obj *T) error {
-	if err := s.db(ctx).Create(obj).Error; err != nil {
-		s.logger.Error(ctx, err, "Failed to insert object into database", "object", obj)
+func (s *Store[T]) Create(ctx context.Context, data *T) error {
+	if err := s.db(ctx).Create(data).Error; err != nil {
+		s.logger.Error(ctx, err, "Failed to insert object into database", "object", data)
 		return err
 	}
 	return nil
 }
 
 // Update 修改数据库中的现有对象
-func (s *Store[T]) Update(ctx context.Context, obj *T) error {
-	if err := s.db(ctx).Save(obj).Error; err != nil {
-		s.logger.Error(ctx, err, "Failed to update object in database", "object", obj)
+func (s *Store[T]) Update(ctx context.Context, data *T) error {
+	if err := s.db(ctx).Save(data).Error; err != nil {
+		s.logger.Error(ctx, err, "Failed to update object in database", "object", data)
 		return err
 	}
 	return nil
@@ -95,19 +95,21 @@ func (s *Store[T]) Delete(ctx context.Context, opts *where.Options) error {
 
 // Get 根据提供的 where 选项从数据库中检索单个对象
 func (s *Store[T]) Get(ctx context.Context, opts *where.Options) (*T, error) {
-	var obj T
-	if err := s.db(ctx, opts).First(&obj).Error; err != nil {
+	var data T
+	if err := s.db(ctx, opts).First(&data).Error; err != nil {
 		s.logger.Error(ctx, err, "Failed to retrieve object from database", "conditions", opts)
 		return nil, err
 	}
-	return &obj, nil
+	return &data, nil
 }
 
 // List 根据提供的 where 选项从数据库中检索对象列表。
-func (s *Store[T]) List(ctx context.Context, opts *where.Options) (count int64, ret []*T, err error) {
-	err = s.db(ctx, opts).Order("id desc").Find(&ret).Offset(-1).Limit(-1).Count(&count).Error
+func (s *Store[T]) List(ctx context.Context, opts *where.Options) (int64, []*T, error) {
+	var count int64
+	var ret []*T
+	err := s.db(ctx, opts).Order("id desc").Find(&ret).Offset(-1).Limit(-1).Count(&count).Error
 	if err != nil {
 		s.logger.Error(ctx, err, "Failed to list objects from database", "conditions", opts)
 	}
-	return
+	return count, ret, err
 }
