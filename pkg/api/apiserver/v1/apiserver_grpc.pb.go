@@ -25,20 +25,35 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MiniBlog_Healthz_FullMethodName        = "/v1.MiniBlog/Healthz"
-	MiniBlog_Login_FullMethodName          = "/v1.MiniBlog/Login"
-	MiniBlog_RefreshToken_FullMethodName   = "/v1.MiniBlog/RefreshToken"
-	MiniBlog_ChangePassword_FullMethodName = "/v1.MiniBlog/ChangePassword"
-	MiniBlog_CreateUser_FullMethodName     = "/v1.MiniBlog/CreateUser"
-	MiniBlog_UpdateUser_FullMethodName     = "/v1.MiniBlog/UpdateUser"
-	MiniBlog_DeleteUser_FullMethodName     = "/v1.MiniBlog/DeleteUser"
-	MiniBlog_GetUser_FullMethodName        = "/v1.MiniBlog/GetUser"
-	MiniBlog_ListUser_FullMethodName       = "/v1.MiniBlog/ListUser"
-	MiniBlog_CreatePost_FullMethodName     = "/v1.MiniBlog/CreatePost"
-	MiniBlog_UpdatePost_FullMethodName     = "/v1.MiniBlog/UpdatePost"
-	MiniBlog_DeletePost_FullMethodName     = "/v1.MiniBlog/DeletePost"
-	MiniBlog_GetPost_FullMethodName        = "/v1.MiniBlog/GetPost"
-	MiniBlog_ListPost_FullMethodName       = "/v1.MiniBlog/ListPost"
+	MiniBlog_Healthz_FullMethodName             = "/v1.MiniBlog/Healthz"
+	MiniBlog_Login_FullMethodName               = "/v1.MiniBlog/Login"
+	MiniBlog_RefreshToken_FullMethodName        = "/v1.MiniBlog/RefreshToken"
+	MiniBlog_ChangePassword_FullMethodName      = "/v1.MiniBlog/ChangePassword"
+	MiniBlog_CreateUser_FullMethodName          = "/v1.MiniBlog/CreateUser"
+	MiniBlog_UpdateUser_FullMethodName          = "/v1.MiniBlog/UpdateUser"
+	MiniBlog_DeleteUser_FullMethodName          = "/v1.MiniBlog/DeleteUser"
+	MiniBlog_GetUser_FullMethodName             = "/v1.MiniBlog/GetUser"
+	MiniBlog_ListUser_FullMethodName            = "/v1.MiniBlog/ListUser"
+	MiniBlog_CreatePost_FullMethodName          = "/v1.MiniBlog/CreatePost"
+	MiniBlog_UpdatePost_FullMethodName          = "/v1.MiniBlog/UpdatePost"
+	MiniBlog_DeletePost_FullMethodName          = "/v1.MiniBlog/DeletePost"
+	MiniBlog_GetPost_FullMethodName             = "/v1.MiniBlog/GetPost"
+	MiniBlog_ListPost_FullMethodName            = "/v1.MiniBlog/ListPost"
+	MiniBlog_CreateCategory_FullMethodName      = "/v1.MiniBlog/CreateCategory"
+	MiniBlog_UpdateCategory_FullMethodName      = "/v1.MiniBlog/UpdateCategory"
+	MiniBlog_DeleteCategory_FullMethodName      = "/v1.MiniBlog/DeleteCategory"
+	MiniBlog_GetCategory_FullMethodName         = "/v1.MiniBlog/GetCategory"
+	MiniBlog_ListCategory_FullMethodName        = "/v1.MiniBlog/ListCategory"
+	MiniBlog_CreateTag_FullMethodName           = "/v1.MiniBlog/CreateTag"
+	MiniBlog_UpdateTag_FullMethodName           = "/v1.MiniBlog/UpdateTag"
+	MiniBlog_DeleteTag_FullMethodName           = "/v1.MiniBlog/DeleteTag"
+	MiniBlog_GetTag_FullMethodName              = "/v1.MiniBlog/GetTag"
+	MiniBlog_ListTag_FullMethodName             = "/v1.MiniBlog/ListTag"
+	MiniBlog_CreatePostTag_FullMethodName       = "/v1.MiniBlog/CreatePostTag"
+	MiniBlog_DeletePostTag_FullMethodName       = "/v1.MiniBlog/DeletePostTag"
+	MiniBlog_ListPostTags_FullMethodName        = "/v1.MiniBlog/ListPostTags"
+	MiniBlog_BatchCreatePostTags_FullMethodName = "/v1.MiniBlog/BatchCreatePostTags"
+	MiniBlog_BatchDeletePostTags_FullMethodName = "/v1.MiniBlog/BatchDeletePostTags"
 )
 
 // MiniBlogClient is the client API for MiniBlog service.
@@ -75,6 +90,36 @@ type MiniBlogClient interface {
 	GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error)
 	// ListPost 列出所有文章
 	ListPost(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (*ListPostResponse, error)
+	// CreateCategory 创建分类
+	CreateCategory(ctx context.Context, in *CreateCategoryRequest, opts ...grpc.CallOption) (*CreateCategoryResponse, error)
+	// UpdateCategory 更新分类
+	UpdateCategory(ctx context.Context, in *UpdateCategoryRequest, opts ...grpc.CallOption) (*UpdateCategoryResponse, error)
+	// DeleteCategory 删除分类
+	DeleteCategory(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*DeleteCategoryResponse, error)
+	// GetCategory 获取分类信息
+	GetCategory(ctx context.Context, in *GetCategoryRequest, opts ...grpc.CallOption) (*GetCategoryResponse, error)
+	// ListCategory 列出所有分类
+	ListCategory(ctx context.Context, in *ListCategoryRequest, opts ...grpc.CallOption) (*ListCategoryResponse, error)
+	// CreateTag 创建标签
+	CreateTag(ctx context.Context, in *CreateTagRequest, opts ...grpc.CallOption) (*CreateTagResponse, error)
+	// UpdateTag 更新标签
+	UpdateTag(ctx context.Context, in *UpdateTagRequest, opts ...grpc.CallOption) (*UpdateTagResponse, error)
+	// DeleteTag 删除标签
+	DeleteTag(ctx context.Context, in *DeleteTagRequest, opts ...grpc.CallOption) (*DeleteTagResponse, error)
+	// GetTag 获取标签信息
+	GetTag(ctx context.Context, in *GetTagRequest, opts ...grpc.CallOption) (*GetTagResponse, error)
+	// ListTag 列出所有标签
+	ListTag(ctx context.Context, in *ListTagRequest, opts ...grpc.CallOption) (*ListTagResponse, error)
+	// CreatePostTag 创建文章标签关联
+	CreatePostTag(ctx context.Context, in *CreatePostTagRequest, opts ...grpc.CallOption) (*CreatePostTagResponse, error)
+	// DeletePostTag 删除文章标签关联
+	DeletePostTag(ctx context.Context, in *DeletePostTagRequest, opts ...grpc.CallOption) (*DeletePostTagResponse, error)
+	// ListPostTags 列出文章标签关联
+	ListPostTags(ctx context.Context, in *ListPostTagsRequest, opts ...grpc.CallOption) (*ListPostTagsResponse, error)
+	// BatchCreatePostTags 批量创建文章标签关联
+	BatchCreatePostTags(ctx context.Context, in *BatchCreatePostTagsRequest, opts ...grpc.CallOption) (*BatchCreatePostTagsResponse, error)
+	// BatchDeletePostTags 批量删除文章标签关联
+	BatchDeletePostTags(ctx context.Context, in *BatchDeletePostTagsRequest, opts ...grpc.CallOption) (*BatchDeletePostTagsResponse, error)
 }
 
 type miniBlogClient struct {
@@ -225,6 +270,156 @@ func (c *miniBlogClient) ListPost(ctx context.Context, in *ListPostRequest, opts
 	return out, nil
 }
 
+func (c *miniBlogClient) CreateCategory(ctx context.Context, in *CreateCategoryRequest, opts ...grpc.CallOption) (*CreateCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateCategoryResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_CreateCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) UpdateCategory(ctx context.Context, in *UpdateCategoryRequest, opts ...grpc.CallOption) (*UpdateCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateCategoryResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_UpdateCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) DeleteCategory(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*DeleteCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteCategoryResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_DeleteCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) GetCategory(ctx context.Context, in *GetCategoryRequest, opts ...grpc.CallOption) (*GetCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCategoryResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_GetCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) ListCategory(ctx context.Context, in *ListCategoryRequest, opts ...grpc.CallOption) (*ListCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCategoryResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_ListCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) CreateTag(ctx context.Context, in *CreateTagRequest, opts ...grpc.CallOption) (*CreateTagResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateTagResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_CreateTag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) UpdateTag(ctx context.Context, in *UpdateTagRequest, opts ...grpc.CallOption) (*UpdateTagResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTagResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_UpdateTag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) DeleteTag(ctx context.Context, in *DeleteTagRequest, opts ...grpc.CallOption) (*DeleteTagResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteTagResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_DeleteTag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) GetTag(ctx context.Context, in *GetTagRequest, opts ...grpc.CallOption) (*GetTagResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetTagResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_GetTag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) ListTag(ctx context.Context, in *ListTagRequest, opts ...grpc.CallOption) (*ListTagResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListTagResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_ListTag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) CreatePostTag(ctx context.Context, in *CreatePostTagRequest, opts ...grpc.CallOption) (*CreatePostTagResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePostTagResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_CreatePostTag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) DeletePostTag(ctx context.Context, in *DeletePostTagRequest, opts ...grpc.CallOption) (*DeletePostTagResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeletePostTagResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_DeletePostTag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) ListPostTags(ctx context.Context, in *ListPostTagsRequest, opts ...grpc.CallOption) (*ListPostTagsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPostTagsResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_ListPostTags_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) BatchCreatePostTags(ctx context.Context, in *BatchCreatePostTagsRequest, opts ...grpc.CallOption) (*BatchCreatePostTagsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BatchCreatePostTagsResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_BatchCreatePostTags_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) BatchDeletePostTags(ctx context.Context, in *BatchDeletePostTagsRequest, opts ...grpc.CallOption) (*BatchDeletePostTagsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BatchDeletePostTagsResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_BatchDeletePostTags_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MiniBlogServer is the server API for MiniBlog service.
 // All implementations must embed UnimplementedMiniBlogServer
 // for forward compatibility.
@@ -259,6 +454,36 @@ type MiniBlogServer interface {
 	GetPost(context.Context, *GetPostRequest) (*GetPostResponse, error)
 	// ListPost 列出所有文章
 	ListPost(context.Context, *ListPostRequest) (*ListPostResponse, error)
+	// CreateCategory 创建分类
+	CreateCategory(context.Context, *CreateCategoryRequest) (*CreateCategoryResponse, error)
+	// UpdateCategory 更新分类
+	UpdateCategory(context.Context, *UpdateCategoryRequest) (*UpdateCategoryResponse, error)
+	// DeleteCategory 删除分类
+	DeleteCategory(context.Context, *DeleteCategoryRequest) (*DeleteCategoryResponse, error)
+	// GetCategory 获取分类信息
+	GetCategory(context.Context, *GetCategoryRequest) (*GetCategoryResponse, error)
+	// ListCategory 列出所有分类
+	ListCategory(context.Context, *ListCategoryRequest) (*ListCategoryResponse, error)
+	// CreateTag 创建标签
+	CreateTag(context.Context, *CreateTagRequest) (*CreateTagResponse, error)
+	// UpdateTag 更新标签
+	UpdateTag(context.Context, *UpdateTagRequest) (*UpdateTagResponse, error)
+	// DeleteTag 删除标签
+	DeleteTag(context.Context, *DeleteTagRequest) (*DeleteTagResponse, error)
+	// GetTag 获取标签信息
+	GetTag(context.Context, *GetTagRequest) (*GetTagResponse, error)
+	// ListTag 列出所有标签
+	ListTag(context.Context, *ListTagRequest) (*ListTagResponse, error)
+	// CreatePostTag 创建文章标签关联
+	CreatePostTag(context.Context, *CreatePostTagRequest) (*CreatePostTagResponse, error)
+	// DeletePostTag 删除文章标签关联
+	DeletePostTag(context.Context, *DeletePostTagRequest) (*DeletePostTagResponse, error)
+	// ListPostTags 列出文章标签关联
+	ListPostTags(context.Context, *ListPostTagsRequest) (*ListPostTagsResponse, error)
+	// BatchCreatePostTags 批量创建文章标签关联
+	BatchCreatePostTags(context.Context, *BatchCreatePostTagsRequest) (*BatchCreatePostTagsResponse, error)
+	// BatchDeletePostTags 批量删除文章标签关联
+	BatchDeletePostTags(context.Context, *BatchDeletePostTagsRequest) (*BatchDeletePostTagsResponse, error)
 	mustEmbedUnimplementedMiniBlogServer()
 }
 
@@ -310,6 +535,51 @@ func (UnimplementedMiniBlogServer) GetPost(context.Context, *GetPostRequest) (*G
 }
 func (UnimplementedMiniBlogServer) ListPost(context.Context, *ListPostRequest) (*ListPostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListPost not implemented")
+}
+func (UnimplementedMiniBlogServer) CreateCategory(context.Context, *CreateCategoryRequest) (*CreateCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCategory not implemented")
+}
+func (UnimplementedMiniBlogServer) UpdateCategory(context.Context, *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCategory not implemented")
+}
+func (UnimplementedMiniBlogServer) DeleteCategory(context.Context, *DeleteCategoryRequest) (*DeleteCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCategory not implemented")
+}
+func (UnimplementedMiniBlogServer) GetCategory(context.Context, *GetCategoryRequest) (*GetCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCategory not implemented")
+}
+func (UnimplementedMiniBlogServer) ListCategory(context.Context, *ListCategoryRequest) (*ListCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCategory not implemented")
+}
+func (UnimplementedMiniBlogServer) CreateTag(context.Context, *CreateTagRequest) (*CreateTagResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTag not implemented")
+}
+func (UnimplementedMiniBlogServer) UpdateTag(context.Context, *UpdateTagRequest) (*UpdateTagResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTag not implemented")
+}
+func (UnimplementedMiniBlogServer) DeleteTag(context.Context, *DeleteTagRequest) (*DeleteTagResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTag not implemented")
+}
+func (UnimplementedMiniBlogServer) GetTag(context.Context, *GetTagRequest) (*GetTagResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTag not implemented")
+}
+func (UnimplementedMiniBlogServer) ListTag(context.Context, *ListTagRequest) (*ListTagResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTag not implemented")
+}
+func (UnimplementedMiniBlogServer) CreatePostTag(context.Context, *CreatePostTagRequest) (*CreatePostTagResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePostTag not implemented")
+}
+func (UnimplementedMiniBlogServer) DeletePostTag(context.Context, *DeletePostTagRequest) (*DeletePostTagResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePostTag not implemented")
+}
+func (UnimplementedMiniBlogServer) ListPostTags(context.Context, *ListPostTagsRequest) (*ListPostTagsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPostTags not implemented")
+}
+func (UnimplementedMiniBlogServer) BatchCreatePostTags(context.Context, *BatchCreatePostTagsRequest) (*BatchCreatePostTagsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BatchCreatePostTags not implemented")
+}
+func (UnimplementedMiniBlogServer) BatchDeletePostTags(context.Context, *BatchDeletePostTagsRequest) (*BatchDeletePostTagsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BatchDeletePostTags not implemented")
 }
 func (UnimplementedMiniBlogServer) mustEmbedUnimplementedMiniBlogServer() {}
 func (UnimplementedMiniBlogServer) testEmbeddedByValue()                  {}
@@ -584,6 +854,276 @@ func _MiniBlog_ListPost_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MiniBlog_CreateCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).CreateCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_CreateCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).CreateCategory(ctx, req.(*CreateCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_UpdateCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).UpdateCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_UpdateCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).UpdateCategory(ctx, req.(*UpdateCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_DeleteCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).DeleteCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_DeleteCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).DeleteCategory(ctx, req.(*DeleteCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_GetCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).GetCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_GetCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).GetCategory(ctx, req.(*GetCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_ListCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).ListCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_ListCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).ListCategory(ctx, req.(*ListCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_CreateTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).CreateTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_CreateTag_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).CreateTag(ctx, req.(*CreateTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_UpdateTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).UpdateTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_UpdateTag_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).UpdateTag(ctx, req.(*UpdateTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_DeleteTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).DeleteTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_DeleteTag_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).DeleteTag(ctx, req.(*DeleteTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_GetTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).GetTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_GetTag_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).GetTag(ctx, req.(*GetTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_ListTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).ListTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_ListTag_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).ListTag(ctx, req.(*ListTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_CreatePostTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePostTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).CreatePostTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_CreatePostTag_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).CreatePostTag(ctx, req.(*CreatePostTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_DeletePostTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePostTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).DeletePostTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_DeletePostTag_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).DeletePostTag(ctx, req.(*DeletePostTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_ListPostTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPostTagsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).ListPostTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_ListPostTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).ListPostTags(ctx, req.(*ListPostTagsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_BatchCreatePostTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchCreatePostTagsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).BatchCreatePostTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_BatchCreatePostTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).BatchCreatePostTags(ctx, req.(*BatchCreatePostTagsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_BatchDeletePostTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchDeletePostTagsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).BatchDeletePostTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_BatchDeletePostTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).BatchDeletePostTags(ctx, req.(*BatchDeletePostTagsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MiniBlog_ServiceDesc is the grpc.ServiceDesc for MiniBlog service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -646,6 +1186,66 @@ var MiniBlog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListPost",
 			Handler:    _MiniBlog_ListPost_Handler,
+		},
+		{
+			MethodName: "CreateCategory",
+			Handler:    _MiniBlog_CreateCategory_Handler,
+		},
+		{
+			MethodName: "UpdateCategory",
+			Handler:    _MiniBlog_UpdateCategory_Handler,
+		},
+		{
+			MethodName: "DeleteCategory",
+			Handler:    _MiniBlog_DeleteCategory_Handler,
+		},
+		{
+			MethodName: "GetCategory",
+			Handler:    _MiniBlog_GetCategory_Handler,
+		},
+		{
+			MethodName: "ListCategory",
+			Handler:    _MiniBlog_ListCategory_Handler,
+		},
+		{
+			MethodName: "CreateTag",
+			Handler:    _MiniBlog_CreateTag_Handler,
+		},
+		{
+			MethodName: "UpdateTag",
+			Handler:    _MiniBlog_UpdateTag_Handler,
+		},
+		{
+			MethodName: "DeleteTag",
+			Handler:    _MiniBlog_DeleteTag_Handler,
+		},
+		{
+			MethodName: "GetTag",
+			Handler:    _MiniBlog_GetTag_Handler,
+		},
+		{
+			MethodName: "ListTag",
+			Handler:    _MiniBlog_ListTag_Handler,
+		},
+		{
+			MethodName: "CreatePostTag",
+			Handler:    _MiniBlog_CreatePostTag_Handler,
+		},
+		{
+			MethodName: "DeletePostTag",
+			Handler:    _MiniBlog_DeletePostTag_Handler,
+		},
+		{
+			MethodName: "ListPostTags",
+			Handler:    _MiniBlog_ListPostTags_Handler,
+		},
+		{
+			MethodName: "BatchCreatePostTags",
+			Handler:    _MiniBlog_BatchCreatePostTags_Handler,
+		},
+		{
+			MethodName: "BatchDeletePostTags",
+			Handler:    _MiniBlog_BatchDeletePostTags_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

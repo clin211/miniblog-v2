@@ -1,0 +1,87 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
+// Tag API 定义，包含标签的请求和响应消息
+syntax = "proto3";
+
+package v1;
+
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
+
+// Tag 表示文章标签
+message Tag {
+    // id 表示标签 ID
+    int32 id = 1;
+    // name 表示标签名称
+    string name = 2;
+    // color 表示标签颜色(hex 格式)
+    string color = 3;
+    // createdAt 表示创建时间（Unix 时间戳）
+    int64 createdAt = 4;
+    // updatedAt 表示最后更新时间（Unix 时间戳）
+    int64 updatedAt = 5;
+}
+
+// CreateTagRequest 表示创建标签请求
+message CreateTagRequest {
+    // name 表示标签名称
+    string name = 1;
+    // color 表示标签颜色
+    optional string color = 2;
+}
+
+// CreateTagResponse 表示创建标签响应
+message CreateTagResponse {
+    // id 表示创建的标签 ID
+    int32 id = 1;
+}
+
+// UpdateTagRequest 表示更新标签请求
+message UpdateTagRequest {
+    // id 表示要更新的标签 ID
+    int32 id = 1;
+    // name 表示可选的标签名称
+    optional string name = 2;
+    // color 表示可选的标签颜色
+    optional string color = 3;
+}
+
+// UpdateTagResponse 表示更新标签响应
+message UpdateTagResponse {
+}
+
+// DeleteTagRequest 表示删除标签请求
+message DeleteTagRequest {
+    // id 表示要删除的标签 ID
+    int32 id = 1;
+}
+
+// DeleteTagResponse 表示删除标签响应
+message DeleteTagResponse {
+}
+
+// GetTagRequest 表示获取标签请求
+message GetTagRequest {
+    // id 表示要获取的标签 ID
+    int32 id = 1;
+}
+
+// GetTagResponse 表示获取标签响应
+message GetTagResponse {
+    // tag 表示返回的标签信息
+    Tag tag = 1;
+}
+
+// ListTagRequest 表示获取标签列表请求
+message ListTagRequest {
+    // name 表示可选的标签名称过滤
+    optional string name = 1;
+}
+
+// ListTagResponse 表示获取标签列表响应
+message ListTagResponse {
+    // tags 表示标签列表
+    repeated Tag tags = 1;
+}

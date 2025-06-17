@@ -7,6 +7,8 @@ package validation
 
 import (
 	"context"
+	"net"
+	"net/url"
 
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
@@ -15,6 +17,7 @@ import (
 	apiv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
 )
 
+// ValidateUserRules 定义用户相关的校验规则
 func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 	// 通用的密码校验函数
 	validatePassword := func() genericvalidation.ValidatorFunc {
@@ -23,11 +26,105 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 		}
 	}
 
+	// 年龄校验函数
+	validateAge := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			age := value.(*int32)
+			if age != nil && (*age < 0 || *age > 150) {
+				return errno.ErrInvalidArgument.WithMessage("age must be between 0 and 150")
+			}
+			return nil
+		}
+	}
+
+	// 头像URL校验函数
+	validateAvatar := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			avatar := value.(*string)
+			if avatar != nil && *avatar != "" {
+				if _, err := url.ParseRequestURI(*avatar); err != nil {
+					return errno.ErrInvalidArgument.WithMessage("avatar must be a valid URL")
+				}
+			}
+			return nil
+		}
+	}
+
+	// 性别校验函数
+	validateGender := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			gender := value.(apiv1.Gender)
+			// 只允许已定义的枚举值
+			switch gender {
+			case apiv1.Gender_GENDER_UNSPECIFIED, apiv1.Gender_GENDER_MALE, apiv1.Gender_GENDER_FEMALE, apiv1.Gender_GENDER_OTHER:
+				return nil
+			default:
+				return errno.ErrInvalidArgument.WithMessage("invalid gender value")
+			}
+		}
+	}
+
+	// 状态校验函数
+	validateStatus := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			status := value.(int32)
+			// 状态只能是0（禁用）或1（正常）
+			if status != 0 && status != 1 {
+				return errno.ErrInvalidArgument.WithMessage("status must be 0 (disabled) or 1 (active)")
+			}
+			return nil
+		}
+	}
+
+	// IP地址校验函数 TODO: 需要优化，应该是在服务端自动获取IP地址，而不是在客户端获取
+	validateIP := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			ipStr := value.(*string)
+			if ipStr != nil && *ipStr != "" {
+				if net.ParseIP(*ipStr) == nil {
+					return errno.ErrInvalidArgument.WithMessage("invalid IP address format")
+				}
+			}
+			return nil
+		}
+	}
+
+	// 注册来源校验函数
+	validateRegisterSource := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			source := value.(apiv1.RegisterSource)
+			// 只允许已定义的枚举值
+			switch source {
+			case apiv1.RegisterSource_REGISTER_SOURCE_UNSPECIFIED, apiv1.RegisterSource_REGISTER_SOURCE_WEB,
+				apiv1.RegisterSource_REGISTER_SOURCE_APP, apiv1.RegisterSource_REGISTER_SOURCE_WECHAT,
+				apiv1.RegisterSource_REGISTER_SOURCE_QQ, apiv1.RegisterSource_REGISTER_SOURCE_GITHUB,
+				apiv1.RegisterSource_REGISTER_SOURCE_GOOGLE:
+				return nil
+			default:
+				return errno.ErrInvalidArgument.WithMessage("invalid register source value")
+			}
+		}
+	}
+
+	// 微信OpenID校验函数
+	validateWechatOpenID := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			openID := value.(*string)
+			if openID != nil && *openID != "" {
+				return errno.ErrInvalidArgument.WithMessage("wechat openID cannot be empty")
+			}
+			return nil
+		}
+	}
+
 	// 定义各字段的校验逻辑，通过一个 map 实现模块化和简化
 	return genericvalidation.Rules{
+		// 密码相关校验
 		"Password":    validatePassword(),
 		"OldPassword": validatePassword(),
 		"NewPassword": validatePassword(),
+
+		// 基本信息校验
 		"UserID": func(value any) error {
 			if value.(string) == "" {
 				return errno.ErrInvalidArgument.WithMessage("userID cannot be empty")
@@ -40,25 +137,39 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 			}
 			return nil
 		},
-		"Nickname": func(value any) error {
-			if len(value.(string)) >= 30 {
-				return errno.ErrInvalidArgument.WithMessage("nickname must be less than 30 characters")
-			}
-			return nil
-		},
 		"Email": func(value any) error {
 			return isValidEmail(value.(string))
 		},
 		"Phone": func(value any) error {
 			return isValidPhone(value.(string))
 		},
+
+		// 新增字段校验
+		"Age":    validateAge(),
+		"Avatar": validateAvatar(),
+		"Gender": validateGender(),
+		"Status": validateStatus(),
+		"IsRisk": func(value any) error {
+			// 布尔值无需特殊校验
+			return nil
+		},
+		"RegisterSource": validateRegisterSource(),
+		"RegisterIP":     validateIP(),
+		"WechatOpenID":   validateWechatOpenID(),
+
+		// 分页参数校验
 		"Limit": func(value any) error {
-			if value.(int64) <= 0 {
-				return errno.ErrInvalidArgument.WithMessage("limit must be greater than 0")
+			// 允许 limit 为 0（使用默认值）或正数，只有负数时才报错
+			if value.(int64) < 0 {
+				return errno.ErrInvalidArgument.WithMessage("limit cannot be negative")
 			}
 			return nil
 		},
 		"Offset": func(value any) error {
+			// offset 可以为 0 或正数，只有负数时才报错
+			if value.(int64) < 0 {
+				return errno.ErrInvalidArgument.WithMessage("offset cannot be negative")
+			}
 			return nil
 		},
 	}

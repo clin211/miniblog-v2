@@ -32,7 +32,7 @@ var File_apiserver_v1_apiserver_proto protoreflect.FileDescriptor
 
 const file_apiserver_v1_apiserver_proto_rawDesc = "" +
 	"\n" +
-	"\x1capiserver/v1/apiserver.proto\x12\x02v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1aapiserver/v1/healthz.proto\x1a\x17apiserver/v1/post.proto\x1a\x17apiserver/v1/user.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\xa0\x0e\n" +
+	"\x1capiserver/v1/apiserver.proto\x12\x02v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1aapiserver/v1/healthz.proto\x1a\x17apiserver/v1/post.proto\x1a\x17apiserver/v1/user.proto\x1a\x1bapiserver/v1/category.proto\x1a\x16apiserver/v1/tag.proto\x1a\x1bapiserver/v1/post_tag.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\xc3\x1f\n" +
 	"\bMiniBlog\x12v\n" +
 	"\aHealthz\x12\x16.google.protobuf.Empty\x1a\x13.v1.HealthzResponse\">\x92A+\n" +
 	"\f服务治理\x12\x12服务健康检查*\aHealthz\x82\xd3\xe4\x93\x02\n" +
@@ -74,40 +74,101 @@ const file_apiserver_v1_apiserver_proto_rawDesc = "" +
 	"\aGetPost\x12\x12.v1.GetPostRequest\x1a\x13.v1.GetPostResponse\"H\x92A+\n" +
 	"\f博客管理\x12\x12获取文章信息*\aGetPost\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/posts/{postID}\x12w\n" +
 	"\bListPost\x12\x13.v1.ListPostRequest\x1a\x14.v1.ListPostResponse\"@\x92A,\n" +
-	"\f博客管理\x12\x12列出所有文章*\bListPost\x82\xd3\xe4\x93\x02\v\x12\t/v1/postsB\x9f\x02\x92A\xe3\x01\x12\xb9\x01\n" +
+	"\f博客管理\x12\x12列出所有文章*\bListPost\x82\xd3\xe4\x93\x02\v\x12\t/v1/posts\x12\x91\x01\n" +
+	"\x0eCreateCategory\x12\x19.v1.CreateCategoryRequest\x1a\x1a.v1.CreateCategoryResponse\"H\x92A,\n" +
+	"\f分类管理\x12\f创建分类*\x0eCreateCategory\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/categories\x12\x96\x01\n" +
+	"\x0eUpdateCategory\x12\x19.v1.UpdateCategoryRequest\x1a\x1a.v1.UpdateCategoryResponse\"M\x92A,\n" +
+	"\f分类管理\x12\f更新分类*\x0eUpdateCategory\x82\xd3\xe4\x93\x02\x18:\x01*\x1a\x13/v1/categories/{id}\x12\x93\x01\n" +
+	"\x0eDeleteCategory\x12\x19.v1.DeleteCategoryRequest\x1a\x1a.v1.DeleteCategoryResponse\"J\x92A,\n" +
+	"\f分类管理\x12\f删除分类*\x0eDeleteCategory\x82\xd3\xe4\x93\x02\x15*\x13/v1/categories/{id}\x12\x8d\x01\n" +
+	"\vGetCategory\x12\x16.v1.GetCategoryRequest\x1a\x17.v1.GetCategoryResponse\"M\x92A/\n" +
+	"\f分类管理\x12\x12获取分类信息*\vGetCategory\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/categories/{id}\x12\x8c\x01\n" +
+	"\fListCategory\x12\x17.v1.ListCategoryRequest\x1a\x18.v1.ListCategoryResponse\"I\x92A0\n" +
+	"\f分类管理\x12\x12列出所有分类*\fListCategory\x82\xd3\xe4\x93\x02\x10\x12\x0e/v1/categories\x12w\n" +
+	"\tCreateTag\x12\x14.v1.CreateTagRequest\x1a\x15.v1.CreateTagResponse\"=\x92A'\n" +
+	"\f标签管理\x12\f创建标签*\tCreateTag\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/tags\x12|\n" +
+	"\tUpdateTag\x12\x14.v1.UpdateTagRequest\x1a\x15.v1.UpdateTagResponse\"B\x92A'\n" +
+	"\f标签管理\x12\f更新标签*\tUpdateTag\x82\xd3\xe4\x93\x02\x12:\x01*\x1a\r/v1/tags/{id}\x12y\n" +
+	"\tDeleteTag\x12\x14.v1.DeleteTagRequest\x1a\x15.v1.DeleteTagResponse\"?\x92A'\n" +
+	"\f标签管理\x12\f删除标签*\tDeleteTag\x82\xd3\xe4\x93\x02\x0f*\r/v1/tags/{id}\x12s\n" +
+	"\x06GetTag\x12\x11.v1.GetTagRequest\x1a\x12.v1.GetTagResponse\"B\x92A*\n" +
+	"\f标签管理\x12\x12获取标签信息*\x06GetTag\x82\xd3\xe4\x93\x02\x0f\x12\r/v1/tags/{id}\x12r\n" +
+	"\aListTag\x12\x12.v1.ListTagRequest\x1a\x13.v1.ListTagResponse\">\x92A+\n" +
+	"\f标签管理\x12\x12列出所有标签*\aListTag\x82\xd3\xe4\x93\x02\n" +
+	"\x12\b/v1/tags\x12\x9e\x01\n" +
+	"\rCreatePostTag\x12\x18.v1.CreatePostTagRequest\x1a\x19.v1.CreatePostTagResponse\"X\x92A=\n" +
+	"\x12文章标签管理\x12\x18创建文章标签关联*\rCreatePostTag\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/v1/post-tags\x12\x9e\x01\n" +
+	"\rDeletePostTag\x12\x18.v1.DeletePostTagRequest\x1a\x19.v1.DeletePostTagResponse\"X\x92A=\n" +
+	"\x12文章标签管理\x12\x18删除文章标签关联*\rDeletePostTag\x82\xd3\xe4\x93\x02\x12:\x01**\r/v1/post-tags\x12\x97\x01\n" +
+	"\fListPostTags\x12\x17.v1.ListPostTagsRequest\x1a\x18.v1.ListPostTagsResponse\"T\x92A<\n" +
+	"\x12文章标签管理\x12\x18列出文章标签关联*\fListPostTags\x82\xd3\xe4\x93\x02\x0f\x12\r/v1/post-tags\x12\xc2\x01\n" +
+	"\x13BatchCreatePostTags\x12\x1e.v1.BatchCreatePostTagsRequest\x1a\x1f.v1.BatchCreatePostTagsResponse\"j\x92AI\n" +
+	"\x12文章标签管理\x12\x1e批量创建文章标签关联*\x13BatchCreatePostTags\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/v1/post-tags/batch\x12\xc2\x01\n" +
+	"\x13BatchDeletePostTags\x12\x1e.v1.BatchDeletePostTagsRequest\x1a\x1f.v1.BatchDeletePostTagsResponse\"j\x92AI\n" +
+	"\x12文章标签管理\x12\x1e批量删除文章标签关联*\x13BatchDeletePostTags\x82\xd3\xe4\x93\x02\x18:\x01**\x13/v1/post-tags/batchB\x9f\x02\x92A\xe3\x01\x12\xb9\x01\n" +
 	"\fminiblog API\"Y\n" +
 	"\x18小而美的博客项目\x12&https://github.com/clin211/miniblog-v2\x1a\x1576742542lin@gmail.com*I\n" +
 	"\vMIT License\x12:https://github.com/clin211/miniblog-v2/blob/master/LICENSE2\x031.0*\x01\x022\x10application/json:\x10application/jsonZ6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
 
 var file_apiserver_v1_apiserver_proto_goTypes = []any{
-	(*emptypb.Empty)(nil),          // 0: google.protobuf.Empty
-	(*LoginRequest)(nil),           // 1: v1.LoginRequest
-	(*RefreshTokenRequest)(nil),    // 2: v1.RefreshTokenRequest
-	(*ChangePasswordRequest)(nil),  // 3: v1.ChangePasswordRequest
-	(*CreateUserRequest)(nil),      // 4: v1.CreateUserRequest
-	(*UpdateUserRequest)(nil),      // 5: v1.UpdateUserRequest
-	(*DeleteUserRequest)(nil),      // 6: v1.DeleteUserRequest
-	(*GetUserRequest)(nil),         // 7: v1.GetUserRequest
-	(*ListUserRequest)(nil),        // 8: v1.ListUserRequest
-	(*CreatePostRequest)(nil),      // 9: v1.CreatePostRequest
-	(*UpdatePostRequest)(nil),      // 10: v1.UpdatePostRequest
-	(*DeletePostRequest)(nil),      // 11: v1.DeletePostRequest
-	(*GetPostRequest)(nil),         // 12: v1.GetPostRequest
-	(*ListPostRequest)(nil),        // 13: v1.ListPostRequest
-	(*HealthzResponse)(nil),        // 14: v1.HealthzResponse
-	(*LoginResponse)(nil),          // 15: v1.LoginResponse
-	(*RefreshTokenResponse)(nil),   // 16: v1.RefreshTokenResponse
-	(*ChangePasswordResponse)(nil), // 17: v1.ChangePasswordResponse
-	(*CreateUserResponse)(nil),     // 18: v1.CreateUserResponse
-	(*UpdateUserResponse)(nil),     // 19: v1.UpdateUserResponse
-	(*DeleteUserResponse)(nil),     // 20: v1.DeleteUserResponse
-	(*GetUserResponse)(nil),        // 21: v1.GetUserResponse
-	(*ListUserResponse)(nil),       // 22: v1.ListUserResponse
-	(*CreatePostResponse)(nil),     // 23: v1.CreatePostResponse
-	(*UpdatePostResponse)(nil),     // 24: v1.UpdatePostResponse
-	(*DeletePostResponse)(nil),     // 25: v1.DeletePostResponse
-	(*GetPostResponse)(nil),        // 26: v1.GetPostResponse
-	(*ListPostResponse)(nil),       // 27: v1.ListPostResponse
+	(*emptypb.Empty)(nil),               // 0: google.protobuf.Empty
+	(*LoginRequest)(nil),                // 1: v1.LoginRequest
+	(*RefreshTokenRequest)(nil),         // 2: v1.RefreshTokenRequest
+	(*ChangePasswordRequest)(nil),       // 3: v1.ChangePasswordRequest
+	(*CreateUserRequest)(nil),           // 4: v1.CreateUserRequest
+	(*UpdateUserRequest)(nil),           // 5: v1.UpdateUserRequest
+	(*DeleteUserRequest)(nil),           // 6: v1.DeleteUserRequest
+	(*GetUserRequest)(nil),              // 7: v1.GetUserRequest
+	(*ListUserRequest)(nil),             // 8: v1.ListUserRequest
+	(*CreatePostRequest)(nil),           // 9: v1.CreatePostRequest
+	(*UpdatePostRequest)(nil),           // 10: v1.UpdatePostRequest
+	(*DeletePostRequest)(nil),           // 11: v1.DeletePostRequest
+	(*GetPostRequest)(nil),              // 12: v1.GetPostRequest
+	(*ListPostRequest)(nil),             // 13: v1.ListPostRequest
+	(*CreateCategoryRequest)(nil),       // 14: v1.CreateCategoryRequest
+	(*UpdateCategoryRequest)(nil),       // 15: v1.UpdateCategoryRequest
+	(*DeleteCategoryRequest)(nil),       // 16: v1.DeleteCategoryRequest
+	(*GetCategoryRequest)(nil),          // 17: v1.GetCategoryRequest
+	(*ListCategoryRequest)(nil),         // 18: v1.ListCategoryRequest
+	(*CreateTagRequest)(nil),            // 19: v1.CreateTagRequest
+	(*UpdateTagRequest)(nil),            // 20: v1.UpdateTagRequest
+	(*DeleteTagRequest)(nil),            // 21: v1.DeleteTagRequest
+	(*GetTagRequest)(nil),               // 22: v1.GetTagRequest
+	(*ListTagRequest)(nil),              // 23: v1.ListTagRequest
+	(*CreatePostTagRequest)(nil),        // 24: v1.CreatePostTagRequest
+	(*DeletePostTagRequest)(nil),        // 25: v1.DeletePostTagRequest
+	(*ListPostTagsRequest)(nil),         // 26: v1.ListPostTagsRequest
+	(*BatchCreatePostTagsRequest)(nil),  // 27: v1.BatchCreatePostTagsRequest
+	(*BatchDeletePostTagsRequest)(nil),  // 28: v1.BatchDeletePostTagsRequest
+	(*HealthzResponse)(nil),             // 29: v1.HealthzResponse
+	(*LoginResponse)(nil),               // 30: v1.LoginResponse
+	(*RefreshTokenResponse)(nil),        // 31: v1.RefreshTokenResponse
+	(*ChangePasswordResponse)(nil),      // 32: v1.ChangePasswordResponse
+	(*CreateUserResponse)(nil),          // 33: v1.CreateUserResponse
+	(*UpdateUserResponse)(nil),          // 34: v1.UpdateUserResponse
+	(*DeleteUserResponse)(nil),          // 35: v1.DeleteUserResponse
+	(*GetUserResponse)(nil),             // 36: v1.GetUserResponse
+	(*ListUserResponse)(nil),            // 37: v1.ListUserResponse
+	(*CreatePostResponse)(nil),          // 38: v1.CreatePostResponse
+	(*UpdatePostResponse)(nil),          // 39: v1.UpdatePostResponse
+	(*DeletePostResponse)(nil),          // 40: v1.DeletePostResponse
+	(*GetPostResponse)(nil),             // 41: v1.GetPostResponse
+	(*ListPostResponse)(nil),            // 42: v1.ListPostResponse
+	(*CreateCategoryResponse)(nil),      // 43: v1.CreateCategoryResponse
+	(*UpdateCategoryResponse)(nil),      // 44: v1.UpdateCategoryResponse
+	(*DeleteCategoryResponse)(nil),      // 45: v1.DeleteCategoryResponse
+	(*GetCategoryResponse)(nil),         // 46: v1.GetCategoryResponse
+	(*ListCategoryResponse)(nil),        // 47: v1.ListCategoryResponse
+	(*CreateTagResponse)(nil),           // 48: v1.CreateTagResponse
+	(*UpdateTagResponse)(nil),           // 49: v1.UpdateTagResponse
+	(*DeleteTagResponse)(nil),           // 50: v1.DeleteTagResponse
+	(*GetTagResponse)(nil),              // 51: v1.GetTagResponse
+	(*ListTagResponse)(nil),             // 52: v1.ListTagResponse
+	(*CreatePostTagResponse)(nil),       // 53: v1.CreatePostTagResponse
+	(*DeletePostTagResponse)(nil),       // 54: v1.DeletePostTagResponse
+	(*ListPostTagsResponse)(nil),        // 55: v1.ListPostTagsResponse
+	(*BatchCreatePostTagsResponse)(nil), // 56: v1.BatchCreatePostTagsResponse
+	(*BatchDeletePostTagsResponse)(nil), // 57: v1.BatchDeletePostTagsResponse
 }
 var file_apiserver_v1_apiserver_proto_depIdxs = []int32{
 	0,  // 0: v1.MiniBlog.Healthz:input_type -> google.protobuf.Empty
@@ -124,22 +185,52 @@ var file_apiserver_v1_apiserver_proto_depIdxs = []int32{
 	11, // 11: v1.MiniBlog.DeletePost:input_type -> v1.DeletePostRequest
 	12, // 12: v1.MiniBlog.GetPost:input_type -> v1.GetPostRequest
 	13, // 13: v1.MiniBlog.ListPost:input_type -> v1.ListPostRequest
-	14, // 14: v1.MiniBlog.Healthz:output_type -> v1.HealthzResponse
-	15, // 15: v1.MiniBlog.Login:output_type -> v1.LoginResponse
-	16, // 16: v1.MiniBlog.RefreshToken:output_type -> v1.RefreshTokenResponse
-	17, // 17: v1.MiniBlog.ChangePassword:output_type -> v1.ChangePasswordResponse
-	18, // 18: v1.MiniBlog.CreateUser:output_type -> v1.CreateUserResponse
-	19, // 19: v1.MiniBlog.UpdateUser:output_type -> v1.UpdateUserResponse
-	20, // 20: v1.MiniBlog.DeleteUser:output_type -> v1.DeleteUserResponse
-	21, // 21: v1.MiniBlog.GetUser:output_type -> v1.GetUserResponse
-	22, // 22: v1.MiniBlog.ListUser:output_type -> v1.ListUserResponse
-	23, // 23: v1.MiniBlog.CreatePost:output_type -> v1.CreatePostResponse
-	24, // 24: v1.MiniBlog.UpdatePost:output_type -> v1.UpdatePostResponse
-	25, // 25: v1.MiniBlog.DeletePost:output_type -> v1.DeletePostResponse
-	26, // 26: v1.MiniBlog.GetPost:output_type -> v1.GetPostResponse
-	27, // 27: v1.MiniBlog.ListPost:output_type -> v1.ListPostResponse
-	14, // [14:28] is the sub-list for method output_type
-	0,  // [0:14] is the sub-list for method input_type
+	14, // 14: v1.MiniBlog.CreateCategory:input_type -> v1.CreateCategoryRequest
+	15, // 15: v1.MiniBlog.UpdateCategory:input_type -> v1.UpdateCategoryRequest
+	16, // 16: v1.MiniBlog.DeleteCategory:input_type -> v1.DeleteCategoryRequest
+	17, // 17: v1.MiniBlog.GetCategory:input_type -> v1.GetCategoryRequest
+	18, // 18: v1.MiniBlog.ListCategory:input_type -> v1.ListCategoryRequest
+	19, // 19: v1.MiniBlog.CreateTag:input_type -> v1.CreateTagRequest
+	20, // 20: v1.MiniBlog.UpdateTag:input_type -> v1.UpdateTagRequest
+	21, // 21: v1.MiniBlog.DeleteTag:input_type -> v1.DeleteTagRequest
+	22, // 22: v1.MiniBlog.GetTag:input_type -> v1.GetTagRequest
+	23, // 23: v1.MiniBlog.ListTag:input_type -> v1.ListTagRequest
+	24, // 24: v1.MiniBlog.CreatePostTag:input_type -> v1.CreatePostTagRequest
+	25, // 25: v1.MiniBlog.DeletePostTag:input_type -> v1.DeletePostTagRequest
+	26, // 26: v1.MiniBlog.ListPostTags:input_type -> v1.ListPostTagsRequest
+	27, // 27: v1.MiniBlog.BatchCreatePostTags:input_type -> v1.BatchCreatePostTagsRequest
+	28, // 28: v1.MiniBlog.BatchDeletePostTags:input_type -> v1.BatchDeletePostTagsRequest
+	29, // 29: v1.MiniBlog.Healthz:output_type -> v1.HealthzResponse
+	30, // 30: v1.MiniBlog.Login:output_type -> v1.LoginResponse
+	31, // 31: v1.MiniBlog.RefreshToken:output_type -> v1.RefreshTokenResponse
+	32, // 32: v1.MiniBlog.ChangePassword:output_type -> v1.ChangePasswordResponse
+	33, // 33: v1.MiniBlog.CreateUser:output_type -> v1.CreateUserResponse
+	34, // 34: v1.MiniBlog.UpdateUser:output_type -> v1.UpdateUserResponse
+	35, // 35: v1.MiniBlog.DeleteUser:output_type -> v1.DeleteUserResponse
+	36, // 36: v1.MiniBlog.GetUser:output_type -> v1.GetUserResponse
+	37, // 37: v1.MiniBlog.ListUser:output_type -> v1.ListUserResponse
+	38, // 38: v1.MiniBlog.CreatePost:output_type -> v1.CreatePostResponse
+	39, // 39: v1.MiniBlog.UpdatePost:output_type -> v1.UpdatePostResponse
+	40, // 40: v1.MiniBlog.DeletePost:output_type -> v1.DeletePostResponse
+	41, // 41: v1.MiniBlog.GetPost:output_type -> v1.GetPostResponse
+	42, // 42: v1.MiniBlog.ListPost:output_type -> v1.ListPostResponse
+	43, // 43: v1.MiniBlog.CreateCategory:output_type -> v1.CreateCategoryResponse
+	44, // 44: v1.MiniBlog.UpdateCategory:output_type -> v1.UpdateCategoryResponse
+	45, // 45: v1.MiniBlog.DeleteCategory:output_type -> v1.DeleteCategoryResponse
+	46, // 46: v1.MiniBlog.GetCategory:output_type -> v1.GetCategoryResponse
+	47, // 47: v1.MiniBlog.ListCategory:output_type -> v1.ListCategoryResponse
+	48, // 48: v1.MiniBlog.CreateTag:output_type -> v1.CreateTagResponse
+	49, // 49: v1.MiniBlog.UpdateTag:output_type -> v1.UpdateTagResponse
+	50, // 50: v1.MiniBlog.DeleteTag:output_type -> v1.DeleteTagResponse
+	51, // 51: v1.MiniBlog.GetTag:output_type -> v1.GetTagResponse
+	52, // 52: v1.MiniBlog.ListTag:output_type -> v1.ListTagResponse
+	53, // 53: v1.MiniBlog.CreatePostTag:output_type -> v1.CreatePostTagResponse
+	54, // 54: v1.MiniBlog.DeletePostTag:output_type -> v1.DeletePostTagResponse
+	55, // 55: v1.MiniBlog.ListPostTags:output_type -> v1.ListPostTagsResponse
+	56, // 56: v1.MiniBlog.BatchCreatePostTags:output_type -> v1.BatchCreatePostTagsResponse
+	57, // 57: v1.MiniBlog.BatchDeletePostTags:output_type -> v1.BatchDeletePostTagsResponse
+	29, // [29:58] is the sub-list for method output_type
+	0,  // [0:29] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -153,6 +244,9 @@ func file_apiserver_v1_apiserver_proto_init() {
 	file_apiserver_v1_healthz_proto_init()
 	file_apiserver_v1_post_proto_init()
 	file_apiserver_v1_user_proto_init()
+	file_apiserver_v1_category_proto_init()
+	file_apiserver_v1_tag_proto_init()
+	file_apiserver_v1_post_tag_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

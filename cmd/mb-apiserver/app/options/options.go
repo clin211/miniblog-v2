@@ -54,9 +54,9 @@ func NewServerOptions() *ServerOptions {
 		// TODO: 这里需要根据实际情况进行调整,比如从环境变量中获取(需要优化)
 		MySQLOptions: &genericoptions.MySQLOptions{
 			Addr:                  "127.0.0.1:3306",
-			Username:              "miniblog",
-			Password:              "CueD7wbmJHxY",
-			Database:              "miniblog",
+			Username:              "root",
+			Password:              "root",
+			Database:              "miniblog_v2",
 			MaxIdleConnections:    10,
 			MaxOpenConnections:    100,
 			MaxConnectionLifeTime: time.Hour,

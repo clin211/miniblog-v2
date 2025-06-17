@@ -14,7 +14,6 @@ import (
 	"github.com/clin211/miniblog-v2/pkg/token"
 	"github.com/clin211/miniblog-v2/pkg/where"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
 	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/conversion"
@@ -43,7 +42,6 @@ type UserExpansion interface {
 	Login(ctx context.Context, rq *apiv1.LoginRequest) (*apiv1.LoginResponse, error)
 	RefreshToken(ctx context.Context, rq *apiv1.RefreshTokenRequest) (*apiv1.RefreshTokenResponse, error)
 	ChangePassword(ctx context.Context, rq *apiv1.ChangePasswordRequest) (*apiv1.ChangePasswordResponse, error)
-	ListWithBadPerformance(ctx context.Context, rq *apiv1.ListUserRequest) (*apiv1.ListUserResponse, error)
 }
 
 // userBiz 是 UserBiz 接口的实现.
@@ -80,7 +78,7 @@ func (b *userBiz) Login(ctx context.Context, rq *apiv1.LoginRequest) (*apiv1.Log
 		return nil, errno.ErrSignToken
 	}
 
-	return &apiv1.LoginResponse{Token: tokenStr, ExpireAt: timestamppb.New(expireAt)}, nil
+	return &apiv1.LoginResponse{Token: tokenStr, ExpireAt: expireAt.Unix()}, nil
 }
 
 // RefreshToken 用于刷新用户的身份验证令牌.
@@ -92,7 +90,7 @@ func (b *userBiz) RefreshToken(ctx context.Context, rq *apiv1.RefreshTokenReques
 		return nil, errno.ErrSignToken
 	}
 
-	return &apiv1.RefreshTokenResponse{Token: tokenStr, ExpireAt: timestamppb.New(expireAt)}, nil
+	return &apiv1.RefreshTokenResponse{Token: tokenStr, ExpireAt: expireAt.Unix()}, nil
 }
 
 // ChangePassword 实现 UserBiz 接口中的 ChangePassword 方法.
@@ -119,10 +117,17 @@ func (b *userBiz) ChangePassword(ctx context.Context, rq *apiv1.ChangePasswordRe
 func (b *userBiz) Create(ctx context.Context, rq *apiv1.CreateUserRequest) (*apiv1.CreateUserResponse, error) {
 	var userM model.UserM
 	_ = copier.Copy(&userM, rq)
-	userM.CreatedAt = time.Now()
-	userM.UpdatedAt = time.Now()
+
+	// 手动设置创建时间
+	now := time.Now()
+	userM.CreatedAt = &now
+	userM.UpdatedAt = &now
+
+	userM.Gender = (*int32)(rq.GetGender().Enum())
+	userM.RegisterSource = (*int32)(rq.GetRegisterSource().Enum())
 
 	if err := b.store.User().Create(ctx, &userM); err != nil {
+		log.W(ctx).Errorw("Failed to create user", "user", userM.UserID, "err", err)
 		return nil, err
 	}
 
@@ -141,14 +146,15 @@ func (b *userBiz) Update(ctx context.Context, rq *apiv1.UpdateUserRequest) (*api
 		return nil, err
 	}
 
+	// 手动设置更新时间
+	now := time.Now()
+	userM.UpdatedAt = &now
+
 	if rq.Username != nil {
 		userM.Username = rq.GetUsername()
 	}
 	if rq.Email != nil {
 		userM.Email = rq.GetEmail()
-	}
-	if rq.Nickname != nil {
-		userM.Nickname = rq.GetNickname()
 	}
 	if rq.Phone != nil {
 		userM.Phone = rq.GetPhone()
@@ -165,7 +171,7 @@ func (b *userBiz) Update(ctx context.Context, rq *apiv1.UpdateUserRequest) (*api
 func (b *userBiz) Delete(ctx context.Context, rq *apiv1.DeleteUserRequest) (*apiv1.DeleteUserResponse, error) {
 	// 只有 `root` 用户可以删除用户，并且可以删除其他用户
 	// 所以这里不用 where.T()，因为 where.T() 会查询 `root` 用户自己
-	if err := b.store.User().Delete(ctx, where.F("userID", rq.GetUserID())); err != nil {
+	if err := b.store.User().Delete(ctx, where.F("user_id", rq.GetUserID())); err != nil {
 		return nil, err
 	}
 
@@ -207,13 +213,13 @@ func (b *userBiz) List(ctx context.Context, rq *apiv1.ListUserRequest) (*apiv1.L
 			case <-ctx.Done():
 				return nil
 			default:
-				count, _, err := b.store.Post().List(ctx, where.T(ctx))
-				if err != nil {
-					return err
-				}
+				// count, _, err := b.store.Post().List(ctx, where.T(ctx))
+				// if err != nil {
+				// 	return err
+				// }
 
 				converted := conversion.UserModelToUserV1(user)
-				converted.PostCount = count
+				// converted.PostCount = count
 				m.Store(user.ID, converted)
 
 				return nil
@@ -230,35 +236,6 @@ func (b *userBiz) List(ctx context.Context, rq *apiv1.ListUserRequest) (*apiv1.L
 	for _, item := range userList {
 		user, _ := m.Load(item.ID)
 		users = append(users, user.(*apiv1.User))
-	}
-
-	log.W(ctx).Debugw("Get users from backend storage", "count", len(users))
-
-	return &apiv1.ListUserResponse{TotalCount: count, Users: users}, nil
-}
-
-// ListWithBadPerformance 是性能较差的实现方式（已废弃）.
-func (b *userBiz) ListWithBadPerformance(ctx context.Context, rq *apiv1.ListUserRequest) (*apiv1.ListUserResponse, error) {
-	whr := where.P(int(rq.GetOffset()), int(rq.GetLimit()))
-	if contextx.Username(ctx) != known.AdminUsername {
-		whr.T(ctx)
-	}
-
-	count, userList, err := b.store.User().List(ctx, whr)
-	if err != nil {
-		return nil, err
-	}
-
-	users := make([]*apiv1.User, 0, len(userList))
-	for _, user := range userList {
-		count, _, err := b.store.Post().List(ctx, where.T(ctx))
-		if err != nil {
-			return nil, err
-		}
-
-		converted := conversion.UserModelToUserV1(user)
-		converted.PostCount = count
-		users = append(users, converted)
 	}
 
 	log.W(ctx).Debugw("Get users from backend storage", "count", len(users))

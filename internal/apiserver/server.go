@@ -80,7 +80,7 @@ type ServerConfig struct {
 // NewUnionServer 根据配置创建联合服务器.
 func (cfg *Config) NewUnionServer() (*UnionServer, error) {
 	// 注册租户解析函数，通过上下文获取用户 ID
-	where.RegisterTenant("userID", func(ctx context.Context) string { //nolint:gocritic
+	where.RegisterTenant("user_id", func(ctx context.Context) string { //nolint:gocritic
 		return contextx.UserID(ctx)
 	})
 
@@ -176,7 +176,7 @@ type UserRetriever struct {
 
 // GetUser 根据用户 ID 获取用户信息.
 func (r *UserRetriever) GetUser(ctx context.Context, userID string) (*model.UserM, error) {
-	return r.store.User().Get(ctx, where.F("userID", userID))
+	return r.store.User().Get(ctx, where.F("user_id", userID))
 }
 
 // ProvideDB 根据配置提供一个数据库实例。Add commentMore actions

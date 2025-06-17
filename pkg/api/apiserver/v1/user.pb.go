@@ -14,10 +14,8 @@
 package v1
 
 import (
-	_ "github.com/onexstack/protoc-gen-defaults/defaults"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -30,6 +28,121 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Gender 表示用户性别
+type Gender int32
+
+const (
+	Gender_GENDER_UNSPECIFIED Gender = 0 // 未设置
+	Gender_GENDER_MALE        Gender = 1 // 男
+	Gender_GENDER_FEMALE      Gender = 2 // 女
+	Gender_GENDER_OTHER       Gender = 3 // 其他
+)
+
+// Enum value maps for Gender.
+var (
+	Gender_name = map[int32]string{
+		0: "GENDER_UNSPECIFIED",
+		1: "GENDER_MALE",
+		2: "GENDER_FEMALE",
+		3: "GENDER_OTHER",
+	}
+	Gender_value = map[string]int32{
+		"GENDER_UNSPECIFIED": 0,
+		"GENDER_MALE":        1,
+		"GENDER_FEMALE":      2,
+		"GENDER_OTHER":       3,
+	}
+)
+
+func (x Gender) Enum() *Gender {
+	p := new(Gender)
+	*p = x
+	return p
+}
+
+func (x Gender) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Gender) Descriptor() protoreflect.EnumDescriptor {
+	return file_apiserver_v1_user_proto_enumTypes[0].Descriptor()
+}
+
+func (Gender) Type() protoreflect.EnumType {
+	return &file_apiserver_v1_user_proto_enumTypes[0]
+}
+
+func (x Gender) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Gender.Descriptor instead.
+func (Gender) EnumDescriptor() ([]byte, []int) {
+	return file_apiserver_v1_user_proto_rawDescGZIP(), []int{0}
+}
+
+// RegisterSource 表示用户注册来源
+type RegisterSource int32
+
+const (
+	RegisterSource_REGISTER_SOURCE_UNSPECIFIED RegisterSource = 0 // 未指定
+	RegisterSource_REGISTER_SOURCE_WEB         RegisterSource = 1 // Web
+	RegisterSource_REGISTER_SOURCE_APP         RegisterSource = 2 // App
+	RegisterSource_REGISTER_SOURCE_WECHAT      RegisterSource = 3 // 微信
+	RegisterSource_REGISTER_SOURCE_QQ          RegisterSource = 4 // QQ
+	RegisterSource_REGISTER_SOURCE_GITHUB      RegisterSource = 5 // GitHub
+	RegisterSource_REGISTER_SOURCE_GOOGLE      RegisterSource = 6 // Google
+)
+
+// Enum value maps for RegisterSource.
+var (
+	RegisterSource_name = map[int32]string{
+		0: "REGISTER_SOURCE_UNSPECIFIED",
+		1: "REGISTER_SOURCE_WEB",
+		2: "REGISTER_SOURCE_APP",
+		3: "REGISTER_SOURCE_WECHAT",
+		4: "REGISTER_SOURCE_QQ",
+		5: "REGISTER_SOURCE_GITHUB",
+		6: "REGISTER_SOURCE_GOOGLE",
+	}
+	RegisterSource_value = map[string]int32{
+		"REGISTER_SOURCE_UNSPECIFIED": 0,
+		"REGISTER_SOURCE_WEB":         1,
+		"REGISTER_SOURCE_APP":         2,
+		"REGISTER_SOURCE_WECHAT":      3,
+		"REGISTER_SOURCE_QQ":          4,
+		"REGISTER_SOURCE_GITHUB":      5,
+		"REGISTER_SOURCE_GOOGLE":      6,
+	}
+)
+
+func (x RegisterSource) Enum() *RegisterSource {
+	p := new(RegisterSource)
+	*p = x
+	return p
+}
+
+func (x RegisterSource) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RegisterSource) Descriptor() protoreflect.EnumDescriptor {
+	return file_apiserver_v1_user_proto_enumTypes[1].Descriptor()
+}
+
+func (RegisterSource) Type() protoreflect.EnumType {
+	return &file_apiserver_v1_user_proto_enumTypes[1]
+}
+
+func (x RegisterSource) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RegisterSource.Descriptor instead.
+func (RegisterSource) EnumDescriptor() ([]byte, []int) {
+	return file_apiserver_v1_user_proto_rawDescGZIP(), []int{1}
+}
+
 // User 表示用户信息
 type User struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -37,18 +150,44 @@ type User struct {
 	UserID string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
 	// username 表示用户名称
 	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	// nickname 表示用户昵称
-	Nickname string `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	// age 表示用户年龄
+	Age *int32 `protobuf:"varint,3,opt,name=age,proto3,oneof" json:"age,omitempty"`
+	// avatar 表示用户头像URL
+	Avatar *string `protobuf:"bytes,4,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
 	// email 表示用户电子邮箱
-	Email string `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Email string `protobuf:"bytes,5,opt,name=email,proto3" json:"email,omitempty"`
+	// emailVerified 表示邮箱是否已验证
+	EmailVerified bool `protobuf:"varint,6,opt,name=emailVerified,proto3" json:"emailVerified,omitempty"`
 	// phone 表示用户手机号
-	Phone string `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`
-	// postCount 表示用户拥有的博客数量
-	PostCount int64 `protobuf:"varint,6,opt,name=postCount,proto3" json:"postCount,omitempty"`
-	// createdAt 表示用户注册时间
-	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	// updatedAt 表示用户最后更新时间
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	Phone string `protobuf:"bytes,7,opt,name=phone,proto3" json:"phone,omitempty"`
+	// phoneVerified 表示手机号是否已验证
+	PhoneVerified bool `protobuf:"varint,8,opt,name=phoneVerified,proto3" json:"phoneVerified,omitempty"`
+	// gender 表示用户性别
+	Gender Gender `protobuf:"varint,9,opt,name=gender,proto3,enum=v1.Gender" json:"gender,omitempty"`
+	// status 表示用户状态：1-正常，0-禁用
+	Status int32 `protobuf:"varint,10,opt,name=status,proto3" json:"status,omitempty"`
+	// failedLoginAttempts 表示失败登录次数
+	FailedLoginAttempts int32 `protobuf:"varint,11,opt,name=failedLoginAttempts,proto3" json:"failedLoginAttempts,omitempty"`
+	// lastLoginAt 表示最后登录时间（Unix 时间戳）
+	LastLoginAt *int64 `protobuf:"varint,12,opt,name=lastLoginAt,proto3,oneof" json:"lastLoginAt,omitempty"`
+	// lastLoginIP 表示最后登录IP
+	LastLoginIP *string `protobuf:"bytes,13,opt,name=lastLoginIP,proto3,oneof" json:"lastLoginIP,omitempty"`
+	// lastLoginDevice 表示最后登录设备
+	LastLoginDevice *string `protobuf:"bytes,14,opt,name=lastLoginDevice,proto3,oneof" json:"lastLoginDevice,omitempty"`
+	// isRisk 表示是否为风险用户
+	IsRisk bool `protobuf:"varint,15,opt,name=isRisk,proto3" json:"isRisk,omitempty"`
+	// registerSource 表示注册来源
+	RegisterSource RegisterSource `protobuf:"varint,16,opt,name=registerSource,proto3,enum=v1.RegisterSource" json:"registerSource,omitempty"`
+	// registerIP 表示注册IP
+	RegisterIP *string `protobuf:"bytes,17,opt,name=registerIP,proto3,oneof" json:"registerIP,omitempty"`
+	// wechatOpenID 表示微信OpenID
+	WechatOpenID *string `protobuf:"bytes,18,opt,name=wechatOpenID,proto3,oneof" json:"wechatOpenID,omitempty"`
+	// passwordUpdatedAt 表示密码更新时间（Unix 时间戳）
+	PasswordUpdatedAt *int64 `protobuf:"varint,19,opt,name=passwordUpdatedAt,proto3,oneof" json:"passwordUpdatedAt,omitempty"`
+	// createdAt 表示用户注册时间（Unix 时间戳）
+	CreatedAt int64 `protobuf:"varint,20,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	// updatedAt 表示用户最后更新时间（Unix 时间戳）
+	UpdatedAt     int64 `protobuf:"varint,21,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -97,9 +236,16 @@ func (x *User) GetUsername() string {
 	return ""
 }
 
-func (x *User) GetNickname() string {
-	if x != nil {
-		return x.Nickname
+func (x *User) GetAge() int32 {
+	if x != nil && x.Age != nil {
+		return *x.Age
+	}
+	return 0
+}
+
+func (x *User) GetAvatar() string {
+	if x != nil && x.Avatar != nil {
+		return *x.Avatar
 	}
 	return ""
 }
@@ -111,6 +257,13 @@ func (x *User) GetEmail() string {
 	return ""
 }
 
+func (x *User) GetEmailVerified() bool {
+	if x != nil {
+		return x.EmailVerified
+	}
+	return false
+}
+
 func (x *User) GetPhone() string {
 	if x != nil {
 		return x.Phone
@@ -118,25 +271,102 @@ func (x *User) GetPhone() string {
 	return ""
 }
 
-func (x *User) GetPostCount() int64 {
+func (x *User) GetPhoneVerified() bool {
 	if x != nil {
-		return x.PostCount
+		return x.PhoneVerified
+	}
+	return false
+}
+
+func (x *User) GetGender() Gender {
+	if x != nil {
+		return x.Gender
+	}
+	return Gender_GENDER_UNSPECIFIED
+}
+
+func (x *User) GetStatus() int32 {
+	if x != nil {
+		return x.Status
 	}
 	return 0
 }
 
-func (x *User) GetCreatedAt() *timestamppb.Timestamp {
+func (x *User) GetFailedLoginAttempts() int32 {
+	if x != nil {
+		return x.FailedLoginAttempts
+	}
+	return 0
+}
+
+func (x *User) GetLastLoginAt() int64 {
+	if x != nil && x.LastLoginAt != nil {
+		return *x.LastLoginAt
+	}
+	return 0
+}
+
+func (x *User) GetLastLoginIP() string {
+	if x != nil && x.LastLoginIP != nil {
+		return *x.LastLoginIP
+	}
+	return ""
+}
+
+func (x *User) GetLastLoginDevice() string {
+	if x != nil && x.LastLoginDevice != nil {
+		return *x.LastLoginDevice
+	}
+	return ""
+}
+
+func (x *User) GetIsRisk() bool {
+	if x != nil {
+		return x.IsRisk
+	}
+	return false
+}
+
+func (x *User) GetRegisterSource() RegisterSource {
+	if x != nil {
+		return x.RegisterSource
+	}
+	return RegisterSource_REGISTER_SOURCE_UNSPECIFIED
+}
+
+func (x *User) GetRegisterIP() string {
+	if x != nil && x.RegisterIP != nil {
+		return *x.RegisterIP
+	}
+	return ""
+}
+
+func (x *User) GetWechatOpenID() string {
+	if x != nil && x.WechatOpenID != nil {
+		return *x.WechatOpenID
+	}
+	return ""
+}
+
+func (x *User) GetPasswordUpdatedAt() int64 {
+	if x != nil && x.PasswordUpdatedAt != nil {
+		return *x.PasswordUpdatedAt
+	}
+	return 0
+}
+
+func (x *User) GetCreatedAt() int64 {
 	if x != nil {
 		return x.CreatedAt
 	}
-	return nil
+	return 0
 }
 
-func (x *User) GetUpdatedAt() *timestamppb.Timestamp {
+func (x *User) GetUpdatedAt() int64 {
 	if x != nil {
 		return x.UpdatedAt
 	}
-	return nil
+	return 0
 }
 
 // LoginRequest 表示登录请求
@@ -199,8 +429,8 @@ type LoginResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// token 表示返回的身份验证令牌
 	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	// expireAt 表示该 token 的过期时间
-	ExpireAt      *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expireAt,proto3" json:"expireAt,omitempty"`
+	// expireAt 表示该 token 的过期时间（Unix 时间戳）
+	ExpireAt      int64 `protobuf:"varint,2,opt,name=expireAt,proto3" json:"expireAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -242,11 +472,11 @@ func (x *LoginResponse) GetToken() string {
 	return ""
 }
 
-func (x *LoginResponse) GetExpireAt() *timestamppb.Timestamp {
+func (x *LoginResponse) GetExpireAt() int64 {
 	if x != nil {
 		return x.ExpireAt
 	}
-	return nil
+	return 0
 }
 
 // RefreshTokenRequest 表示刷新令牌的请求
@@ -291,8 +521,8 @@ type RefreshTokenResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// token 表示返回的身份验证令牌
 	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	// expireAt 表示该 token 的过期时间
-	ExpireAt      *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expireAt,proto3" json:"expireAt,omitempty"`
+	// expireAt 表示该 token 的过期时间（Unix 时间戳）
+	ExpireAt      int64 `protobuf:"varint,2,opt,name=expireAt,proto3" json:"expireAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -334,11 +564,11 @@ func (x *RefreshTokenResponse) GetToken() string {
 	return ""
 }
 
-func (x *RefreshTokenResponse) GetExpireAt() *timestamppb.Timestamp {
+func (x *RefreshTokenResponse) GetExpireAt() int64 {
 	if x != nil {
 		return x.ExpireAt
 	}
-	return nil
+	return 0
 }
 
 // ChangePasswordRequest 表示修改密码请求
@@ -449,12 +679,22 @@ type CreateUserRequest struct {
 	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	// password 表示用户密码
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	// nickname 表示用户昵称
-	Nickname *string `protobuf:"bytes,3,opt,name=nickname,proto3,oneof" json:"nickname,omitempty"`
+	// age 表示用户年龄
+	Age *int32 `protobuf:"varint,3,opt,name=age,proto3,oneof" json:"age,omitempty"`
+	// avatar 表示用户头像URL
+	Avatar *string `protobuf:"bytes,4,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
 	// email 表示用户电子邮箱
-	Email string `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Email string `protobuf:"bytes,5,opt,name=email,proto3" json:"email,omitempty"`
 	// phone 表示用户手机号
-	Phone         string `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`
+	Phone *string `protobuf:"bytes,6,opt,name=phone,proto3,oneof" json:"phone,omitempty"`
+	// gender 表示用户性别
+	Gender *Gender `protobuf:"varint,7,opt,name=gender,proto3,enum=v1.Gender,oneof" json:"gender,omitempty"`
+	// registerSource 表示注册来源
+	RegisterSource RegisterSource `protobuf:"varint,8,opt,name=registerSource,proto3,enum=v1.RegisterSource" json:"registerSource,omitempty"`
+	// registerIP 表示注册IP
+	RegisterIP *string `protobuf:"bytes,9,opt,name=registerIP,proto3,oneof" json:"registerIP,omitempty"`
+	// wechatOpenID 表示微信OpenID
+	WechatOpenID  *string `protobuf:"bytes,10,opt,name=wechatOpenID,proto3,oneof" json:"wechatOpenID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -503,9 +743,16 @@ func (x *CreateUserRequest) GetPassword() string {
 	return ""
 }
 
-func (x *CreateUserRequest) GetNickname() string {
-	if x != nil && x.Nickname != nil {
-		return *x.Nickname
+func (x *CreateUserRequest) GetAge() int32 {
+	if x != nil && x.Age != nil {
+		return *x.Age
+	}
+	return 0
+}
+
+func (x *CreateUserRequest) GetAvatar() string {
+	if x != nil && x.Avatar != nil {
+		return *x.Avatar
 	}
 	return ""
 }
@@ -518,8 +765,36 @@ func (x *CreateUserRequest) GetEmail() string {
 }
 
 func (x *CreateUserRequest) GetPhone() string {
+	if x != nil && x.Phone != nil {
+		return *x.Phone
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetGender() Gender {
+	if x != nil && x.Gender != nil {
+		return *x.Gender
+	}
+	return Gender_GENDER_UNSPECIFIED
+}
+
+func (x *CreateUserRequest) GetRegisterSource() RegisterSource {
 	if x != nil {
-		return x.Phone
+		return x.RegisterSource
+	}
+	return RegisterSource_REGISTER_SOURCE_UNSPECIFIED
+}
+
+func (x *CreateUserRequest) GetRegisterIP() string {
+	if x != nil && x.RegisterIP != nil {
+		return *x.RegisterIP
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetWechatOpenID() string {
+	if x != nil && x.WechatOpenID != nil {
+		return *x.WechatOpenID
 	}
 	return ""
 }
@@ -577,12 +852,20 @@ type UpdateUserRequest struct {
 	UserID string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
 	// username 表示可选的用户名称
 	Username *string `protobuf:"bytes,2,opt,name=username,proto3,oneof" json:"username,omitempty"`
-	// nickname 表示可选的用户昵称
-	Nickname *string `protobuf:"bytes,3,opt,name=nickname,proto3,oneof" json:"nickname,omitempty"`
+	// age 表示可选的用户年龄
+	Age *int32 `protobuf:"varint,3,opt,name=age,proto3,oneof" json:"age,omitempty"`
+	// avatar 表示可选的用户头像URL
+	Avatar *string `protobuf:"bytes,4,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
 	// email 表示可选的用户电子邮箱
-	Email *string `protobuf:"bytes,4,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Email *string `protobuf:"bytes,5,opt,name=email,proto3,oneof" json:"email,omitempty"`
 	// phone 表示可选的用户手机号
-	Phone         *string `protobuf:"bytes,5,opt,name=phone,proto3,oneof" json:"phone,omitempty"`
+	Phone *string `protobuf:"bytes,6,opt,name=phone,proto3,oneof" json:"phone,omitempty"`
+	// gender 表示可选的用户性别
+	Gender *Gender `protobuf:"varint,7,opt,name=gender,proto3,enum=v1.Gender,oneof" json:"gender,omitempty"`
+	// status 表示可选的用户状态
+	Status *int32 `protobuf:"varint,8,opt,name=status,proto3,oneof" json:"status,omitempty"`
+	// isRisk 表示可选的用户风险状态
+	IsRisk        *bool `protobuf:"varint,9,opt,name=isRisk,proto3,oneof" json:"isRisk,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -631,9 +914,16 @@ func (x *UpdateUserRequest) GetUsername() string {
 	return ""
 }
 
-func (x *UpdateUserRequest) GetNickname() string {
-	if x != nil && x.Nickname != nil {
-		return *x.Nickname
+func (x *UpdateUserRequest) GetAge() int32 {
+	if x != nil && x.Age != nil {
+		return *x.Age
+	}
+	return 0
+}
+
+func (x *UpdateUserRequest) GetAvatar() string {
+	if x != nil && x.Avatar != nil {
+		return *x.Avatar
 	}
 	return ""
 }
@@ -650,6 +940,27 @@ func (x *UpdateUserRequest) GetPhone() string {
 		return *x.Phone
 	}
 	return ""
+}
+
+func (x *UpdateUserRequest) GetGender() Gender {
+	if x != nil && x.Gender != nil {
+		return *x.Gender
+	}
+	return Gender_GENDER_UNSPECIFIED
+}
+
+func (x *UpdateUserRequest) GetStatus() int32 {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return 0
+}
+
+func (x *UpdateUserRequest) GetIsRisk() bool {
+	if x != nil && x.IsRisk != nil {
+		return *x.IsRisk
+	}
+	return false
 }
 
 // UpdateUserResponse 表示更新用户响应
@@ -866,15 +1177,13 @@ func (x *GetUserResponse) GetUser() *User {
 	return nil
 }
 
-// ListUserRequest 表示用户列表请求
+// ListUserRequest 表示获取用户列表请求
 type ListUserRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// offset 表示偏移量
-	// @gotags: form:"offset"
-	Offset int64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty" form:"offset"`
+	// offset 表示分页偏移量
+	Offset int64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
 	// limit 表示每页数量
-	// @gotags: form:"limit"
-	Limit         int64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty" form:"limit"`
+	Limit         int64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -923,10 +1232,10 @@ func (x *ListUserRequest) GetLimit() int64 {
 	return 0
 }
 
-// ListUserResponse 表示用户列表响应
+// ListUserResponse 表示获取用户列表响应
 type ListUserResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// totalCount 表示总用户数
+	// totalCount 表示用户总数
 	TotalCount int64 `protobuf:"varint,1,opt,name=totalCount,proto3" json:"totalCount,omitempty"`
 	// users 表示用户列表
 	Users         []*User `protobuf:"bytes,2,rep,name=users,proto3" json:"users,omitempty"`
@@ -982,50 +1291,98 @@ var File_apiserver_v1_user_proto protoreflect.FileDescriptor
 
 const file_apiserver_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x17apiserver/v1/user.proto\x12\x02v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a,github.com/onexstack/defaults/defaults.proto\"\x94\x02\n" +
+	"\x17apiserver/v1/user.proto\x12\x02v1\"\xdf\x06\n" +
 	"\x04User\x12\x16\n" +
 	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
-	"\bnickname\x18\x03 \x01(\tR\bnickname\x12\x14\n" +
-	"\x05email\x18\x04 \x01(\tR\x05email\x12\x14\n" +
-	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x1c\n" +
-	"\tpostCount\x18\x06 \x01(\x03R\tpostCount\x128\n" +
-	"\tcreatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"F\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x15\n" +
+	"\x03age\x18\x03 \x01(\x05H\x00R\x03age\x88\x01\x01\x12\x1b\n" +
+	"\x06avatar\x18\x04 \x01(\tH\x01R\x06avatar\x88\x01\x01\x12\x14\n" +
+	"\x05email\x18\x05 \x01(\tR\x05email\x12$\n" +
+	"\remailVerified\x18\x06 \x01(\bR\remailVerified\x12\x14\n" +
+	"\x05phone\x18\a \x01(\tR\x05phone\x12$\n" +
+	"\rphoneVerified\x18\b \x01(\bR\rphoneVerified\x12\"\n" +
+	"\x06gender\x18\t \x01(\x0e2\n" +
+	".v1.GenderR\x06gender\x12\x16\n" +
+	"\x06status\x18\n" +
+	" \x01(\x05R\x06status\x120\n" +
+	"\x13failedLoginAttempts\x18\v \x01(\x05R\x13failedLoginAttempts\x12%\n" +
+	"\vlastLoginAt\x18\f \x01(\x03H\x02R\vlastLoginAt\x88\x01\x01\x12%\n" +
+	"\vlastLoginIP\x18\r \x01(\tH\x03R\vlastLoginIP\x88\x01\x01\x12-\n" +
+	"\x0flastLoginDevice\x18\x0e \x01(\tH\x04R\x0flastLoginDevice\x88\x01\x01\x12\x16\n" +
+	"\x06isRisk\x18\x0f \x01(\bR\x06isRisk\x12:\n" +
+	"\x0eregisterSource\x18\x10 \x01(\x0e2\x12.v1.RegisterSourceR\x0eregisterSource\x12#\n" +
+	"\n" +
+	"registerIP\x18\x11 \x01(\tH\x05R\n" +
+	"registerIP\x88\x01\x01\x12'\n" +
+	"\fwechatOpenID\x18\x12 \x01(\tH\x06R\fwechatOpenID\x88\x01\x01\x121\n" +
+	"\x11passwordUpdatedAt\x18\x13 \x01(\x03H\aR\x11passwordUpdatedAt\x88\x01\x01\x12\x1c\n" +
+	"\tcreatedAt\x18\x14 \x01(\x03R\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\x15 \x01(\x03R\tupdatedAtB\x06\n" +
+	"\x04_ageB\t\n" +
+	"\a_avatarB\x0e\n" +
+	"\f_lastLoginAtB\x0e\n" +
+	"\f_lastLoginIPB\x12\n" +
+	"\x10_lastLoginDeviceB\r\n" +
+	"\v_registerIPB\x0f\n" +
+	"\r_wechatOpenIDB\x14\n" +
+	"\x12_passwordUpdatedAt\"F\n" +
 	"\fLoginRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"]\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"A\n" +
 	"\rLoginResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x126\n" +
-	"\bexpireAt\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bexpireAt\"\x15\n" +
-	"\x13RefreshTokenRequest\"d\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
+	"\bexpireAt\x18\x02 \x01(\x03R\bexpireAt\"\x15\n" +
+	"\x13RefreshTokenRequest\"H\n" +
 	"\x14RefreshTokenResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x126\n" +
-	"\bexpireAt\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bexpireAt\"s\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
+	"\bexpireAt\x18\x02 \x01(\x03R\bexpireAt\"s\n" +
 	"\x15ChangePasswordRequest\x12\x16\n" +
 	"\x06userID\x18\x01 \x01(\tR\x06userID\x12 \n" +
 	"\voldPassword\x18\x02 \x01(\tR\voldPassword\x12 \n" +
 	"\vnewPassword\x18\x03 \x01(\tR\vnewPassword\"\x18\n" +
-	"\x16ChangePasswordResponse\"\xb8\x01\n" +
+	"\x16ChangePasswordResponse\"\xab\x03\n" +
 	"\x11CreateUserRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x122\n" +
-	"\bnickname\x18\x03 \x01(\tB\x11\x9aI\x0er\f你好世界H\x00R\bnickname\x88\x01\x01\x12\x14\n" +
-	"\x05email\x18\x04 \x01(\tR\x05email\x12\x14\n" +
-	"\x05phone\x18\x05 \x01(\tR\x05phoneB\v\n" +
-	"\t_nickname\",\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x15\n" +
+	"\x03age\x18\x03 \x01(\x05H\x00R\x03age\x88\x01\x01\x12\x1b\n" +
+	"\x06avatar\x18\x04 \x01(\tH\x01R\x06avatar\x88\x01\x01\x12\x14\n" +
+	"\x05email\x18\x05 \x01(\tR\x05email\x12\x19\n" +
+	"\x05phone\x18\x06 \x01(\tH\x02R\x05phone\x88\x01\x01\x12'\n" +
+	"\x06gender\x18\a \x01(\x0e2\n" +
+	".v1.GenderH\x03R\x06gender\x88\x01\x01\x12:\n" +
+	"\x0eregisterSource\x18\b \x01(\x0e2\x12.v1.RegisterSourceR\x0eregisterSource\x12#\n" +
+	"\n" +
+	"registerIP\x18\t \x01(\tH\x04R\n" +
+	"registerIP\x88\x01\x01\x12'\n" +
+	"\fwechatOpenID\x18\n" +
+	" \x01(\tH\x05R\fwechatOpenID\x88\x01\x01B\x06\n" +
+	"\x04_ageB\t\n" +
+	"\a_avatarB\b\n" +
+	"\x06_phoneB\t\n" +
+	"\a_genderB\r\n" +
+	"\v_registerIPB\x0f\n" +
+	"\r_wechatOpenID\",\n" +
 	"\x12CreateUserResponse\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\tR\x06userID\"\xd1\x01\n" +
+	"\x06userID\x18\x01 \x01(\tR\x06userID\"\xee\x02\n" +
 	"\x11UpdateUserRequest\x12\x16\n" +
 	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x1f\n" +
-	"\busername\x18\x02 \x01(\tH\x00R\busername\x88\x01\x01\x12\x1f\n" +
-	"\bnickname\x18\x03 \x01(\tH\x01R\bnickname\x88\x01\x01\x12\x19\n" +
-	"\x05email\x18\x04 \x01(\tH\x02R\x05email\x88\x01\x01\x12\x19\n" +
-	"\x05phone\x18\x05 \x01(\tH\x03R\x05phone\x88\x01\x01B\v\n" +
-	"\t_usernameB\v\n" +
-	"\t_nicknameB\b\n" +
+	"\busername\x18\x02 \x01(\tH\x00R\busername\x88\x01\x01\x12\x15\n" +
+	"\x03age\x18\x03 \x01(\x05H\x01R\x03age\x88\x01\x01\x12\x1b\n" +
+	"\x06avatar\x18\x04 \x01(\tH\x02R\x06avatar\x88\x01\x01\x12\x19\n" +
+	"\x05email\x18\x05 \x01(\tH\x03R\x05email\x88\x01\x01\x12\x19\n" +
+	"\x05phone\x18\x06 \x01(\tH\x04R\x05phone\x88\x01\x01\x12'\n" +
+	"\x06gender\x18\a \x01(\x0e2\n" +
+	".v1.GenderH\x05R\x06gender\x88\x01\x01\x12\x1b\n" +
+	"\x06status\x18\b \x01(\x05H\x06R\x06status\x88\x01\x01\x12\x1b\n" +
+	"\x06isRisk\x18\t \x01(\bH\aR\x06isRisk\x88\x01\x01B\v\n" +
+	"\t_usernameB\x06\n" +
+	"\x04_ageB\t\n" +
+	"\a_avatarB\b\n" +
 	"\x06_emailB\b\n" +
-	"\x06_phone\"\x14\n" +
+	"\x06_phoneB\t\n" +
+	"\a_genderB\t\n" +
+	"\a_statusB\t\n" +
+	"\a_isRisk\"\x14\n" +
 	"\x12UpdateUserResponse\"+\n" +
 	"\x11DeleteUserRequest\x12\x16\n" +
 	"\x06userID\x18\x01 \x01(\tR\x06userID\"\x14\n" +
@@ -1041,7 +1398,20 @@ const file_apiserver_v1_user_proto_rawDesc = "" +
 	"\n" +
 	"totalCount\x18\x01 \x01(\x03R\n" +
 	"totalCount\x12\x1e\n" +
-	"\x05users\x18\x02 \x03(\v2\b.v1.UserR\x05usersB8Z6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
+	"\x05users\x18\x02 \x03(\v2\b.v1.UserR\x05users*V\n" +
+	"\x06Gender\x12\x16\n" +
+	"\x12GENDER_UNSPECIFIED\x10\x00\x12\x0f\n" +
+	"\vGENDER_MALE\x10\x01\x12\x11\n" +
+	"\rGENDER_FEMALE\x10\x02\x12\x10\n" +
+	"\fGENDER_OTHER\x10\x03*\xcf\x01\n" +
+	"\x0eRegisterSource\x12\x1f\n" +
+	"\x1bREGISTER_SOURCE_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13REGISTER_SOURCE_WEB\x10\x01\x12\x17\n" +
+	"\x13REGISTER_SOURCE_APP\x10\x02\x12\x1a\n" +
+	"\x16REGISTER_SOURCE_WECHAT\x10\x03\x12\x16\n" +
+	"\x12REGISTER_SOURCE_QQ\x10\x04\x12\x1a\n" +
+	"\x16REGISTER_SOURCE_GITHUB\x10\x05\x12\x1a\n" +
+	"\x16REGISTER_SOURCE_GOOGLE\x10\x06B8Z6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
 
 var (
 	file_apiserver_v1_user_proto_rawDescOnce sync.Once
@@ -1055,39 +1425,42 @@ func file_apiserver_v1_user_proto_rawDescGZIP() []byte {
 	return file_apiserver_v1_user_proto_rawDescData
 }
 
+var file_apiserver_v1_user_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_apiserver_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_apiserver_v1_user_proto_goTypes = []any{
-	(*User)(nil),                   // 0: v1.User
-	(*LoginRequest)(nil),           // 1: v1.LoginRequest
-	(*LoginResponse)(nil),          // 2: v1.LoginResponse
-	(*RefreshTokenRequest)(nil),    // 3: v1.RefreshTokenRequest
-	(*RefreshTokenResponse)(nil),   // 4: v1.RefreshTokenResponse
-	(*ChangePasswordRequest)(nil),  // 5: v1.ChangePasswordRequest
-	(*ChangePasswordResponse)(nil), // 6: v1.ChangePasswordResponse
-	(*CreateUserRequest)(nil),      // 7: v1.CreateUserRequest
-	(*CreateUserResponse)(nil),     // 8: v1.CreateUserResponse
-	(*UpdateUserRequest)(nil),      // 9: v1.UpdateUserRequest
-	(*UpdateUserResponse)(nil),     // 10: v1.UpdateUserResponse
-	(*DeleteUserRequest)(nil),      // 11: v1.DeleteUserRequest
-	(*DeleteUserResponse)(nil),     // 12: v1.DeleteUserResponse
-	(*GetUserRequest)(nil),         // 13: v1.GetUserRequest
-	(*GetUserResponse)(nil),        // 14: v1.GetUserResponse
-	(*ListUserRequest)(nil),        // 15: v1.ListUserRequest
-	(*ListUserResponse)(nil),       // 16: v1.ListUserResponse
-	(*timestamppb.Timestamp)(nil),  // 17: google.protobuf.Timestamp
+	(Gender)(0),                    // 0: v1.Gender
+	(RegisterSource)(0),            // 1: v1.RegisterSource
+	(*User)(nil),                   // 2: v1.User
+	(*LoginRequest)(nil),           // 3: v1.LoginRequest
+	(*LoginResponse)(nil),          // 4: v1.LoginResponse
+	(*RefreshTokenRequest)(nil),    // 5: v1.RefreshTokenRequest
+	(*RefreshTokenResponse)(nil),   // 6: v1.RefreshTokenResponse
+	(*ChangePasswordRequest)(nil),  // 7: v1.ChangePasswordRequest
+	(*ChangePasswordResponse)(nil), // 8: v1.ChangePasswordResponse
+	(*CreateUserRequest)(nil),      // 9: v1.CreateUserRequest
+	(*CreateUserResponse)(nil),     // 10: v1.CreateUserResponse
+	(*UpdateUserRequest)(nil),      // 11: v1.UpdateUserRequest
+	(*UpdateUserResponse)(nil),     // 12: v1.UpdateUserResponse
+	(*DeleteUserRequest)(nil),      // 13: v1.DeleteUserRequest
+	(*DeleteUserResponse)(nil),     // 14: v1.DeleteUserResponse
+	(*GetUserRequest)(nil),         // 15: v1.GetUserRequest
+	(*GetUserResponse)(nil),        // 16: v1.GetUserResponse
+	(*ListUserRequest)(nil),        // 17: v1.ListUserRequest
+	(*ListUserResponse)(nil),       // 18: v1.ListUserResponse
 }
 var file_apiserver_v1_user_proto_depIdxs = []int32{
-	17, // 0: v1.User.createdAt:type_name -> google.protobuf.Timestamp
-	17, // 1: v1.User.updatedAt:type_name -> google.protobuf.Timestamp
-	17, // 2: v1.LoginResponse.expireAt:type_name -> google.protobuf.Timestamp
-	17, // 3: v1.RefreshTokenResponse.expireAt:type_name -> google.protobuf.Timestamp
-	0,  // 4: v1.GetUserResponse.user:type_name -> v1.User
-	0,  // 5: v1.ListUserResponse.users:type_name -> v1.User
-	6,  // [6:6] is the sub-list for method output_type
-	6,  // [6:6] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	0, // 0: v1.User.gender:type_name -> v1.Gender
+	1, // 1: v1.User.registerSource:type_name -> v1.RegisterSource
+	0, // 2: v1.CreateUserRequest.gender:type_name -> v1.Gender
+	1, // 3: v1.CreateUserRequest.registerSource:type_name -> v1.RegisterSource
+	0, // 4: v1.UpdateUserRequest.gender:type_name -> v1.Gender
+	2, // 5: v1.GetUserResponse.user:type_name -> v1.User
+	2, // 6: v1.ListUserResponse.users:type_name -> v1.User
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_apiserver_v1_user_proto_init() }
@@ -1095,6 +1468,7 @@ func file_apiserver_v1_user_proto_init() {
 	if File_apiserver_v1_user_proto != nil {
 		return
 	}
+	file_apiserver_v1_user_proto_msgTypes[0].OneofWrappers = []any{}
 	file_apiserver_v1_user_proto_msgTypes[7].OneofWrappers = []any{}
 	file_apiserver_v1_user_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
@@ -1102,13 +1476,14 @@ func file_apiserver_v1_user_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_apiserver_v1_user_proto_rawDesc), len(file_apiserver_v1_user_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      2,
 			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_apiserver_v1_user_proto_goTypes,
 		DependencyIndexes: file_apiserver_v1_user_proto_depIdxs,
+		EnumInfos:         file_apiserver_v1_user_proto_enumTypes,
 		MessageInfos:      file_apiserver_v1_user_proto_msgTypes,
 	}.Build()
 	File_apiserver_v1_user_proto = out.File

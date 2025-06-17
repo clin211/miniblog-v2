@@ -153,14 +153,31 @@ Flags:
 使用方式：
 
 ```sh
-go run cmd/gen-gorm-model/gen_gorm_model.go -a <host>:<port> -u <username> -p <password>
+cd cmd/gen-gorm-model
+go run ./gen_gorm_model.go -a <host>:<port> -u <username> -p <password> -d <database_name>
 ```
 
 > 以 docker-compose 中 MySQL 配置为例！生成 GORM Model 的命令如下：
 >
 > ```sh
-> go run cmd/gen-gorm-model/gen_gorm_model.go -a 127.0.0.1:3306 -u 'miniblog' -p 'CueD7wbmJHxY'
+> $ cd cmd/gen-gorm-model
+> $ go run ./gen_gorm_model.go -a 127.0.0.1:3306 -u 'root' -p 'root' -d 'miniblog_v2'
+> 2025/06/13 09:01:50 got 24 columns from table <user>
+> 2025/06/13 09:01:50 got 20 columns from table <post>
+> 2025/06/13 09:01:50 got 9 columns from table <category>
+> 2025/06/13 09:01:50 got 6 columns from table <tag>
+> 2025/06/13 09:01:50 got 5 columns from table <post_tag>
+> 2025/06/13 09:01:50 got 8 columns from table <casbin_rule>
+> 2025/06/13 09:01:50 Start generating code.
+> 2025/06/13 09:01:50 generate model file(table <category> -> {model.CategoryM}): /Users/forest/code/backend/Go/miniblog-v2/internal/apiserver/model/category.gen.go
+> 2025/06/13 09:01:50 generate model file(table <tag> -> {model.TagM}): /Users/forest/code/backend/Go/miniblog-v2/internal/apiserver/model/tag.gen.go
+> 2025/06/13 09:01:50 generate model file(table <post_tag> -> {model.PostTagM}): /Users/forest/code/backend/Go/miniblog-v2/internal/apiserver/model/post_tag.gen.go
+> 2025/06/13 09:01:50 generate model file(table <casbin_rule> -> {model.CasbinRuleM}): /Users/forest/code/backend/Go/miniblog-v2/internal/apiserver/model/casbin_rule.gen.go
+> 2025/06/13 09:01:50 generate model file(table <post> -> {model.PostM}): /Users/forest/code/backend/Go/miniblog-v2/internal/apiserver/model/post.gen.go
+> 2025/06/13 09:01:50 generate model file(table <user> -> {model.UserM}): /Users/forest/code/backend/Go/miniblog-v2/internal/apiserver/model/user.gen.go
+> 2025/06/13 09:01:50 Generate code done.
 > ```
+>
 
 ## 开源许可
 

@@ -17,6 +17,12 @@ import "apiserver/v1/healthz.proto";
 import "apiserver/v1/post.proto";
 // 定义当前服务所依赖的用户消息
 import "apiserver/v1/user.proto";
+// 定义当前服务所依赖的分类消息
+import "apiserver/v1/category.proto";
+// 定义当前服务所依赖的标签消息
+import "apiserver/v1/tag.proto";
+// 定义当前服务所依赖的文章标签关联消息
+import "apiserver/v1/post_tag.proto";
 // 为生成 OpenAPI 文档提供相关注释（如标题、版本、作者、许可证等信息）
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -60,11 +66,11 @@ service MiniBlog {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            // 在 OpenAPI 文档中的接口简要描述，为“服务健康检查”
+            // 在 OpenAPI 文档中的接口简要描述，为"服务健康检查"
             summary: "服务健康检查";
-            // 标识该操作的唯一ID，为“Healthz”
+            // 标识该操作的唯一ID，为"Healthz"
             operation_id: "Healthz";
-            // 将该接口归类为“服务治理”
+            // 将该接口归类为"服务治理"
             tags: "服务治理";
         };
     }
@@ -254,6 +260,209 @@ service MiniBlog {
             summary: "列出所有文章";
             operation_id: "ListPost";
             tags: "博客管理";
+        };
+    }
+
+    // CreateCategory 创建分类
+    rpc CreateCategory(CreateCategoryRequest) returns (CreateCategoryResponse) {
+        option (google.api.http) = {
+            post: "/v1/categories",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "创建分类";
+            operation_id: "CreateCategory";
+            tags: "分类管理";
+        };
+    }
+
+    // UpdateCategory 更新分类
+    rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse) {
+        option (google.api.http) = {
+            put: "/v1/categories/{id}",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "更新分类";
+            operation_id: "UpdateCategory";
+            tags: "分类管理";
+        };
+    }
+
+    // DeleteCategory 删除分类
+    rpc DeleteCategory(DeleteCategoryRequest) returns (DeleteCategoryResponse) {
+        option (google.api.http) = {
+            delete: "/v1/categories/{id}",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "删除分类";
+            operation_id: "DeleteCategory";
+            tags: "分类管理";
+        };
+    }
+
+    // GetCategory 获取分类信息
+    rpc GetCategory(GetCategoryRequest) returns (GetCategoryResponse) {
+        option (google.api.http) = {
+            get: "/v1/categories/{id}",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "获取分类信息";
+            operation_id: "GetCategory";
+            tags: "分类管理";
+        };
+    }
+
+    // ListCategory 列出所有分类
+    rpc ListCategory(ListCategoryRequest) returns (ListCategoryResponse) {
+        option (google.api.http) = {
+            get: "/v1/categories",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "列出所有分类";
+            operation_id: "ListCategory";
+            tags: "分类管理";
+        };
+    }
+
+    // CreateTag 创建标签
+    rpc CreateTag(CreateTagRequest) returns (CreateTagResponse) {
+        option (google.api.http) = {
+            post: "/v1/tags",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "创建标签";
+            operation_id: "CreateTag";
+            tags: "标签管理";
+        };
+    }
+
+    // UpdateTag 更新标签
+    rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse) {
+        option (google.api.http) = {
+            put: "/v1/tags/{id}",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "更新标签";
+            operation_id: "UpdateTag";
+            tags: "标签管理";
+        };
+    }
+
+    // DeleteTag 删除标签
+    rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse) {
+        option (google.api.http) = {
+            delete: "/v1/tags/{id}",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "删除标签";
+            operation_id: "DeleteTag";
+            tags: "标签管理";
+        };
+    }
+
+    // GetTag 获取标签信息
+    rpc GetTag(GetTagRequest) returns (GetTagResponse) {
+        option (google.api.http) = {
+            get: "/v1/tags/{id}",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "获取标签信息";
+            operation_id: "GetTag";
+            tags: "标签管理";
+        };
+    }
+
+    // ListTag 列出所有标签
+    rpc ListTag(ListTagRequest) returns (ListTagResponse) {
+        option (google.api.http) = {
+            get: "/v1/tags",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "列出所有标签";
+            operation_id: "ListTag";
+            tags: "标签管理";
+        };
+    }
+
+    // CreatePostTag 创建文章标签关联
+    rpc CreatePostTag(CreatePostTagRequest) returns (CreatePostTagResponse) {
+        option (google.api.http) = {
+            post: "/v1/post-tags",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "创建文章标签关联";
+            operation_id: "CreatePostTag";
+            tags: "文章标签管理";
+        };
+    }
+
+    // DeletePostTag 删除文章标签关联
+    rpc DeletePostTag(DeletePostTagRequest) returns (DeletePostTagResponse) {
+        option (google.api.http) = {
+            delete: "/v1/post-tags",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "删除文章标签关联";
+            operation_id: "DeletePostTag";
+            tags: "文章标签管理";
+        };
+    }
+
+    // ListPostTags 列出文章标签关联
+    rpc ListPostTags(ListPostTagsRequest) returns (ListPostTagsResponse) {
+        option (google.api.http) = {
+            get: "/v1/post-tags",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "列出文章标签关联";
+            operation_id: "ListPostTags";
+            tags: "文章标签管理";
+        };
+    }
+
+    // BatchCreatePostTags 批量创建文章标签关联
+    rpc BatchCreatePostTags(BatchCreatePostTagsRequest) returns (BatchCreatePostTagsResponse) {
+        option (google.api.http) = {
+            post: "/v1/post-tags/batch",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "批量创建文章标签关联";
+            operation_id: "BatchCreatePostTags";
+            tags: "文章标签管理";
+        };
+    }
+
+    // BatchDeletePostTags 批量删除文章标签关联
+    rpc BatchDeletePostTags(BatchDeletePostTagsRequest) returns (BatchDeletePostTagsResponse) {
+        option (google.api.http) = {
+            delete: "/v1/post-tags/batch",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "批量删除文章标签关联";
+            operation_id: "BatchDeletePostTags";
+            tags: "文章标签管理";
         };
     }
 }

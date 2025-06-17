@@ -16,7 +16,6 @@ package v1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -29,21 +28,151 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// PostType 表示文章类型
+type PostType int32
+
+const (
+	PostType_POST_TYPE_UNSPECIFIED  PostType = 0 // 未指定
+	PostType_POST_TYPE_ORIGINAL     PostType = 1 // 原创
+	PostType_POST_TYPE_REPOST       PostType = 2 // 转载
+	PostType_POST_TYPE_CONTRIBUTION PostType = 3 // 投稿
+)
+
+// Enum value maps for PostType.
+var (
+	PostType_name = map[int32]string{
+		0: "POST_TYPE_UNSPECIFIED",
+		1: "POST_TYPE_ORIGINAL",
+		2: "POST_TYPE_REPOST",
+		3: "POST_TYPE_CONTRIBUTION",
+	}
+	PostType_value = map[string]int32{
+		"POST_TYPE_UNSPECIFIED":  0,
+		"POST_TYPE_ORIGINAL":     1,
+		"POST_TYPE_REPOST":       2,
+		"POST_TYPE_CONTRIBUTION": 3,
+	}
+)
+
+func (x PostType) Enum() *PostType {
+	p := new(PostType)
+	*p = x
+	return p
+}
+
+func (x PostType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PostType) Descriptor() protoreflect.EnumDescriptor {
+	return file_apiserver_v1_post_proto_enumTypes[0].Descriptor()
+}
+
+func (PostType) Type() protoreflect.EnumType {
+	return &file_apiserver_v1_post_proto_enumTypes[0]
+}
+
+func (x PostType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PostType.Descriptor instead.
+func (PostType) EnumDescriptor() ([]byte, []int) {
+	return file_apiserver_v1_post_proto_rawDescGZIP(), []int{0}
+}
+
+// PostStatus 表示文章状态
+type PostStatus int32
+
+const (
+	PostStatus_POST_STATUS_UNSPECIFIED PostStatus = 0 // 未指定
+	PostStatus_POST_STATUS_DRAFT       PostStatus = 1 // 草稿
+	PostStatus_POST_STATUS_PUBLISHED   PostStatus = 2 // 已发布
+	PostStatus_POST_STATUS_ARCHIVED    PostStatus = 3 // 已归档
+)
+
+// Enum value maps for PostStatus.
+var (
+	PostStatus_name = map[int32]string{
+		0: "POST_STATUS_UNSPECIFIED",
+		1: "POST_STATUS_DRAFT",
+		2: "POST_STATUS_PUBLISHED",
+		3: "POST_STATUS_ARCHIVED",
+	}
+	PostStatus_value = map[string]int32{
+		"POST_STATUS_UNSPECIFIED": 0,
+		"POST_STATUS_DRAFT":       1,
+		"POST_STATUS_PUBLISHED":   2,
+		"POST_STATUS_ARCHIVED":    3,
+	}
+)
+
+func (x PostStatus) Enum() *PostStatus {
+	p := new(PostStatus)
+	*p = x
+	return p
+}
+
+func (x PostStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PostStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_apiserver_v1_post_proto_enumTypes[1].Descriptor()
+}
+
+func (PostStatus) Type() protoreflect.EnumType {
+	return &file_apiserver_v1_post_proto_enumTypes[1]
+}
+
+func (x PostStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PostStatus.Descriptor instead.
+func (PostStatus) EnumDescriptor() ([]byte, []int) {
+	return file_apiserver_v1_post_proto_rawDescGZIP(), []int{1}
+}
+
 // Post 表示博客文章
 type Post struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// postID 表示博文 ID
 	PostID string `protobuf:"bytes,1,opt,name=postID,proto3" json:"postID,omitempty"`
-	// userID 表示用户 ID
-	UserID string `protobuf:"bytes,2,opt,name=userID,proto3" json:"userID,omitempty"`
 	// title 表示博客标题
-	Title string `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	// content 表示博客内容
-	Content string `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
-	// createdAt 表示博客创建时间
-	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	// updatedAt 表示博客最后更新时间
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	Content string `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	// cover 表示文章封面
+	Cover *string `protobuf:"bytes,4,opt,name=cover,proto3,oneof" json:"cover,omitempty"`
+	// summary 表示文章摘要
+	Summary *string `protobuf:"bytes,5,opt,name=summary,proto3,oneof" json:"summary,omitempty"`
+	// userID 表示用户ID
+	UserID string `protobuf:"bytes,6,opt,name=userID,proto3" json:"userID,omitempty"`
+	// categoryID 表示分类ID
+	CategoryID *int32 `protobuf:"varint,7,opt,name=categoryID,proto3,oneof" json:"categoryID,omitempty"`
+	// postType 表示文章类型
+	PostType PostType `protobuf:"varint,8,opt,name=postType,proto3,enum=v1.PostType" json:"postType,omitempty"`
+	// originalAuthor 表示原作者姓名（转载/投稿时使用）
+	OriginalAuthor *string `protobuf:"bytes,9,opt,name=originalAuthor,proto3,oneof" json:"originalAuthor,omitempty"`
+	// originalSource 表示原文链接或来源（转载时使用）
+	OriginalSource *string `protobuf:"bytes,10,opt,name=originalSource,proto3,oneof" json:"originalSource,omitempty"`
+	// originalAuthorIntro 表示原作者简介（投稿时使用）
+	OriginalAuthorIntro *string `protobuf:"bytes,11,opt,name=originalAuthorIntro,proto3,oneof" json:"originalAuthorIntro,omitempty"`
+	// position 表示文章排序，0-默认排序，1-置顶，数字越大越靠前
+	Position int32 `protobuf:"varint,12,opt,name=position,proto3" json:"position,omitempty"`
+	// viewCount 表示阅读次数
+	ViewCount int32 `protobuf:"varint,13,opt,name=viewCount,proto3" json:"viewCount,omitempty"`
+	// likeCount 表示点赞数
+	LikeCount int32 `protobuf:"varint,14,opt,name=likeCount,proto3" json:"likeCount,omitempty"`
+	// status 表示文章状态
+	Status PostStatus `protobuf:"varint,15,opt,name=status,proto3,enum=v1.PostStatus" json:"status,omitempty"`
+	// publishedAt 表示发布时间（Unix 时间戳）
+	PublishedAt *int64 `protobuf:"varint,16,opt,name=publishedAt,proto3,oneof" json:"publishedAt,omitempty"`
+	// createdAt 表示博客创建时间（Unix 时间戳）
+	CreatedAt int64 `protobuf:"varint,17,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	// updatedAt 表示博客最后更新时间（Unix 时间戳）
+	UpdatedAt     int64 `protobuf:"varint,18,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -85,13 +214,6 @@ func (x *Post) GetPostID() string {
 	return ""
 }
 
-func (x *Post) GetUserID() string {
-	if x != nil {
-		return x.UserID
-	}
-	return ""
-}
-
 func (x *Post) GetTitle() string {
 	if x != nil {
 		return x.Title
@@ -106,18 +228,109 @@ func (x *Post) GetContent() string {
 	return ""
 }
 
-func (x *Post) GetCreatedAt() *timestamppb.Timestamp {
+func (x *Post) GetCover() string {
+	if x != nil && x.Cover != nil {
+		return *x.Cover
+	}
+	return ""
+}
+
+func (x *Post) GetSummary() string {
+	if x != nil && x.Summary != nil {
+		return *x.Summary
+	}
+	return ""
+}
+
+func (x *Post) GetUserID() string {
+	if x != nil {
+		return x.UserID
+	}
+	return ""
+}
+
+func (x *Post) GetCategoryID() int32 {
+	if x != nil && x.CategoryID != nil {
+		return *x.CategoryID
+	}
+	return 0
+}
+
+func (x *Post) GetPostType() PostType {
+	if x != nil {
+		return x.PostType
+	}
+	return PostType_POST_TYPE_UNSPECIFIED
+}
+
+func (x *Post) GetOriginalAuthor() string {
+	if x != nil && x.OriginalAuthor != nil {
+		return *x.OriginalAuthor
+	}
+	return ""
+}
+
+func (x *Post) GetOriginalSource() string {
+	if x != nil && x.OriginalSource != nil {
+		return *x.OriginalSource
+	}
+	return ""
+}
+
+func (x *Post) GetOriginalAuthorIntro() string {
+	if x != nil && x.OriginalAuthorIntro != nil {
+		return *x.OriginalAuthorIntro
+	}
+	return ""
+}
+
+func (x *Post) GetPosition() int32 {
+	if x != nil {
+		return x.Position
+	}
+	return 0
+}
+
+func (x *Post) GetViewCount() int32 {
+	if x != nil {
+		return x.ViewCount
+	}
+	return 0
+}
+
+func (x *Post) GetLikeCount() int32 {
+	if x != nil {
+		return x.LikeCount
+	}
+	return 0
+}
+
+func (x *Post) GetStatus() PostStatus {
+	if x != nil {
+		return x.Status
+	}
+	return PostStatus_POST_STATUS_UNSPECIFIED
+}
+
+func (x *Post) GetPublishedAt() int64 {
+	if x != nil && x.PublishedAt != nil {
+		return *x.PublishedAt
+	}
+	return 0
+}
+
+func (x *Post) GetCreatedAt() int64 {
 	if x != nil {
 		return x.CreatedAt
 	}
-	return nil
+	return 0
 }
 
-func (x *Post) GetUpdatedAt() *timestamppb.Timestamp {
+func (x *Post) GetUpdatedAt() int64 {
 	if x != nil {
 		return x.UpdatedAt
 	}
-	return nil
+	return 0
 }
 
 // CreatePostRequest 表示创建文章请求
@@ -126,7 +339,25 @@ type CreatePostRequest struct {
 	// title 表示博客标题
 	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	// content 表示博客内容
-	Content       string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	Content string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	// cover 表示文章封面
+	Cover *string `protobuf:"bytes,3,opt,name=cover,proto3,oneof" json:"cover,omitempty"`
+	// summary 表示文章摘要
+	Summary *string `protobuf:"bytes,4,opt,name=summary,proto3,oneof" json:"summary,omitempty"`
+	// categoryID 表示分类ID
+	CategoryID *int32 `protobuf:"varint,5,opt,name=categoryID,proto3,oneof" json:"categoryID,omitempty"`
+	// postType 表示文章类型
+	PostType PostType `protobuf:"varint,6,opt,name=postType,proto3,enum=v1.PostType" json:"postType,omitempty"`
+	// originalAuthor 表示原作者姓名（转载/投稿时使用）
+	OriginalAuthor *string `protobuf:"bytes,7,opt,name=originalAuthor,proto3,oneof" json:"originalAuthor,omitempty"`
+	// originalSource 表示原文链接或来源（转载时使用）
+	OriginalSource *string `protobuf:"bytes,8,opt,name=originalSource,proto3,oneof" json:"originalSource,omitempty"`
+	// originalAuthorIntro 表示原作者简介（投稿时使用）
+	OriginalAuthorIntro *string `protobuf:"bytes,9,opt,name=originalAuthorIntro,proto3,oneof" json:"originalAuthorIntro,omitempty"`
+	// position 表示文章排序
+	Position *int32 `protobuf:"varint,10,opt,name=position,proto3,oneof" json:"position,omitempty"`
+	// status 表示文章状态
+	Status        PostStatus `protobuf:"varint,11,opt,name=status,proto3,enum=v1.PostStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -173,6 +404,69 @@ func (x *CreatePostRequest) GetContent() string {
 		return x.Content
 	}
 	return ""
+}
+
+func (x *CreatePostRequest) GetCover() string {
+	if x != nil && x.Cover != nil {
+		return *x.Cover
+	}
+	return ""
+}
+
+func (x *CreatePostRequest) GetSummary() string {
+	if x != nil && x.Summary != nil {
+		return *x.Summary
+	}
+	return ""
+}
+
+func (x *CreatePostRequest) GetCategoryID() int32 {
+	if x != nil && x.CategoryID != nil {
+		return *x.CategoryID
+	}
+	return 0
+}
+
+func (x *CreatePostRequest) GetPostType() PostType {
+	if x != nil {
+		return x.PostType
+	}
+	return PostType_POST_TYPE_UNSPECIFIED
+}
+
+func (x *CreatePostRequest) GetOriginalAuthor() string {
+	if x != nil && x.OriginalAuthor != nil {
+		return *x.OriginalAuthor
+	}
+	return ""
+}
+
+func (x *CreatePostRequest) GetOriginalSource() string {
+	if x != nil && x.OriginalSource != nil {
+		return *x.OriginalSource
+	}
+	return ""
+}
+
+func (x *CreatePostRequest) GetOriginalAuthorIntro() string {
+	if x != nil && x.OriginalAuthorIntro != nil {
+		return *x.OriginalAuthorIntro
+	}
+	return ""
+}
+
+func (x *CreatePostRequest) GetPosition() int32 {
+	if x != nil && x.Position != nil {
+		return *x.Position
+	}
+	return 0
+}
+
+func (x *CreatePostRequest) GetStatus() PostStatus {
+	if x != nil {
+		return x.Status
+	}
+	return PostStatus_POST_STATUS_UNSPECIFIED
 }
 
 // CreatePostResponse 表示创建文章响应
@@ -229,7 +523,25 @@ type UpdatePostRequest struct {
 	// title 表示更新后的博客标题
 	Title *string `protobuf:"bytes,2,opt,name=title,proto3,oneof" json:"title,omitempty"`
 	// content 表示更新后的博客内容
-	Content       *string `protobuf:"bytes,3,opt,name=content,proto3,oneof" json:"content,omitempty"`
+	Content *string `protobuf:"bytes,3,opt,name=content,proto3,oneof" json:"content,omitempty"`
+	// cover 表示更新后的文章封面
+	Cover *string `protobuf:"bytes,4,opt,name=cover,proto3,oneof" json:"cover,omitempty"`
+	// summary 表示更新后的文章摘要
+	Summary *string `protobuf:"bytes,5,opt,name=summary,proto3,oneof" json:"summary,omitempty"`
+	// categoryID 表示更新后的分类ID
+	CategoryID *int32 `protobuf:"varint,6,opt,name=categoryID,proto3,oneof" json:"categoryID,omitempty"`
+	// postType 表示更新后的文章类型
+	PostType *PostType `protobuf:"varint,7,opt,name=postType,proto3,enum=v1.PostType,oneof" json:"postType,omitempty"`
+	// originalAuthor 表示更新后的原作者姓名
+	OriginalAuthor *string `protobuf:"bytes,8,opt,name=originalAuthor,proto3,oneof" json:"originalAuthor,omitempty"`
+	// originalSource 表示更新后的原文链接或来源
+	OriginalSource *string `protobuf:"bytes,9,opt,name=originalSource,proto3,oneof" json:"originalSource,omitempty"`
+	// originalAuthorIntro 表示更新后的原作者简介
+	OriginalAuthorIntro *string `protobuf:"bytes,10,opt,name=originalAuthorIntro,proto3,oneof" json:"originalAuthorIntro,omitempty"`
+	// position 表示更新后的文章排序
+	Position *int32 `protobuf:"varint,11,opt,name=position,proto3,oneof" json:"position,omitempty"`
+	// status 表示更新后的文章状态
+	Status        *PostStatus `protobuf:"varint,12,opt,name=status,proto3,enum=v1.PostStatus,oneof" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -283,6 +595,69 @@ func (x *UpdatePostRequest) GetContent() string {
 		return *x.Content
 	}
 	return ""
+}
+
+func (x *UpdatePostRequest) GetCover() string {
+	if x != nil && x.Cover != nil {
+		return *x.Cover
+	}
+	return ""
+}
+
+func (x *UpdatePostRequest) GetSummary() string {
+	if x != nil && x.Summary != nil {
+		return *x.Summary
+	}
+	return ""
+}
+
+func (x *UpdatePostRequest) GetCategoryID() int32 {
+	if x != nil && x.CategoryID != nil {
+		return *x.CategoryID
+	}
+	return 0
+}
+
+func (x *UpdatePostRequest) GetPostType() PostType {
+	if x != nil && x.PostType != nil {
+		return *x.PostType
+	}
+	return PostType_POST_TYPE_UNSPECIFIED
+}
+
+func (x *UpdatePostRequest) GetOriginalAuthor() string {
+	if x != nil && x.OriginalAuthor != nil {
+		return *x.OriginalAuthor
+	}
+	return ""
+}
+
+func (x *UpdatePostRequest) GetOriginalSource() string {
+	if x != nil && x.OriginalSource != nil {
+		return *x.OriginalSource
+	}
+	return ""
+}
+
+func (x *UpdatePostRequest) GetOriginalAuthorIntro() string {
+	if x != nil && x.OriginalAuthorIntro != nil {
+		return *x.OriginalAuthorIntro
+	}
+	return ""
+}
+
+func (x *UpdatePostRequest) GetPosition() int32 {
+	if x != nil && x.Position != nil {
+		return *x.Position
+	}
+	return 0
+}
+
+func (x *UpdatePostRequest) GetStatus() PostStatus {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return PostStatus_POST_STATUS_UNSPECIFIED
 }
 
 // UpdatePostResponse 表示更新文章响应
@@ -623,26 +998,92 @@ var File_apiserver_v1_post_proto protoreflect.FileDescriptor
 
 const file_apiserver_v1_post_proto_rawDesc = "" +
 	"\n" +
-	"\x17apiserver/v1/post.proto\x12\x02v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xda\x01\n" +
+	"\x17apiserver/v1/post.proto\x12\x02v1\"\xd6\x05\n" +
 	"\x04Post\x12\x16\n" +
-	"\x06postID\x18\x01 \x01(\tR\x06postID\x12\x16\n" +
-	"\x06userID\x18\x02 \x01(\tR\x06userID\x12\x14\n" +
-	"\x05title\x18\x03 \x01(\tR\x05title\x12\x18\n" +
-	"\acontent\x18\x04 \x01(\tR\acontent\x128\n" +
-	"\tcreatedAt\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"C\n" +
+	"\x06postID\x18\x01 \x01(\tR\x06postID\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x19\n" +
+	"\x05cover\x18\x04 \x01(\tH\x00R\x05cover\x88\x01\x01\x12\x1d\n" +
+	"\asummary\x18\x05 \x01(\tH\x01R\asummary\x88\x01\x01\x12\x16\n" +
+	"\x06userID\x18\x06 \x01(\tR\x06userID\x12#\n" +
+	"\n" +
+	"categoryID\x18\a \x01(\x05H\x02R\n" +
+	"categoryID\x88\x01\x01\x12(\n" +
+	"\bpostType\x18\b \x01(\x0e2\f.v1.PostTypeR\bpostType\x12+\n" +
+	"\x0eoriginalAuthor\x18\t \x01(\tH\x03R\x0eoriginalAuthor\x88\x01\x01\x12+\n" +
+	"\x0eoriginalSource\x18\n" +
+	" \x01(\tH\x04R\x0eoriginalSource\x88\x01\x01\x125\n" +
+	"\x13originalAuthorIntro\x18\v \x01(\tH\x05R\x13originalAuthorIntro\x88\x01\x01\x12\x1a\n" +
+	"\bposition\x18\f \x01(\x05R\bposition\x12\x1c\n" +
+	"\tviewCount\x18\r \x01(\x05R\tviewCount\x12\x1c\n" +
+	"\tlikeCount\x18\x0e \x01(\x05R\tlikeCount\x12&\n" +
+	"\x06status\x18\x0f \x01(\x0e2\x0e.v1.PostStatusR\x06status\x12%\n" +
+	"\vpublishedAt\x18\x10 \x01(\x03H\x06R\vpublishedAt\x88\x01\x01\x12\x1c\n" +
+	"\tcreatedAt\x18\x11 \x01(\x03R\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\x12 \x01(\x03R\tupdatedAtB\b\n" +
+	"\x06_coverB\n" +
+	"\n" +
+	"\b_summaryB\r\n" +
+	"\v_categoryIDB\x11\n" +
+	"\x0f_originalAuthorB\x11\n" +
+	"\x0f_originalSourceB\x16\n" +
+	"\x14_originalAuthorIntroB\x0e\n" +
+	"\f_publishedAt\"\x96\x04\n" +
 	"\x11CreatePostRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\",\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\x12\x19\n" +
+	"\x05cover\x18\x03 \x01(\tH\x00R\x05cover\x88\x01\x01\x12\x1d\n" +
+	"\asummary\x18\x04 \x01(\tH\x01R\asummary\x88\x01\x01\x12#\n" +
+	"\n" +
+	"categoryID\x18\x05 \x01(\x05H\x02R\n" +
+	"categoryID\x88\x01\x01\x12(\n" +
+	"\bpostType\x18\x06 \x01(\x0e2\f.v1.PostTypeR\bpostType\x12+\n" +
+	"\x0eoriginalAuthor\x18\a \x01(\tH\x03R\x0eoriginalAuthor\x88\x01\x01\x12+\n" +
+	"\x0eoriginalSource\x18\b \x01(\tH\x04R\x0eoriginalSource\x88\x01\x01\x125\n" +
+	"\x13originalAuthorIntro\x18\t \x01(\tH\x05R\x13originalAuthorIntro\x88\x01\x01\x12\x1f\n" +
+	"\bposition\x18\n" +
+	" \x01(\x05H\x06R\bposition\x88\x01\x01\x12&\n" +
+	"\x06status\x18\v \x01(\x0e2\x0e.v1.PostStatusR\x06statusB\b\n" +
+	"\x06_coverB\n" +
+	"\n" +
+	"\b_summaryB\r\n" +
+	"\v_categoryIDB\x11\n" +
+	"\x0f_originalAuthorB\x11\n" +
+	"\x0f_originalSourceB\x16\n" +
+	"\x14_originalAuthorIntroB\v\n" +
+	"\t_position\",\n" +
 	"\x12CreatePostResponse\x12\x16\n" +
-	"\x06postID\x18\x01 \x01(\tR\x06postID\"{\n" +
+	"\x06postID\x18\x01 \x01(\tR\x06postID\"\xf0\x04\n" +
 	"\x11UpdatePostRequest\x12\x16\n" +
 	"\x06postID\x18\x01 \x01(\tR\x06postID\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tH\x00R\x05title\x88\x01\x01\x12\x1d\n" +
-	"\acontent\x18\x03 \x01(\tH\x01R\acontent\x88\x01\x01B\b\n" +
+	"\acontent\x18\x03 \x01(\tH\x01R\acontent\x88\x01\x01\x12\x19\n" +
+	"\x05cover\x18\x04 \x01(\tH\x02R\x05cover\x88\x01\x01\x12\x1d\n" +
+	"\asummary\x18\x05 \x01(\tH\x03R\asummary\x88\x01\x01\x12#\n" +
+	"\n" +
+	"categoryID\x18\x06 \x01(\x05H\x04R\n" +
+	"categoryID\x88\x01\x01\x12-\n" +
+	"\bpostType\x18\a \x01(\x0e2\f.v1.PostTypeH\x05R\bpostType\x88\x01\x01\x12+\n" +
+	"\x0eoriginalAuthor\x18\b \x01(\tH\x06R\x0eoriginalAuthor\x88\x01\x01\x12+\n" +
+	"\x0eoriginalSource\x18\t \x01(\tH\aR\x0eoriginalSource\x88\x01\x01\x125\n" +
+	"\x13originalAuthorIntro\x18\n" +
+	" \x01(\tH\bR\x13originalAuthorIntro\x88\x01\x01\x12\x1f\n" +
+	"\bposition\x18\v \x01(\x05H\tR\bposition\x88\x01\x01\x12+\n" +
+	"\x06status\x18\f \x01(\x0e2\x0e.v1.PostStatusH\n" +
+	"R\x06status\x88\x01\x01B\b\n" +
 	"\x06_titleB\n" +
 	"\n" +
-	"\b_content\"\x14\n" +
+	"\b_contentB\b\n" +
+	"\x06_coverB\n" +
+	"\n" +
+	"\b_summaryB\r\n" +
+	"\v_categoryIDB\v\n" +
+	"\t_postTypeB\x11\n" +
+	"\x0f_originalAuthorB\x11\n" +
+	"\x0f_originalSourceB\x16\n" +
+	"\x14_originalAuthorIntroB\v\n" +
+	"\t_positionB\t\n" +
+	"\a_status\"\x14\n" +
 	"\x12UpdatePostResponse\"-\n" +
 	"\x11DeletePostRequest\x12\x18\n" +
 	"\apostIDs\x18\x01 \x03(\tR\apostIDs\"\x14\n" +
@@ -659,7 +1100,18 @@ const file_apiserver_v1_post_proto_rawDesc = "" +
 	"\x10ListPostResponse\x12\x1f\n" +
 	"\vtotal_count\x18\x01 \x01(\x03R\n" +
 	"totalCount\x12\x1e\n" +
-	"\x05posts\x18\x02 \x03(\v2\b.v1.PostR\x05postsB8Z6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
+	"\x05posts\x18\x02 \x03(\v2\b.v1.PostR\x05posts*o\n" +
+	"\bPostType\x12\x19\n" +
+	"\x15POST_TYPE_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12POST_TYPE_ORIGINAL\x10\x01\x12\x14\n" +
+	"\x10POST_TYPE_REPOST\x10\x02\x12\x1a\n" +
+	"\x16POST_TYPE_CONTRIBUTION\x10\x03*u\n" +
+	"\n" +
+	"PostStatus\x12\x1b\n" +
+	"\x17POST_STATUS_UNSPECIFIED\x10\x00\x12\x15\n" +
+	"\x11POST_STATUS_DRAFT\x10\x01\x12\x19\n" +
+	"\x15POST_STATUS_PUBLISHED\x10\x02\x12\x18\n" +
+	"\x14POST_STATUS_ARCHIVED\x10\x03B8Z6github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1b\x06proto3"
 
 var (
 	file_apiserver_v1_post_proto_rawDescOnce sync.Once
@@ -673,31 +1125,37 @@ func file_apiserver_v1_post_proto_rawDescGZIP() []byte {
 	return file_apiserver_v1_post_proto_rawDescData
 }
 
+var file_apiserver_v1_post_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_apiserver_v1_post_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_apiserver_v1_post_proto_goTypes = []any{
-	(*Post)(nil),                  // 0: v1.Post
-	(*CreatePostRequest)(nil),     // 1: v1.CreatePostRequest
-	(*CreatePostResponse)(nil),    // 2: v1.CreatePostResponse
-	(*UpdatePostRequest)(nil),     // 3: v1.UpdatePostRequest
-	(*UpdatePostResponse)(nil),    // 4: v1.UpdatePostResponse
-	(*DeletePostRequest)(nil),     // 5: v1.DeletePostRequest
-	(*DeletePostResponse)(nil),    // 6: v1.DeletePostResponse
-	(*GetPostRequest)(nil),        // 7: v1.GetPostRequest
-	(*GetPostResponse)(nil),       // 8: v1.GetPostResponse
-	(*ListPostRequest)(nil),       // 9: v1.ListPostRequest
-	(*ListPostResponse)(nil),      // 10: v1.ListPostResponse
-	(*timestamppb.Timestamp)(nil), // 11: google.protobuf.Timestamp
+	(PostType)(0),              // 0: v1.PostType
+	(PostStatus)(0),            // 1: v1.PostStatus
+	(*Post)(nil),               // 2: v1.Post
+	(*CreatePostRequest)(nil),  // 3: v1.CreatePostRequest
+	(*CreatePostResponse)(nil), // 4: v1.CreatePostResponse
+	(*UpdatePostRequest)(nil),  // 5: v1.UpdatePostRequest
+	(*UpdatePostResponse)(nil), // 6: v1.UpdatePostResponse
+	(*DeletePostRequest)(nil),  // 7: v1.DeletePostRequest
+	(*DeletePostResponse)(nil), // 8: v1.DeletePostResponse
+	(*GetPostRequest)(nil),     // 9: v1.GetPostRequest
+	(*GetPostResponse)(nil),    // 10: v1.GetPostResponse
+	(*ListPostRequest)(nil),    // 11: v1.ListPostRequest
+	(*ListPostResponse)(nil),   // 12: v1.ListPostResponse
 }
 var file_apiserver_v1_post_proto_depIdxs = []int32{
-	11, // 0: v1.Post.createdAt:type_name -> google.protobuf.Timestamp
-	11, // 1: v1.Post.updatedAt:type_name -> google.protobuf.Timestamp
-	0,  // 2: v1.GetPostResponse.post:type_name -> v1.Post
-	0,  // 3: v1.ListPostResponse.posts:type_name -> v1.Post
-	4,  // [4:4] is the sub-list for method output_type
-	4,  // [4:4] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	0, // 0: v1.Post.postType:type_name -> v1.PostType
+	1, // 1: v1.Post.status:type_name -> v1.PostStatus
+	0, // 2: v1.CreatePostRequest.postType:type_name -> v1.PostType
+	1, // 3: v1.CreatePostRequest.status:type_name -> v1.PostStatus
+	0, // 4: v1.UpdatePostRequest.postType:type_name -> v1.PostType
+	1, // 5: v1.UpdatePostRequest.status:type_name -> v1.PostStatus
+	2, // 6: v1.GetPostResponse.post:type_name -> v1.Post
+	2, // 7: v1.ListPostResponse.posts:type_name -> v1.Post
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_apiserver_v1_post_proto_init() }
@@ -705,6 +1163,8 @@ func file_apiserver_v1_post_proto_init() {
 	if File_apiserver_v1_post_proto != nil {
 		return
 	}
+	file_apiserver_v1_post_proto_msgTypes[0].OneofWrappers = []any{}
+	file_apiserver_v1_post_proto_msgTypes[1].OneofWrappers = []any{}
 	file_apiserver_v1_post_proto_msgTypes[3].OneofWrappers = []any{}
 	file_apiserver_v1_post_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
@@ -712,13 +1172,14 @@ func file_apiserver_v1_post_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_apiserver_v1_post_proto_rawDesc), len(file_apiserver_v1_post_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      2,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_apiserver_v1_post_proto_goTypes,
 		DependencyIndexes: file_apiserver_v1_post_proto_depIdxs,
+		EnumInfos:         file_apiserver_v1_post_proto_enumTypes,
 		MessageInfos:      file_apiserver_v1_post_proto_msgTypes,
 	}.Build()
 	File_apiserver_v1_post_proto = out.File

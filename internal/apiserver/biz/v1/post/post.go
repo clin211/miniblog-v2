@@ -7,6 +7,7 @@ package post
 
 import (
 	"context"
+	"time"
 
 	"github.com/jinzhu/copier"
 
@@ -51,6 +52,11 @@ func (b *postBiz) Create(ctx context.Context, rq *apiv1.CreatePostRequest) (*api
 	_ = copier.Copy(&postM, rq)
 	postM.UserID = contextx.UserID(ctx)
 
+	// 手动设置创建时间
+	now := time.Now()
+	postM.CreatedAt = &now
+	postM.UpdatedAt = &now
+
 	if err := b.store.Post().Create(ctx, &postM); err != nil {
 		return nil, err
 	}
@@ -60,7 +66,7 @@ func (b *postBiz) Create(ctx context.Context, rq *apiv1.CreatePostRequest) (*api
 
 // Update 实现 PostBiz 接口中的 Update 方法.
 func (b *postBiz) Update(ctx context.Context, rq *apiv1.UpdatePostRequest) (*apiv1.UpdatePostResponse, error) {
-	whr := where.T(ctx).F("postID", rq.GetPostID())
+	whr := where.T(ctx).F("post_id", rq.GetPostID())
 	postM, err := b.store.Post().Get(ctx, whr)
 	if err != nil {
 		return nil, err
@@ -71,8 +77,13 @@ func (b *postBiz) Update(ctx context.Context, rq *apiv1.UpdatePostRequest) (*api
 	}
 
 	if rq.Content != nil {
-		postM.Content = rq.GetContent()
+		content := rq.GetContent()
+		postM.Content = &content
 	}
+
+	// 手动设置更新时间
+	now := time.Now()
+	postM.UpdatedAt = &now
 
 	if err := b.store.Post().Update(ctx, postM); err != nil {
 		return nil, err
@@ -83,7 +94,7 @@ func (b *postBiz) Update(ctx context.Context, rq *apiv1.UpdatePostRequest) (*api
 
 // Delete 实现 PostBiz 接口中的 Delete 方法.
 func (b *postBiz) Delete(ctx context.Context, rq *apiv1.DeletePostRequest) (*apiv1.DeletePostResponse, error) {
-	whr := where.T(ctx).F("postID", rq.GetPostIDs())
+	whr := where.T(ctx).F("post_id", rq.GetPostIDs())
 	if err := b.store.Post().Delete(ctx, whr); err != nil {
 		return nil, err
 	}
@@ -93,7 +104,7 @@ func (b *postBiz) Delete(ctx context.Context, rq *apiv1.DeletePostRequest) (*api
 
 // Get 实现 PostBiz 接口中的 Get 方法.
 func (b *postBiz) Get(ctx context.Context, rq *apiv1.GetPostRequest) (*apiv1.GetPostResponse, error) {
-	whr := where.T(ctx).F("postID", rq.GetPostID())
+	whr := where.T(ctx).F("post_id", rq.GetPostID())
 	postM, err := b.store.Post().Get(ctx, whr)
 	if err != nil {
 		return nil, err

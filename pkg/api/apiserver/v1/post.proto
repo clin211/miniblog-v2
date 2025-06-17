@@ -8,24 +8,62 @@ syntax = "proto3";
 
 package v1;
 
-import "google/protobuf/timestamp.proto";
-
 option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
+
+// PostType 表示文章类型
+enum PostType {
+    POST_TYPE_UNSPECIFIED = 0;  // 未指定
+    POST_TYPE_ORIGINAL = 1;     // 原创
+    POST_TYPE_REPOST = 2;       // 转载
+    POST_TYPE_CONTRIBUTION = 3; // 投稿
+}
+
+// PostStatus 表示文章状态
+enum PostStatus {
+    POST_STATUS_UNSPECIFIED = 0; // 未指定
+    POST_STATUS_DRAFT = 1;       // 草稿
+    POST_STATUS_PUBLISHED = 2;   // 已发布
+    POST_STATUS_ARCHIVED = 3;    // 已归档
+}
 
 // Post 表示博客文章
 message Post {
     // postID 表示博文 ID
     string postID = 1;
-    // userID 表示用户 ID
-    string userID = 2;
     // title 表示博客标题
-    string title = 3;
+    string title = 2;
     // content 表示博客内容
-    string content = 4;
-    // createdAt 表示博客创建时间
-    google.protobuf.Timestamp createdAt = 5;
-    // updatedAt 表示博客最后更新时间
-    google.protobuf.Timestamp updatedAt = 6;
+    string content = 3;
+    // cover 表示文章封面
+    optional string cover = 4;
+    // summary 表示文章摘要
+    optional string summary = 5;
+    // userID 表示用户ID
+    string userID = 6;
+    // categoryID 表示分类ID
+    optional int32 categoryID = 7;
+    // postType 表示文章类型
+    PostType postType = 8;
+    // originalAuthor 表示原作者姓名（转载/投稿时使用）
+    optional string originalAuthor = 9;
+    // originalSource 表示原文链接或来源（转载时使用）
+    optional string originalSource = 10;
+    // originalAuthorIntro 表示原作者简介（投稿时使用）
+    optional string originalAuthorIntro = 11;
+    // position 表示文章排序，0-默认排序，1-置顶，数字越大越靠前
+    int32 position = 12;
+    // viewCount 表示阅读次数
+    int32 viewCount = 13;
+    // likeCount 表示点赞数
+    int32 likeCount = 14;
+    // status 表示文章状态
+    PostStatus status = 15;
+    // publishedAt 表示发布时间（Unix 时间戳）
+    optional int64 publishedAt = 16;
+    // createdAt 表示博客创建时间（Unix 时间戳）
+    int64 createdAt = 17;
+    // updatedAt 表示博客最后更新时间（Unix 时间戳）
+    int64 updatedAt = 18;
 }
 
 // CreatePostRequest 表示创建文章请求
@@ -34,6 +72,24 @@ message CreatePostRequest {
     string title = 1;
     // content 表示博客内容
     string content = 2;
+    // cover 表示文章封面
+    optional string cover = 3;
+    // summary 表示文章摘要
+    optional string summary = 4;
+    // categoryID 表示分类ID
+    optional int32 categoryID = 5;
+    // postType 表示文章类型
+    PostType postType = 6;
+    // originalAuthor 表示原作者姓名（转载/投稿时使用）
+    optional string originalAuthor = 7;
+    // originalSource 表示原文链接或来源（转载时使用）
+    optional string originalSource = 8;
+    // originalAuthorIntro 表示原作者简介（投稿时使用）
+    optional string originalAuthorIntro = 9;
+    // position 表示文章排序
+    optional int32 position = 10;
+    // status 表示文章状态
+    PostStatus status = 11;
 }
 
 // CreatePostResponse 表示创建文章响应
@@ -50,6 +106,24 @@ message UpdatePostRequest {
     optional string title = 2;
     // content 表示更新后的博客内容
     optional string content = 3;
+    // cover 表示更新后的文章封面
+    optional string cover = 4;
+    // summary 表示更新后的文章摘要
+    optional string summary = 5;
+    // categoryID 表示更新后的分类ID
+    optional int32 categoryID = 6;
+    // postType 表示更新后的文章类型
+    optional PostType postType = 7;
+    // originalAuthor 表示更新后的原作者姓名
+    optional string originalAuthor = 8;
+    // originalSource 表示更新后的原文链接或来源
+    optional string originalSource = 9;
+    // originalAuthorIntro 表示更新后的原作者简介
+    optional string originalAuthorIntro = 10;
+    // position 表示更新后的文章排序
+    optional int32 position = 11;
+    // status 表示更新后的文章状态
+    optional PostStatus status = 12;
 }
 
 // UpdatePostResponse 表示更新文章响应

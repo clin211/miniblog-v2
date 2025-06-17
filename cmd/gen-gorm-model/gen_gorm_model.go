@@ -47,7 +47,7 @@ var (
 	addr       = pflag.StringP("addr", "a", "127.0.0.1:3306", "MySQL host address.")
 	username   = pflag.StringP("username", "u", "miniblog", "Username to connect to the database.")
 	password   = pflag.StringP("password", "p", "miniblog1234", "Password to use when connecting to the database.")
-	database   = pflag.StringP("db", "d", "miniblog", "Database name to connect to.")
+	database   = pflag.StringP("db", "d", "miniblog_v2", "Database name to connect to.")
 	modelPath  = pflag.String("model-pkg-path", "", "Generated model code's package name.")
 	components = pflag.StringSlice("component", []string{"mb"}, "Generated model code's for specified component.")
 	help       = pflag.BoolP("help", "h", false, "Show this help message.")
@@ -147,11 +147,11 @@ func createGenerator(packagePath string) *gen.Generator {
 func applyGeneratorOptions(g *gen.Generator) {
 	// 为特定字段自定义 GORM 标签
 	g.WithOpts(
-		gen.FieldGORMTag("createdAt", func(tag field.GormTag) field.GormTag {
+		gen.FieldGORMTag("created_at", func(tag field.GormTag) field.GormTag {
 			tag.Set("default", "current_timestamp")
 			return tag
 		}),
-		gen.FieldGORMTag("updatedAt", func(tag field.GormTag) field.GormTag {
+		gen.FieldGORMTag("updated_at", func(tag field.GormTag) field.GormTag {
 			tag.Set("default", "current_timestamp")
 			return tag
 		}),
@@ -160,32 +160,158 @@ func applyGeneratorOptions(g *gen.Generator) {
 
 // GenerateMiniBlogModels 为 miniblog 组件生成模型.
 func GenerateMiniBlogModels(g *gen.Generator) {
+	// 用户表模型生成
 	g.GenerateModelAs(
 		"user",
 		"UserM",
 		gen.FieldIgnore("placeholder"),
-		gen.FieldGORMTag("username", func(tag field.GormTag) field.GormTag {
-			tag.Set("uniqueIndex", "idx_user_username")
+		gen.FieldRename("user_id", "UserID"),
+		gen.FieldRename("password_updated_at", "PasswordUpdatedAt"),
+		gen.FieldRename("email_verified", "EmailVerified"),
+		gen.FieldRename("phone_verified", "PhoneVerified"),
+		gen.FieldRename("failed_login_attempts", "FailedLoginAttempts"),
+		gen.FieldRename("last_login_at", "LastLoginAt"),
+		gen.FieldRename("last_login_ip", "LastLoginIP"),
+		gen.FieldRename("last_login_device", "LastLoginDevice"),
+		gen.FieldRename("is_risk", "IsRisk"),
+		gen.FieldRename("register_source", "RegisterSource"),
+		gen.FieldRename("register_ip", "RegisterIP"),
+		gen.FieldRename("wechat_openid", "WechatOpenID"),
+		gen.FieldRename("created_at", "CreatedAt"),
+		gen.FieldRename("updated_at", "UpdatedAt"),
+		gen.FieldRename("deleted_at", "DeletedAt"),
+		gen.FieldGORMTag("user_id", func(tag field.GormTag) field.GormTag {
+			tag.Set("uniqueIndex", "uk_user_id")
 			return tag
 		}),
-		gen.FieldGORMTag("userID", func(tag field.GormTag) field.GormTag {
-			tag.Set("uniqueIndex", "idx_user_userID")
+		gen.FieldGORMTag("username", func(tag field.GormTag) field.GormTag {
+			tag.Set("uniqueIndex", "uk_username")
+			return tag
+		}),
+		gen.FieldGORMTag("email", func(tag field.GormTag) field.GormTag {
+			tag.Set("uniqueIndex", "uk_email")
 			return tag
 		}),
 		gen.FieldGORMTag("phone", func(tag field.GormTag) field.GormTag {
-			tag.Set("uniqueIndex", "idx_user_phone")
+			tag.Set("uniqueIndex", "uk_phone")
+			return tag
+		}),
+		gen.FieldGORMTag("wechat_openid", func(tag field.GormTag) field.GormTag {
+			tag.Set("uniqueIndex", "uk_wechat_openid")
+			return tag
+		}),
+		gen.FieldGORMTag("status", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_status")
+			return tag
+		}),
+		gen.FieldGORMTag("deleted_at", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_deleted_at")
 			return tag
 		}),
 	)
+
+	// 分类表模型生成
+	g.GenerateModelAs(
+		"category",
+		"CategoryM",
+		gen.FieldIgnore("placeholder"),
+		gen.FieldRename("parent_id", "ParentID"),
+		gen.FieldRename("sort_order", "SortOrder"),
+		gen.FieldRename("is_active", "IsActive"),
+		gen.FieldRename("created_at", "CreatedAt"),
+		gen.FieldRename("updated_at", "UpdatedAt"),
+		gen.FieldRename("deleted_at", "DeletedAt"),
+		gen.FieldGORMTag("parent_id", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_parent_id")
+			return tag
+		}),
+		gen.FieldGORMTag("sort_order", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_sort_order")
+			return tag
+		}),
+	)
+
+	// 标签表模型生成
+	g.GenerateModelAs(
+		"tag",
+		"TagM",
+		gen.FieldIgnore("placeholder"),
+		gen.FieldRename("created_at", "CreatedAt"),
+		gen.FieldRename("updated_at", "UpdatedAt"),
+		gen.FieldRename("deleted_at", "DeletedAt"),
+		gen.FieldGORMTag("name", func(tag field.GormTag) field.GormTag {
+			tag.Set("uniqueIndex", "uk_tag_name")
+			return tag
+		}),
+	)
+
+	// 文章表模型生成 - 注意这里改为 user_id
 	g.GenerateModelAs(
 		"post",
 		"PostM",
 		gen.FieldIgnore("placeholder"),
-		gen.FieldGORMTag("postID", func(tag field.GormTag) field.GormTag {
-			tag.Set("uniqueIndex", "idx_post_postID")
+		gen.FieldRename("post_id", "PostID"),
+		gen.FieldRename("user_id", "UserID"),
+		gen.FieldRename("category_id", "CategoryID"),
+		gen.FieldRename("post_type", "PostType"),
+		gen.FieldRename("original_author", "OriginalAuthor"),
+		gen.FieldRename("original_source", "OriginalSource"),
+		gen.FieldRename("original_author_intro", "OriginalAuthorIntro"),
+		gen.FieldRename("view_count", "ViewCount"),
+		gen.FieldRename("like_count", "LikeCount"),
+		gen.FieldRename("published_at", "PublishedAt"),
+		gen.FieldRename("created_at", "CreatedAt"),
+		gen.FieldRename("updated_at", "UpdatedAt"),
+		gen.FieldRename("deleted_at", "DeletedAt"),
+		gen.FieldGORMTag("post_id", func(tag field.GormTag) field.GormTag {
+			tag.Set("uniqueIndex", "uk_post_id")
+			return tag
+		}),
+		gen.FieldGORMTag("user_id", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_user_id")
+			return tag
+		}),
+		gen.FieldGORMTag("category_id", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_category_id")
+			return tag
+		}),
+		gen.FieldGORMTag("post_type", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_post_type")
+			return tag
+		}),
+		gen.FieldGORMTag("status", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_status")
+			return tag
+		}),
+		gen.FieldGORMTag("deleted_at", func(tag field.GormTag) field.GormTag {
+			tag.Set("index", "idx_deleted_at")
 			return tag
 		}),
 	)
+
+	// 文章标签关联表模型生成
+	g.GenerateModelAs(
+		"post_tag",
+		"PostTagM",
+		gen.FieldIgnore("placeholder"),
+		gen.FieldRename("post_id", "PostID"),
+		gen.FieldRename("tag_id", "TagID"),
+		gen.FieldRename("created_at", "CreatedAt"),
+		gen.FieldRename("updated_at", "UpdatedAt"),
+		gen.FieldRename("deleted_at", "DeletedAt"),
+		gen.FieldGORMTag("post_id", func(tag field.GormTag) field.GormTag {
+			tag.Set("primaryKey", "true")
+			tag.Set("index", "idx_post_id")
+			return tag
+		}),
+		gen.FieldGORMTag("tag_id", func(tag field.GormTag) field.GormTag {
+			tag.Set("primaryKey", "true")
+			tag.Set("index", "idx_tag_id")
+			return tag
+		}),
+	)
+
+	// Casbin 规则表模型生成
 	g.GenerateModelAs(
 		"casbin_rule",
 		"CasbinRuleM",
