@@ -1,0 +1,51 @@
+# Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+# Use of this source code is governed by a MIT style
+# license that can be found in the LICENSE file. The original repo for
+# this file is https://github.com/clin211/miniblog-v2.git.
+
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+    - "release"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up QEMU
+      uses: actions/checkout@v4
+
+    - name: give version
+      run: |
+        echo "VERSION=$(git describe --tags --always --match='v*')" >> $GITHUB_ENV
+
+    - name: print version
+      run: |
+        echo "print version is ${{env.VERSION}}"
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build the Docker image
+      run: |
+        echo "build the image with tag is ${{env.VERSION}}"
+        docker version
+        # 登录阿里云镜像仓库
+        docker login --username=${{secrets.ALIYUN_USERNAME}} --password=${{secrets.ALIYUN_PASSWORD}} registry.cn-chengdu.aliyuncs.com
+        # 使用Dockerfile构建镜像
+        docker build . --file ./deployment/docker/prod/Dockerfile --tag registry.cn-chengdu.aliyuncs.com/go-practice/miniblog-v2:${{env.VERSION}}
+        # 推送镜像到镜像仓库
+        docker push registry.cn-chengdu.aliyuncs.com/go-practice/miniblog-v2:${{env.VERSION}}
+
+    - name: deploy to remote server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{secrets.HOST}}
+        username: root
+        key: ${{secrets.SSH_PRIVATE_KEY}}
+        port: 22
+        script: |
+          echo "deploy the image with tag is ${{env.VERSION}}"
+          cd /home/project/miniblog-v2
+          sh setup.sh ${{secrets.ALIYUN_USERNAME}} ${{secrets.ALIYUN_PASSWORD}} ${{env.VERSION}}

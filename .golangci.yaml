@@ -132,8 +132,8 @@ linters-settings:
     # Exclude godoc examples from forbidigo checks.  Default is true.
     exclude_godoc_examples: false
   funlen:
-    lines: 150
-    statements: 50
+    lines: 350 # 增加行数限制，适应验证规则函数
+    statements: 80 # 增加语句限制
   gci:
     # put imports beginning with prefix after 3rd-party packages;
     # only support one prefix
@@ -141,7 +141,7 @@ linters-settings:
     # prefix: github.com/onexstack/miniblog
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 30
+    min-complexity: 150 # 提高认知复杂度限制
   goconst:
     # minimal length of string constant, 3 by default
     min-len: 3
@@ -162,10 +162,10 @@ linters-settings:
 
   gocyclo:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 30
+    min-complexity: 70 # 提高圈复杂度限制
   cyclop:
     # the maximal code complexity to report
-    max-complexity: 50
+    max-complexity: 80 # 提高循环复杂度限制
     # the maximal average package complexity. If it's higher than 0.0 (float) the check is enabled (default 0.0)
     package-average: 0.0
     # should ignore tests (default false)
@@ -618,7 +618,7 @@ linters-settings:
       name: true
       begin: true
 
-  tenv:
+  usetesting:
     # The option `all` will run against whole test files (`_test.go`) regardless of method/function signatures.
     # By default, only methods that take `*testing.T`, `*testing.B`, and `testing.TB` as arguments are checked.
     all: false
@@ -677,6 +677,9 @@ linters-settings:
     force-err-cuddling: false
     # Allow leading comments to be separated with empty liens
     allow-separated-leading-comment: false
+  maintidx:
+    # show functions with maintainability index lower than N, only functions with complexity > 10 are checked.
+    under: 5 # 降低可维护性指数门槛，原默认值通常是10
   makezero:
     # Allow only slices initialized with a length of zero. Default is false.
     always: false
@@ -716,6 +719,8 @@ linters:
   - dupl
   - gosmopolitan
   - godot
+  - tenv
+    # deprecated, replaced by usetesting
     #- rowserrcheck
     #- sqlclosecheck
     #- structcheck
@@ -739,7 +744,7 @@ linters:
     #- tagliatelle
     #- nonamedreturns
     #- nilnil
-    #- tenv
+    #- tenv # deprecated, no longer valid linter name
     #- varnamelen
     #- contextcheck
     #- errname

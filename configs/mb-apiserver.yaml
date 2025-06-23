@@ -36,16 +36,25 @@ tls:
 # JWT 签发密钥
 jwt-key: Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5
 
-# MySQL
+# MySQL 数据库相关配置
 mysql:
-  # MySQL 机器 IP 和端口
-  host: 127.0.0.1:3306
-  # MySQL 用户名
-  user: root
-  # MySQL 密码
-  password: root
-  # MySQL 数据库名
+  # MySQL 机器 IP 和端口，默认 127.0.0.1:3306
+  addr: 127.0.0.1:11006
+  # MySQL 用户名(建议授权最小权限集)
+  username: root
+  # MySQL 用户密码
+  password: 123456
+  # miniblog 系统所用的数据库名
   database: miniblog_v2
+  # MySQL 最大空闲连接数，默认 100
+  max-idle-connections: 100
+  # MySQL 最大打开的连接数，默认 100
+  max-open-connections: 100
+  # 空闲连接最大存活时间，默认 10s
+  max-connection-life-time: 10s
+  # GORM 日志级别, 1: silent, 2:error, 3:warn, 4:info
+  # 生产环境建议设置为 4
+  log-level: 4
 
 # 日志配置
 log:
@@ -60,4 +69,4 @@ log:
   # 生产环境建议设置为 json
   format: json
   # 指定日志输出位置，多个输出，用 `逗号 + 空格` 分开。stdout：标准输出
-  output-paths: [ ./tmp/miniblog.log, stdout ]
+  output-paths: [ ./_output/miniblog.log, stdout ]

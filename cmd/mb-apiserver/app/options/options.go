@@ -45,23 +45,13 @@ type ServerOptions struct {
 // NewServerOptions 创建带有默认值的 ServerOptions 实例
 func NewServerOptions() *ServerOptions {
 	opts := &ServerOptions{
-		ServerMode:  apiserver.GRPCGatewayServerMode,
-		JWTKey:      "Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5",
-		TLSOptions:  genericoptions.NewTLSOptions(),
-		Expiration:  2 * time.Hour,
-		HTTPOptions: genericoptions.NewHTTPOptions(),
-		GRPCOptions: genericoptions.NewGRPCOptions(),
-		// TODO: 这里需要根据实际情况进行调整,比如从环境变量中获取(需要优化)
-		MySQLOptions: &genericoptions.MySQLOptions{
-			Addr:                  "127.0.0.1:3306",
-			Username:              "root",
-			Password:              "root",
-			Database:              "miniblog_v2",
-			MaxIdleConnections:    10,
-			MaxOpenConnections:    100,
-			MaxConnectionLifeTime: time.Hour,
-		},
-		// MySQLOptions: genericoptions.NewMySQLOptions(),
+		ServerMode:   apiserver.GRPCGatewayServerMode,
+		JWTKey:       "Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5",
+		Expiration:   2 * time.Hour,
+		TLSOptions:   genericoptions.NewTLSOptions(),
+		HTTPOptions:  genericoptions.NewHTTPOptions(),
+		GRPCOptions:  genericoptions.NewGRPCOptions(),
+		MySQLOptions: genericoptions.NewMySQLOptions(),
 	}
 	opts.HTTPOptions.Addr = ":5555"
 	opts.GRPCOptions.Addr = ":6666"
