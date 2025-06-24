@@ -29,8 +29,8 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 	// 年龄校验函数
 	validateAge := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
-			age := value.(*int32)
-			if age != nil && (*age < 0 || *age > 150) {
+			age := value.(int32)
+			if age < 0 || age > 150 {
 				return errno.ErrInvalidArgument.WithMessage("age must be between 0 and 150")
 			}
 			return nil
@@ -40,9 +40,9 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 	// 头像URL校验函数
 	validateAvatar := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
-			avatar := value.(*string)
-			if avatar != nil && *avatar != "" {
-				if _, err := url.ParseRequestURI(*avatar); err != nil {
+			avatar := value.(string)
+			if avatar != "" {
+				if _, err := url.ParseRequestURI(avatar); err != nil {
 					return errno.ErrInvalidArgument.WithMessage("avatar must be a valid URL")
 				}
 			}
@@ -79,9 +79,9 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 	// IP地址校验函数 TODO: 需要优化，应该是在服务端自动获取IP地址，而不是在客户端获取
 	validateIP := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
-			ipStr := value.(*string)
-			if ipStr != nil && *ipStr != "" {
-				if net.ParseIP(*ipStr) == nil {
+			ipStr := value.(string)
+			if ipStr != "" {
+				if net.ParseIP(ipStr) == nil {
 					return errno.ErrInvalidArgument.WithMessage("invalid IP address format")
 				}
 			}
@@ -109,9 +109,10 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 	// 微信OpenID校验函数
 	validateWechatOpenID := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
-			openID := value.(*string)
-			if openID != nil && *openID != "" {
-				return errno.ErrInvalidArgument.WithMessage("wechat openID cannot be empty")
+			openID := value.(string)
+			// 微信OpenID格式校验，如果提供了OpenID则进行基本格式检查
+			if openID != "" && len(openID) < 10 {
+				return errno.ErrInvalidArgument.WithMessage("wechat openID format is invalid")
 			}
 			return nil
 		}

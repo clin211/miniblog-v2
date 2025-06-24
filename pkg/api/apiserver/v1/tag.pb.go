@@ -215,7 +215,8 @@ func (x *CreateTagResponse) GetId() int32 {
 type UpdateTagRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// id 表示要更新的标签 ID
-	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	// @gotags: uri:"id"
+	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" uri:"id"`
 	// name 表示可选的标签名称
 	Name *string `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	// color 表示可选的标签颜色
@@ -316,7 +317,8 @@ func (*UpdateTagResponse) Descriptor() ([]byte, []int) {
 type DeleteTagRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// id 表示要删除的标签 ID
-	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	// @gotags: uri:"id"
+	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" uri:"id"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -399,7 +401,8 @@ func (*DeleteTagResponse) Descriptor() ([]byte, []int) {
 type GetTagRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// id 表示要获取的标签 ID
-	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	// @gotags: uri:"id"
+	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" uri:"id"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

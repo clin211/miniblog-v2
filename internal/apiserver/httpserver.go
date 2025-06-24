@@ -85,6 +85,16 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 			postv1.GET(":postID", handler.GetPost)    // 查询博客详情
 			postv1.GET("", handler.ListPost)          // 查询博客列表
 		}
+
+		// 标签相关路由
+		tagv1 := v1.Group("/tags")
+		{
+			tagv1.POST("", handler.CreateTag)      // 创建标签
+			tagv1.PUT(":id", handler.UpdateTag)    // 更新标签
+			tagv1.DELETE(":id", handler.DeleteTag) // 删除标签
+			tagv1.GET(":id", handler.GetTag)       // 查询标签详情
+			tagv1.GET("", handler.ListTag)         // 查询标签列表
+		}
 	}
 }
 

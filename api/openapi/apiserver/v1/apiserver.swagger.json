@@ -722,7 +722,7 @@
         "parameters": [
           {
             "name": "id",
-            "description": "id 表示要获取的标签 ID",
+            "description": "id 表示要获取的标签 ID\n@gotags: uri:\"id\"",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -753,7 +753,7 @@
         "parameters": [
           {
             "name": "id",
-            "description": "id 表示要删除的标签 ID",
+            "description": "id 表示要删除的标签 ID\n@gotags: uri:\"id\"",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -784,7 +784,7 @@
         "parameters": [
           {
             "name": "id",
-            "description": "id 表示要更新的标签 ID",
+            "description": "id 表示要更新的标签 ID\n@gotags: uri:\"id\"",
             "in": "path",
             "required": true,
             "type": "integer",

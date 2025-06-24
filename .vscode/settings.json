@@ -43,6 +43,7 @@
     "signkey",
     "Sonyflake",
     "stretchr",
+    "tagv",
     "timestamppb",
     "userv",
     "utilerrors",
