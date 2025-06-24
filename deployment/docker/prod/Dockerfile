@@ -39,6 +39,9 @@ FROM alpine:latest
 # 安装ca证书和时区数据
 RUN apk --no-cache add ca-certificates tzdata
 
+# 设置时区为上海
+ENV TZ=Asia/Shanghai
+
 WORKDIR /root/
 
 # 从构建阶段复制二进制文件
