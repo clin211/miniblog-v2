@@ -13,7 +13,6 @@ import (
 
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
 	"github.com/clin211/miniblog-v2/internal/pkg/known"
-	"github.com/clin211/miniblog-v2/internal/pkg/log"
 )
 
 // AuthnBypasswInterceptor 是一个 gRPC 拦截器，模拟所有请求都通过认证。
@@ -27,8 +26,6 @@ func AuthnBypasswInterceptor() grpc.UnaryServerInterceptor {
 				userID = values[0]
 			}
 		}
-
-		log.Debugw("Simulated authentication successful", "userID", userID)
 
 		// 将默认的用户信息存入上下文
 		ctx = context.WithValue(ctx, known.XUserID, userID) //nolint:staticcheck

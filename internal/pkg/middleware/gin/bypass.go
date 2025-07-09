@@ -8,7 +8,6 @@ package gin
 import (
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
 	"github.com/clin211/miniblog-v2/internal/pkg/known"
-	"github.com/clin211/miniblog-v2/internal/pkg/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,8 +20,6 @@ func AuthnBypasswMiddleware() gin.HandlerFunc {
 		if val := c.GetHeader(known.XUserID); val != "" {
 			userID = val
 		}
-
-		log.Debugw("Simulated authentication successful", "userID", userID)
 
 		// 将用户ID和用户名注入到上下文中
 		ctx := contextx.WithUserID(c.Request.Context(), userID)
