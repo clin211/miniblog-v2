@@ -55,6 +55,6 @@ func TestLoggerInitialization(t *testing.T) {
 // TestSync 测试日志同步
 func TestSync(t *testing.T) {
 	assert.NotPanics(t, func() {
-		Sync() // 确保 Sync 不会引发恐慌
+		Sync() // 确保 Sync 不会引发 panic
 	}, "Sync should not panic")
 }
