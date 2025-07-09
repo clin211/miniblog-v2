@@ -19,6 +19,10 @@ type (
 	accessTokenKey struct{}
 	// requestIDKey 定义请求 ID 的上下文键.
 	requestIDKey struct{}
+	// clientIPKey 定义客户端 IP 地址的上下文键.
+	clientIPKey struct{}
+	// clientLocationKey 定义客户端地理位置的上下文键.
+	clientLocationKey struct{}
 )
 
 // WithUserID 将用户 ID 存放到上下文中.
@@ -63,4 +67,26 @@ func WithRequestID(ctx context.Context, requestID string) context.Context {
 func RequestID(ctx context.Context) string {
 	requestID, _ := ctx.Value(requestIDKey{}).(string)
 	return requestID
+}
+
+// WithClientIP 将客户端 IP 地址存放到上下文中.
+func WithClientIP(ctx context.Context, clientIP string) context.Context {
+	return context.WithValue(ctx, clientIPKey{}, clientIP)
+}
+
+// ClientIP 从上下文中提取客户端 IP 地址.
+func ClientIP(ctx context.Context) string {
+	clientIP, _ := ctx.Value(clientIPKey{}).(string)
+	return clientIP
+}
+
+// WithClientLocation 将客户端地理位置信息存放到上下文中.
+func WithClientLocation(ctx context.Context, location string) context.Context {
+	return context.WithValue(ctx, clientLocationKey{}, location)
+}
+
+// ClientLocation 从上下文中提取客户端地理位置信息.
+func ClientLocation(ctx context.Context) string {
+	location, _ := ctx.Value(clientLocationKey{}).(string)
+	return location
 }
