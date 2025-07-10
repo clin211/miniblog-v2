@@ -25,6 +25,7 @@ func InitializeWebServer(*Config) (server.Server, error) {
 		wire.Struct(new(ServerConfig), "*"), // * 表示注入全部字段
 		wire.NewSet(store.ProviderSet, biz.ProviderSet),
 		ProvideDB, // 提供数据库实例
+		ProvideMongoDB,
 		validation.ProviderSet,
 		wire.NewSet(
 			wire.Struct(new(UserRetriever), "*"),

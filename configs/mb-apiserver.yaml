@@ -56,6 +56,21 @@ mysql:
   # 生产环境建议设置为 4
   log-level: 4
 
+# mongoDB 相关配置
+mongo:
+  # mongoDB 链接方式，如：mongodb://root:example@27.0.0.1:27001/?directConnection=true
+  url: mongodb://root:r8SggC783Xh1@127.0.0.1:27001/miniblog_v2?directConnection=true
+  # MongoDB 数据库名
+  database: miniblog_v2
+  # MongoDB 集合名（可选，通常在代码中指定）
+  collection: "device"
+  # MongoDB 用户名
+  username: root
+  # MongoDB 用户密码
+  password: r8SggC783Xh1
+  # 连接超时时间，默认 10s
+  timeout: 10s
+
 # 日志配置
 log:
   # 是否开启 caller，如果开启会在日志中显示调用日志所在的文件和行号

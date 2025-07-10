@@ -13,6 +13,7 @@ import (
 	"time"
 
 	genericoptions "github.com/onexstack/onexstack/pkg/options"
+	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
@@ -52,6 +53,7 @@ type Config struct {
 	GRPCOptions  *genericoptions.GRPCOptions
 	MySQLOptions *genericoptions.MySQLOptions
 	TLSOptions   *genericoptions.TLSOptions
+	MongoOptions *genericoptions.MongoOptions
 }
 
 // UnionServer 定义一个联合服务器. 根据 ServerMode 决定要启动的服务器类型.
@@ -147,7 +149,12 @@ func (cfg *Config) NewServerConfig() (*ServerConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	store := store.NewStore(db)
+
+	m, err := cfg.NewMongoClient()
+	if err != nil {
+		return nil, err
+	}
+	store := store.NewStore(db, m)
 
 	// 初始化权限认证模块
 	authz, err := auth.NewAuthz(store.DB(context.TODO()))
@@ -169,6 +176,10 @@ func (cfg *Config) NewDB() (*gorm.DB, error) {
 	return cfg.MySQLOptions.NewDB()
 }
 
+func (cfg *Config) NewMongoClient() (*mongo.Client, error) {
+	return cfg.MongoOptions.NewClient()
+}
+
 // UserRetriever 定义一个用户数据获取器. 用来获取用户信息.
 type UserRetriever struct {
 	store store.IStore
@@ -182,6 +193,11 @@ func (r *UserRetriever) GetUser(ctx context.Context, userID string) (*model.User
 // ProvideDB 根据配置提供一个数据库实例。Add commentMore actions
 func ProvideDB(cfg *Config) (*gorm.DB, error) {
 	return cfg.NewDB()
+}
+
+// ProvideMongoDB 根据配置t提供一个 MongoDB 数据库实例
+func ProvideMongoDB(cfg *Config) (*mongo.Client, error) {
+	return cfg.NewMongoClient()
 }
 
 func NewWebServer(serverMode string, serverConfig *ServerConfig) (server.Server, error) {

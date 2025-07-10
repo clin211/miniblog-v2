@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/google/wire"
+	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 
 	"github.com/clin211/miniblog-v2/pkg/where"
@@ -47,8 +48,8 @@ type transactionKey struct{}
 
 // datastore 是 IStore 的具体实现.
 type datastore struct {
-	core *gorm.DB
-
+	core  *gorm.DB
+	mongo *mongo.Client
 	// 可以根据需要添加其他数据库实例
 	// fake *gorm.DB
 }
@@ -57,10 +58,13 @@ type datastore struct {
 var _ IStore = (*datastore)(nil)
 
 // NewStore 创建一个 IStore 类型的实例.
-func NewStore(db *gorm.DB) *datastore {
+func NewStore(db *gorm.DB, md *mongo.Client) *datastore {
 	// 确保 S 只被初始化一次
 	once.Do(func() {
-		S = &datastore{db}
+		S = &datastore{
+			core:  db,
+			mongo: md,
+		}
 	})
 
 	return S

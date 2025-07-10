@@ -40,6 +40,8 @@ type ServerOptions struct {
 	GRPCOptions *genericoptions.GRPCOptions `json:"grpc" mapstructure:"grpc"`
 	// MySQLOptions 包含 MySQL 配置选项.
 	MySQLOptions *genericoptions.MySQLOptions `json:"mysql" mapstructure:"mysql"`
+	// MongoOptions 包含 MongoDB 选项
+	MongoOptions *genericoptions.MongoOptions `json:"mongodb" mapstructure:"mongo"`
 }
 
 // NewServerOptions 创建带有默认值的 ServerOptions 实例
@@ -52,6 +54,7 @@ func NewServerOptions() *ServerOptions {
 		HTTPOptions:  genericoptions.NewHTTPOptions(),
 		GRPCOptions:  genericoptions.NewGRPCOptions(),
 		MySQLOptions: genericoptions.NewMySQLOptions(),
+		MongoOptions: genericoptions.NewMongoOptions(),
 	}
 	opts.HTTPOptions.Addr = ":5555"
 	opts.GRPCOptions.Addr = ":6666"
@@ -69,6 +72,7 @@ func (o *ServerOptions) AddFlags(fs *pflag.FlagSet) {
 	o.HTTPOptions.AddFlags(fs)
 	o.GRPCOptions.AddFlags(fs)
 	o.MySQLOptions.AddFlags(fs)
+	o.MongoOptions.AddFlags(fs)
 }
 
 // Validate 检验 ServerOptions 中的选项是否合法
@@ -89,6 +93,7 @@ func (o *ServerOptions) Validate() error {
 	errs = append(errs, o.TLSOptions.Validate()...)
 	errs = append(errs, o.HTTPOptions.Validate()...)
 	errs = append(errs, o.MySQLOptions.Validate()...)
+	errs = append(errs, o.MongoOptions.Validate()...)
 
 	// 如果是 gRPC 或 gRPC-Gateway 模式，校验 gRPC 配置
 	if stringsutil.StringIn(o.ServerMode, []string{apiserver.GRPCServerMode, apiserver.GRPCGatewayServerMode}) {
@@ -109,5 +114,6 @@ func (o *ServerOptions) Config() (*apiserver.Config, error) {
 		HTTPOptions:  o.HTTPOptions,
 		GRPCOptions:  o.GRPCOptions,
 		MySQLOptions: o.MySQLOptions,
+		MongoOptions: o.MongoOptions,
 	}, nil
 }
