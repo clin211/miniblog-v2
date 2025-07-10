@@ -67,10 +67,18 @@ func AccessLogger() grpc.UnaryServerInterceptor {
 }
 
 // getClientIP 从 context 中获取客户端 IP 地址
+// 优先从 contextx 中获取已经处理过的 IP 信息，如果没有则从 peer 中提取
 func getClientIP(ctx context.Context) string {
+	// 优先从 context 中获取已经通过 requestid 中间件处理过的 IP 信息
+	if ip := contextx.ClientIP(ctx); ip != "" {
+		return ip
+	}
+
+	// 如果 context 中没有 IP 信息，则从 peer 中提取（兜底方案）
 	if p, ok := peer.FromContext(ctx); ok {
 		return p.Addr.String()
 	}
+
 	return "unknown"
 }
 

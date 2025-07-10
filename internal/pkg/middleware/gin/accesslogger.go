@@ -1,3 +1,8 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
 package gin
 
 import (
@@ -66,9 +71,15 @@ func AccessLogger() gin.HandlerFunc {
 			reqBody, _ = io.ReadAll(ctx.Request.Body)
 			ctx.Request.Body = io.NopCloser(bytes.NewReader(reqBody))
 		}
+
+		c := ctx.Request.Context()
+
 		// 从请求头中获取 `x-request-id`
-		requestID := contextx.RequestID(ctx.Request.Context())
+		requestID := contextx.RequestID(c)
 		start := time.Now()
+
+		// 获取 IP 信息
+		ip := contextx.ClientIP(c)
 
 		// 从池中获取 buffer
 		responseBuffer := getBuffer()
@@ -76,7 +87,7 @@ func AccessLogger() gin.HandlerFunc {
 		ctx.Writer = blw
 
 		// 记录访问开始
-		accessLog(ctx, "access_start", time.Since(start), requestID, reqBody, nil)
+		accessLog(ctx, "access_start", time.Since(start), requestID, ip, reqBody, nil)
 
 		defer func() {
 			var responseLogging string
@@ -87,7 +98,7 @@ func AccessLogger() gin.HandlerFunc {
 			}
 
 			// 记录访问结束
-			accessLog(ctx, "access_end", time.Since(start), requestID, reqBody, responseLogging)
+			accessLog(ctx, "access_end", time.Since(start), requestID, ip, reqBody, responseLogging)
 
 			// 将 buffer 放回池中
 			putBuffer(responseBuffer)
@@ -97,16 +108,17 @@ func AccessLogger() gin.HandlerFunc {
 }
 
 // accessLog 记录访问日志
-func accessLog(c *gin.Context, accessType string, dur time.Duration, requestID string, body []byte, dataOut interface{}) {
+func accessLog(c *gin.Context, accessType string, dur time.Duration, requestID, ip string, body []byte, dataOut interface{}) {
 	req := c.Request
 	bodyStr := string(body)
 	query := req.URL.RawQuery
 	path := req.URL.Path
 
 	userID, _ := token.ParseRequest(c)
+
 	log.Infow("AccessLog",
 		"type", accessType,
-		"ip", c.ClientIP(),
+		"ip", ip,
 		"userID", userID,
 		"requestID", requestID,
 		"method", req.Method,

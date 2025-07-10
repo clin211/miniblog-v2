@@ -7,19 +7,36 @@ package grpc
 
 import (
 	"context"
+	"net"
+	"strings"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
 	"github.com/clin211/miniblog-v2/internal/pkg/known"
+	"github.com/clin211/miniblog-v2/pkg/ipwho"
 )
 
-// RequestIDInterceptor 是一个 gRPC 拦截器，用于设置请求 ID.
+// RequestIDInterceptor 是一个 gRPC 拦截器，用于设置请求 ID 和客户端 IP 信息.
 func RequestIDInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+		// 获取详细的 IP 信息
+		client := ipwho.NewClient()
+		details, err := client.GetHostIPDetail(ctx)
+		if err != nil || details.IP == "" { // 获取客户端 IP 信息
+			clientIP := extractClientIP(ctx)
+			// 如果获取详细信息失败，仍然使用原始 IP
+			ctx = contextx.WithClientIP(ctx, clientIP)
+		} else {
+			// 将详细的 IP 信息保存到 context 中
+			ctx = contextx.WithClientIP(ctx, details.IP)
+
+		}
+
 		var requestID string
 		md, _ := metadata.FromIncomingContext(ctx)
 
@@ -44,8 +61,7 @@ func RequestIDInterceptor() grpc.UnaryServerInterceptor {
 		// Header Metadata 会在 RPC 响应返回时一并发送。
 		_ = grpc.SetHeader(ctx, md)
 
-		// 将请求 ID 添加到 ctx 中
-		//nolint: staticcheck
+		// 将请求 ID 添加到 ctx 中，使用已经包含 IP 信息的 context
 		ctx = contextx.WithRequestID(ctx, requestID)
 
 		// 继续处理请求
@@ -56,5 +72,35 @@ func RequestIDInterceptor() grpc.UnaryServerInterceptor {
 		}
 
 		return res, nil
+	}
+}
+
+// extractClientIP 从 gRPC context 中提取客户端 IP 地址，处理更复杂的情况
+func extractClientIP(ctx context.Context) string {
+	p, ok := peer.FromContext(ctx)
+	if !ok {
+		return ""
+	}
+
+	// 处理不同类型的地址
+	switch addr := p.Addr.(type) {
+	case *net.TCPAddr:
+		return addr.IP.String()
+	case *net.UDPAddr:
+		return addr.IP.String()
+	default:
+		// 尝试解析地址字符串
+		addrStr := addr.String()
+		if host, _, err := net.SplitHostPort(addrStr); err == nil {
+			return host
+		}
+		// 如果解析失败，尝试直接提取 IP（可能格式不标准）
+		if strings.Contains(addrStr, ":") {
+			parts := strings.Split(addrStr, ":")
+			if len(parts) > 0 {
+				return parts[0]
+			}
+		}
+		return addrStr
 	}
 }
