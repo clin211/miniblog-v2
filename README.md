@@ -16,7 +16,6 @@ MiniBlog 是一个基于 Go 语言开发的小型博客系统，旨在展示如�
 - **多服务器支持**：HTTP/HTTPS/gRPC 服务器和 HTTP 反向代理
 - **API 设计**：遵循 RESTful API 规范，提供 OpenAPI/Swagger 文档
 - **代码质量保证**：通过 golangci-lint 进行静态检查
-- **完善的测试**：单元测试、性能测试、模糊测试和示例测试
 
 ## 技术栈
 

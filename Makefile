@@ -107,3 +107,10 @@ ca: # 生成 CA 文件.
 lint: # 执行静态代码检查.
 	@echo "===========> Running golangci to lint source codes"
 	@golangci-lint run -c $(PROJ_ROOT_DIR)/.golangci.yaml $(PROJ_ROOT_DIR)/...
+
+
+.PHONY: dev
+dev:
+	@docker compose -f $(PROJ_ROOT_DIR)/deployment/docker/dev/docker-compose.env.yml up -d
+	@mkdir -p $(PROJ_ROOT_DIR)/tmp
+	@air

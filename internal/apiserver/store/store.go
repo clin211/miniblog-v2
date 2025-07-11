@@ -34,6 +34,8 @@ var (
 type IStore interface {
 	// 返回 Store 层的 *gorm.DB 实例，在少数场景下会被用到.
 	DB(ctx context.Context, wheres ...where.Where) *gorm.DB
+	// 返回 Store 层的 *mongo.Client 实例，用于 MongoDB 操作.
+	MongoDB(ctx context.Context) *mongo.Client
 	TX(ctx context.Context, fn func(ctx context.Context) error) error
 
 	User() UserStore
@@ -41,6 +43,8 @@ type IStore interface {
 	Tag() TagStore
 	// ConcretePosts 是一个示例 store 实现，用来演示在 Go 中如何直接与 DB 交互.
 	ConcretePost() ConcretePostStore
+	// Device 返回一个实现了 DeviceStore 接口的实例，用于演示 MongoDB 的使用.
+	Device() DeviceStore
 }
 
 // transactionKey 用于在 context.Context 中存储事务上下文的键.
@@ -110,7 +114,17 @@ func (store *datastore) Tag() TagStore {
 	return newTagStore(store)
 }
 
+// MongoDB 返回 MongoDB 客户端实例.
+func (store *datastore) MongoDB(ctx context.Context) *mongo.Client {
+	return store.mongo
+}
+
 // ConcretePosts 返回一个实现了 ConcretePostStore 接口的实例.
 func (store *datastore) ConcretePost() ConcretePostStore {
 	return newConcretePostStore(store)
+}
+
+// Device 返回一个实现了 DeviceStore 接口的实例.
+func (store *datastore) Device() DeviceStore {
+	return newDeviceStore(store)
 }

@@ -8,6 +8,7 @@ package biz
 import (
 	"github.com/google/wire"
 
+	devicev1 "github.com/clin211/miniblog-v2/internal/apiserver/biz/v1/device"
 	postv1 "github.com/clin211/miniblog-v2/internal/apiserver/biz/v1/post"
 	tagv1 "github.com/clin211/miniblog-v2/internal/apiserver/biz/v1/tag"
 	userv1 "github.com/clin211/miniblog-v2/internal/apiserver/biz/v1/user"
@@ -31,6 +32,8 @@ type IBiz interface {
 	PostV1() postv1.PostBiz
 	// 获取标签业务接口.
 	TagV1() tagv1.TagBiz
+	// 获取设备业务接口.
+	Device() devicev1.DeviceBiz
 	// 获取帖子业务接口（V2版本）.
 	// PostV2() post.PostBiz
 }
@@ -62,4 +65,9 @@ func (b *biz) PostV1() postv1.PostBiz {
 // TagV1 返回一个实现了 TagBiz 接口的实例.
 func (b *biz) TagV1() tagv1.TagBiz {
 	return tagv1.New(b.store)
+}
+
+// Device 返回设备业务逻辑接口的实现.
+func (b *biz) Device() devicev1.DeviceBiz {
+	return devicev1.NewDeviceBiz(b.store)
 }

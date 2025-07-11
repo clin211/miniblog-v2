@@ -95,6 +95,16 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 			tagv1.GET(":id", handler.GetTag)       // 查询标签详情
 			tagv1.GET("", handler.ListTag)         // 查询标签列表
 		}
+
+		// 设备相关路由
+		devicev1 := v1.Group("/devices")
+		{
+			devicev1.POST("", handler.CreateDevice)      // 创建设备
+			devicev1.PUT(":id", handler.UpdateDevice)    // 更新设备
+			devicev1.DELETE(":id", handler.DeleteDevice) // 删除设备
+			devicev1.GET(":id", handler.GetDevice)       // 获取单个设备
+			devicev1.GET("", handler.ListDevices)        // 查询设备列表
+		}
 	}
 }
 

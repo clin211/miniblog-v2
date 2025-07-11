@@ -14,6 +14,7 @@ import (
 
 	genericoptions "github.com/onexstack/onexstack/pkg/options"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
@@ -90,22 +91,6 @@ func (cfg *Config) NewUnionServer() (*UnionServer, error) {
 	token.Init(cfg.JWTKey, known.XUserID, cfg.Expiration)
 
 	log.Infow("Initializing federation server", "server-mode", cfg.ServerMode)
-	// 创建服务配置，这些配置可用来创建服务器
-	// serverConfig, err := cfg.NewServerConfig()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// // 根据服务模式创建对应的服务实例
-	// // 实际企业开发中，可以根据需要只选择一种服务器模式.
-	// // 这里为了方便给你展示，通过 cfg.ServerMode 同时支持了 Gin 和 GRPC 2 种服务器模式.
-	// var srv server.Server
-	// switch cfg.ServerMode {
-	// case GinServerMode:
-	// 	srv, err = serverConfig.NewGinServer(), nil
-	// default:
-	// 	srv, err = serverConfig.NewGRPCServerOr()
-	// }
 
 	// 创建服务配置，这些配置可用来创建服务器Add commentMore actions
 	srv, err := InitializeWebServer(cfg)
@@ -177,7 +162,23 @@ func (cfg *Config) NewDB() (*gorm.DB, error) {
 }
 
 func (cfg *Config) NewMongoClient() (*mongo.Client, error) {
-	return cfg.MongoOptions.NewClient()
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.MongoOptions.Timeout)
+	defer cancel()
+
+	// 使用URL创建MongoDB客户端
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.MongoOptions.URL))
+	if err != nil {
+		log.Errorw("Failed to connect to MongoDB", "err", err)
+		return nil, err
+	}
+
+	// 测试连接
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Errorw("Failed to ping MongoDB", "err", err)
+		return nil, err
+	}
+
+	return client, nil
 }
 
 // UserRetriever 定义一个用户数据获取器. 用来获取用户信息.
