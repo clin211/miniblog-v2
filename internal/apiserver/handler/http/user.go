@@ -23,7 +23,7 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 
 // ChangeUserPassword 修改用户密码.
 func (h *Handler) ChangePassword(c *gin.Context) {
-	core.HandleJSONRequest(c, h.biz.UserV1().ChangePassword, h.val.ValidateChangePasswordRequest)
+	core.HandleJSONWithURIRequest(c, h.biz.UserV1().ChangePassword, h.val.ValidateChangePasswordRequest)
 }
 
 // CreateUser 创建新用户.
@@ -33,7 +33,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 
 // UpdateUser 更新用户信息.
 func (h *Handler) UpdateUser(c *gin.Context) {
-	core.HandleJSONRequest(c, h.biz.UserV1().Update, h.val.ValidateUpdateUserRequest)
+	core.HandleJSONWithURIRequest(c, h.biz.UserV1().Update, h.val.ValidateUpdateUserRequest)
 }
 
 // DeleteUser 删除用户.

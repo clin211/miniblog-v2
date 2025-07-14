@@ -527,7 +527,8 @@ func (x *CreatePostResponse) GetPostID() string {
 type UpdatePostRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// postID 表示要更新的文章 ID，对应 {postID}
-	PostID string `protobuf:"bytes,1,opt,name=postID,proto3" json:"postID,omitempty"`
+	// @gotags: uri:"postID"
+	PostID string `protobuf:"bytes,1,opt,name=postID,proto3" json:"postID,omitempty" uri:"postID"`
 	// title 表示更新后的博客标题
 	Title *string `protobuf:"bytes,2,opt,name=title,proto3,oneof" json:"title,omitempty"`
 	// content 表示更新后的博客内容
@@ -802,7 +803,7 @@ type GetPostRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// postID 表示要获取的文章 ID
 	// @gotags: uri:"postID"
-	PostID        string `protobuf:"bytes,1,opt,name=postID,proto3" json:"postID,omitempty"`
+	PostID        string `protobuf:"bytes,1,opt,name=postID,proto3" json:"postID,omitempty" uri:"postID"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -895,10 +896,10 @@ type ListPostRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// offset 表示偏移量
 	// @gotags: form:"offset"
-	Offset int64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
+	Offset int64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty" form:"offset"`
 	// limit 表示每页数量
 	// @gotags: form:"limit"
-	Limit int64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Limit int64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty" form:"limit"`
 	// title 表示可选的标题过滤
 	Title         *string `protobuf:"bytes,3,opt,name=title,proto3,oneof" json:"title,omitempty"`
 	unknownFields protoimpl.UnknownFields

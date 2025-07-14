@@ -17,7 +17,7 @@ func (h *Handler) CreatePost(c *gin.Context) {
 
 // UpdatePost 更新博客帖子.
 func (h *Handler) UpdatePost(c *gin.Context) {
-	core.HandleJSONRequest(c, h.biz.PostV1().Update, h.val.ValidateUpdatePostRequest)
+	core.HandleJSONWithURIRequest(c, h.biz.PostV1().Update, h.val.ValidateUpdatePostRequest)
 }
 
 // DeletePost 删除博客帖子.

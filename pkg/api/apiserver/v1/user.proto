@@ -107,6 +107,7 @@ message RefreshTokenResponse {
 // ChangePasswordRequest 表示修改密码请求
 message ChangePasswordRequest {
     // userID 表示用户 ID
+    // @gotags: uri:"userID"
     string userID = 1;
     // oldPassword 表示当前密码
     string oldPassword = 2;
@@ -151,6 +152,7 @@ message CreateUserResponse {
 // UpdateUserRequest 表示更新用户请求
 message UpdateUserRequest {
     // userID 表示用户 ID
+    // @gotags: uri:"userID"
     string userID = 1;
     // username 表示可选的用户名称
     optional string username = 2;

@@ -103,6 +103,7 @@ message CreatePostResponse {
 // UpdatePostRequest 表示更新文章请求
 message UpdatePostRequest {
     // postID 表示要更新的文章 ID，对应 {postID}
+    // @gotags: uri:"postID"
     string postID = 1;
     // title 表示更新后的博客标题
     optional string title = 2;

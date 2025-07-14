@@ -49,6 +49,22 @@ func HandleUriRequest[T any, R any](c *gin.Context, handler Handler[T, R], valid
 	HandleRequest(c, c.ShouldBindUri, handler, validators...)
 }
 
+// HandleJSONWithURIRequest 是处理同时包含 JSON 和 URI 参数请求的快捷函数.
+// 先绑定 URI 路径参数，再绑定 JSON 请求体数据.
+func HandleJSONWithURIRequest[T any, R any](c *gin.Context, handler Handler[T, R], validators ...Validator[T]) {
+	// 创建组合绑定函数，先绑定URI参数，再绑定JSON数据
+	combinedBinder := func(obj any) error {
+		// 首先绑定URI路径参数
+		if err := c.ShouldBindUri(obj); err != nil {
+			return err
+		}
+		// 然后绑定JSON请求体数据
+		return c.ShouldBindJSON(obj)
+	}
+
+	HandleRequest(c, combinedBinder, handler, validators...)
+}
+
 // HandleRequest 是通用的请求处理函数.
 // 负责绑定请求数据、执行验证、并调用实际的业务处理逻辑函数.
 func HandleRequest[T any, R any](c *gin.Context, binder Binder, handler Handler[T, R], validators ...Validator[T]) {

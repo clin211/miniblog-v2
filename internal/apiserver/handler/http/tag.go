@@ -18,7 +18,7 @@ func (h *Handler) CreateTag(c *gin.Context) {
 
 // UpdateTag 更新标签信息.
 func (h *Handler) UpdateTag(c *gin.Context) {
-	core.HandleJSONRequest(c, h.biz.TagV1().Update, h.val.ValidateUpdateTagRequest)
+	core.HandleJSONWithURIRequest(c, h.biz.TagV1().Update, h.val.ValidateUpdateTagRequest)
 }
 
 // DeleteTag 删除标签.

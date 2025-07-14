@@ -215,7 +215,7 @@ type UpdateTagRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// id 表示要更新的标签 ID
 	// @gotags: uri:"id"
-	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" uri:"id"`
 	// name 表示可选的标签名称
 	Name *string `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	// color 表示可选的标签颜色
@@ -317,7 +317,7 @@ type DeleteTagRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// id 表示要删除的标签 ID
 	// @gotags: uri:"id"
-	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" uri:"id"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -401,7 +401,7 @@ type GetTagRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// id 表示要获取的标签 ID
 	// @gotags: uri:"id"
-	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" uri:"id"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

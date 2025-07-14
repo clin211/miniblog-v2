@@ -574,7 +574,8 @@ func (x *RefreshTokenResponse) GetExpireAt() int64 {
 type ChangePasswordRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// userID 表示用户 ID
-	UserID string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	// @gotags: uri:"userID"
+	UserID string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty" uri:"userID"`
 	// oldPassword 表示当前密码
 	OldPassword string `protobuf:"bytes,2,opt,name=oldPassword,proto3" json:"oldPassword,omitempty"`
 	// newPassword 表示准备修改的新密码
@@ -848,7 +849,8 @@ func (x *CreateUserResponse) GetUserID() string {
 type UpdateUserRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// userID 表示用户 ID
-	UserID string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	// @gotags: uri:"userID"
+	UserID string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty" uri:"userID"`
 	// username 表示可选的用户名称
 	Username *string `protobuf:"bytes,2,opt,name=username,proto3,oneof" json:"username,omitempty"`
 	// age 表示可选的用户年龄
@@ -1004,7 +1006,7 @@ type DeleteUserRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// userID 表示用户 ID
 	// @gotags: uri:"userID"
-	UserID        string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty" uri:"userID"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1088,7 +1090,7 @@ type GetUserRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// userID 表示用户 ID
 	// @gotags: uri:"userID"
-	UserID        string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserID        string `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty" uri:"userID"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

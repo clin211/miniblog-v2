@@ -619,7 +619,7 @@
         "parameters": [
           {
             "name": "postID",
-            "description": "postID 表示要更新的文章 ID，对应 {postID}",
+            "description": "postID 表示要更新的文章 ID，对应 {postID}\n@gotags: uri:\"postID\"",
             "in": "path",
             "required": true,
             "type": "string"
@@ -957,7 +957,7 @@
         "parameters": [
           {
             "name": "userID",
-            "description": "userID 表示用户 ID",
+            "description": "userID 表示用户 ID\n@gotags: uri:\"userID\"",
             "in": "path",
             "required": true,
             "type": "string"
@@ -997,7 +997,7 @@
         "parameters": [
           {
             "name": "userID",
-            "description": "userID 表示用户 ID",
+            "description": "userID 表示用户 ID\n@gotags: uri:\"userID\"",
             "in": "path",
             "required": true,
             "type": "string"
