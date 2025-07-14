@@ -15,6 +15,7 @@ import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/conversion"
 	"github.com/clin211/miniblog-v2/internal/apiserver/store"
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
+	"github.com/clin211/miniblog-v2/internal/pkg/log"
 	apiv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
 	"github.com/clin211/miniblog-v2/pkg/where"
 )
@@ -57,7 +58,33 @@ func (b *postBiz) Create(ctx context.Context, rq *apiv1.CreatePostRequest) (*api
 	postM.CreatedAt = &now
 	postM.UpdatedAt = &now
 
-	if err := b.store.Post().Create(ctx, &postM); err != nil {
+	// 使用事务确保创建文章和标签关联的原子性
+	err := b.store.TX(ctx, func(txCtx context.Context) error {
+		// 创建文章
+		if err := b.store.Post().Create(txCtx, &postM); err != nil {
+			log.W(ctx).Errorw("create post failed", "error", err)
+			return err
+		}
+
+		// 创建文章标签关联
+		for _, tagID := range rq.GetTags() {
+			postTagM := model.PostTagM{
+				PostID:    postM.PostID,
+				TagID:     tagID,
+				CreatedAt: &now,
+				UpdatedAt: &now,
+			}
+			if err := b.store.PostTag().Create(txCtx, &postTagM); err != nil {
+				log.W(ctx).Errorw("create post tag failed", "error", err)
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.W(ctx).Errorw("create post failed", "error", err)
 		return nil, err
 	}
 
@@ -72,20 +99,96 @@ func (b *postBiz) Update(ctx context.Context, rq *apiv1.UpdatePostRequest) (*api
 		return nil, err
 	}
 
-	if rq.Title != nil {
-		postM.Title = rq.GetTitle()
-	}
+	// 使用事务确保更新文章和标签关联的原子性
+	err = b.store.TX(ctx, func(txCtx context.Context) error {
+		// 更新文章基本信息
+		if rq.Title != nil {
+			postM.Title = rq.GetTitle()
+		}
 
-	if rq.Content != nil {
-		content := rq.GetContent()
-		postM.Content = &content
-	}
+		if rq.Content != nil {
+			content := rq.GetContent()
+			postM.Content = &content
+		}
 
-	// 手动设置更新时间
-	now := time.Now()
-	postM.UpdatedAt = &now
+		if rq.Cover != nil {
+			cover := rq.GetCover()
+			postM.Cover = &cover
+		}
 
-	if err := b.store.Post().Update(ctx, postM); err != nil {
+		if rq.Summary != nil {
+			summary := rq.GetSummary()
+			postM.Summary = &summary
+		}
+
+		if rq.CategoryID != nil {
+			categoryID := rq.GetCategoryID()
+			postM.CategoryID = &categoryID
+		}
+
+		if rq.PostType != nil {
+			postType := int32(rq.GetPostType())
+			postM.PostType = &postType
+		}
+
+		if rq.OriginalAuthor != nil {
+			originalAuthor := rq.GetOriginalAuthor()
+			postM.OriginalAuthor = &originalAuthor
+		}
+
+		if rq.OriginalSource != nil {
+			originalSource := rq.GetOriginalSource()
+			postM.OriginalSource = &originalSource
+		}
+
+		if rq.OriginalAuthorIntro != nil {
+			originalAuthorIntro := rq.GetOriginalAuthorIntro()
+			postM.OriginalAuthorIntro = &originalAuthorIntro
+		}
+
+		if rq.Position != nil {
+			position := rq.GetPosition()
+			postM.Position = &position
+		}
+
+		if rq.Status != nil {
+			status := int32(rq.GetStatus())
+			postM.Status = &status
+		}
+
+		// 手动设置更新时间
+		now := time.Now()
+		postM.UpdatedAt = &now
+
+		// 更新文章信息
+		if err := b.store.Post().Update(txCtx, postM); err != nil {
+			return err
+		}
+
+		// 如果提供了标签，则更新标签关联
+		if len(rq.GetTags()) > 0 {
+			// 删除现有的标签关联
+			postTagWhr := where.T(txCtx).F("post_id", rq.GetPostID())
+			if err := b.store.PostTag().Delete(txCtx, postTagWhr); err != nil {
+				return err
+			}
+
+			// 创建新的标签关联
+			for _, tagID := range rq.GetTags() {
+				postTagM := model.PostTagM{
+					PostID: postM.PostID,
+					TagID:  tagID,
+				}
+				if err := b.store.PostTag().Create(txCtx, &postTagM); err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 

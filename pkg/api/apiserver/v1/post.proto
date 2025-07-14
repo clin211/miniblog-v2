@@ -77,19 +77,21 @@ message CreatePostRequest {
     // summary 表示文章摘要
     optional string summary = 4;
     // categoryID 表示分类ID
-    optional int32 categoryID = 5;
-    // postType 表示文章类型
+    int32 categoryID = 5;
+    // postType 表示文章类型，默认原创
     PostType postType = 6;
-    // originalAuthor 表示原作者姓名（转载/投稿时使用）
+    // originalAuthor 表示原作者姓名（转载/投稿时使用），原创时则是登录用户名
     optional string originalAuthor = 7;
-    // originalSource 表示原文链接或来源（转载时使用）
+    // originalSource 表示原文链接或来源（转载时使用），原创时为空
     optional string originalSource = 8;
-    // originalAuthorIntro 表示原作者简介（投稿时使用）
+    // originalAuthorIntro 表示原作者简介（投稿时使用），原创时为空
     optional string originalAuthorIntro = 9;
     // position 表示文章排序
     optional int32 position = 10;
     // status 表示文章状态
     PostStatus status = 11;
+    // tags 表示文章标签，多个标签用逗号分隔
+    repeated int32 tags = 12;
 }
 
 // CreatePostResponse 表示创建文章响应
@@ -124,6 +126,8 @@ message UpdatePostRequest {
     optional int32 position = 11;
     // status 表示更新后的文章状态
     optional PostStatus status = 12;
+    // tags 表示更新后的文章标签，多个标签用逗号分隔
+    repeated int32 tags = 13;
 }
 
 // UpdatePostResponse 表示更新文章响应

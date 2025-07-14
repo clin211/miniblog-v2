@@ -59,7 +59,7 @@ mysql:
 # mongoDB 相关配置
 mongo:
   # mongoDB 链接方式，添加authSource=admin解决认证问题
-  url: mongodb://root:r8SggC783Xh1@127.0.0.1:27001/miniblog_v2?directConnection=true
+  url: mongodb://root:r8SggC783Xh1@127.0.0.1:27001/miniblog_v2?directConnection=true&authSource=admin
   # MongoDB 数据库名
   database: miniblog_v2
   # MongoDB 集合名（可选，通常在代码中指定）

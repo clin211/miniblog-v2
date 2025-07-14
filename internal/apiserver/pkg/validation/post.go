@@ -165,7 +165,7 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 			}
 
 			if hasSummary && len(summaryStr) > 500 {
-				return errno.ErrInvalidArgument.WithMessage("summary cannot exceed 500 characters")
+				return errno.ErrInvalidArgument.WithMessage("summary is too long")
 			}
 			return nil
 		}
@@ -196,7 +196,7 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 					return errno.ErrInvalidArgument.WithMessage("original author cannot be empty or whitespace only")
 				}
 				if len(authorStr) > 100 {
-					return errno.ErrInvalidArgument.WithMessage("original author name cannot exceed 100 characters")
+					return errno.ErrInvalidArgument.WithMessage("original author name is too long")
 				}
 			}
 			return nil
@@ -224,7 +224,7 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 			}
 
 			if hasIntro && len(introStr) > 200 {
-				return errno.ErrInvalidArgument.WithMessage("original author intro cannot exceed 200 characters")
+				return errno.ErrInvalidArgument.WithMessage("original author intro is too long")
 			}
 			return nil
 		}
@@ -284,6 +284,45 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 		}
 	}
 
+	// 标签校验函数
+	validateTags := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			// 只处理 []int32 类型
+			tags, ok := value.([]int32)
+			if !ok {
+				return errno.ErrInvalidArgument.WithMessage("tags field type error")
+			}
+
+			// 标签列表不能为空
+			if len(tags) == 0 {
+				return errno.ErrInvalidArgument.WithMessage("tags cannot be empty")
+			}
+
+			// 标签数量限制：最多5个标签
+			if len(tags) > 5 {
+				return errno.ErrInvalidArgument.WithMessage("too many tags provided")
+			}
+
+			// 用于检查重复标签 ID
+			tagSet := make(map[int32]bool)
+
+			for _, tagID := range tags {
+				// 标签 ID 必须为正数
+				if tagID <= 0 {
+					return errno.ErrInvalidArgument.WithMessage("invalid tag ID")
+				}
+
+				// 检查重复标签 ID
+				if tagSet[tagID] {
+					return errno.ErrInvalidArgument.WithMessage("duplicate tag ID found")
+				}
+				tagSet[tagID] = true
+			}
+
+			return nil
+		}
+	}
+
 	// 定义各字段的校验逻辑，通过一个 map 实现模块化和简化
 	return genericvalidation.Rules{
 		// 基本字段校验
@@ -302,7 +341,7 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 				return errno.ErrInvalidArgument.WithMessage("title cannot be whitespace only")
 			}
 			if len(title) > 200 {
-				return errno.ErrInvalidArgument.WithMessage("title cannot exceed 200 characters")
+				return errno.ErrInvalidArgument.WithMessage("title is too long")
 			}
 			return nil
 		},
@@ -335,6 +374,9 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 		// 枚举字段校验
 		"PostType": validatePostType(),
 		"Status":   validatePostStatus(),
+
+		// 数组字段校验
+		"Tags": validateTags(),
 
 		// 计数字段校验
 		"ViewCount": func(value any) error {
@@ -411,7 +453,7 @@ func (v *Validator) ValidateListPostRequest(ctx context.Context, rq *apiv1.ListP
 			return errno.ErrInvalidArgument.WithMessage("title filter cannot be whitespace only")
 		}
 		if len(title) > 200 {
-			return errno.ErrInvalidArgument.WithMessage("title filter cannot exceed 200 characters")
+			return errno.ErrInvalidArgument.WithMessage("title filter is too long")
 		}
 	}
 

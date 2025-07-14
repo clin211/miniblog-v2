@@ -1108,6 +1108,14 @@
         "status": {
           "$ref": "#/definitions/v1PostStatus",
           "title": "status 表示更新后的文章状态"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "tags 表示更新后的文章标签，多个标签用逗号分隔"
         }
       },
       "title": "UpdatePostRequest 表示更新文章请求"
@@ -1350,19 +1358,19 @@
         },
         "postType": {
           "$ref": "#/definitions/v1PostType",
-          "title": "postType 表示文章类型"
+          "title": "postType 表示文章类型，默认原创"
         },
         "originalAuthor": {
           "type": "string",
-          "title": "originalAuthor 表示原作者姓名（转载/投稿时使用）"
+          "title": "originalAuthor 表示原作者姓名（转载/投稿时使用），原创时则是登录用户名"
         },
         "originalSource": {
           "type": "string",
-          "title": "originalSource 表示原文链接或来源（转载时使用）"
+          "title": "originalSource 表示原文链接或来源（转载时使用），原创时为空"
         },
         "originalAuthorIntro": {
           "type": "string",
-          "title": "originalAuthorIntro 表示原作者简介（投稿时使用）"
+          "title": "originalAuthorIntro 表示原作者简介（投稿时使用），原创时为空"
         },
         "position": {
           "type": "integer",
@@ -1372,6 +1380,14 @@
         "status": {
           "$ref": "#/definitions/v1PostStatus",
           "title": "status 表示文章状态"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "tags 表示文章标签，多个标签用逗号分隔"
         }
       },
       "title": "CreatePostRequest 表示创建文章请求"
