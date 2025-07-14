@@ -13,7 +13,7 @@ import (
 
 // DeviceBiz 定义了 device 模块在 biz 层所实现的方法.
 type DeviceBiz interface {
-	Create(ctx context.Context, device *store.DeviceM) error
+	Create(ctx context.Context, device any) error
 	Update(ctx context.Context, device *store.DeviceM) error
 	Delete(ctx context.Context, deviceID string) error
 	Get(ctx context.Context, deviceID string) (*store.DeviceM, error)
@@ -34,7 +34,7 @@ func NewDeviceBiz(store store.IStore) *deviceBiz {
 }
 
 // Create 创建一个新的设备记录.
-func (b *deviceBiz) Create(ctx context.Context, device *store.DeviceM) error {
+func (b *deviceBiz) Create(ctx context.Context, device any) error {
 	return b.store.Device().Create(ctx, device)
 }
 

@@ -11,7 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/clin211/miniblog-v2/internal/apiserver/store"
 	"github.com/clin211/miniblog-v2/internal/pkg/core"
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
 )
@@ -21,23 +20,18 @@ func (h *Handler) CreateDevice(c *gin.Context) {
 	log.Infow("MongoDB Create operation demo - open access")
 
 	// 接收任意扁平化数据
-	var deviceData map[string]interface{}
+	var deviceData any
 	if err := c.ShouldBindJSON(&deviceData); err != nil {
 		core.WriteResponse(c, nil, err)
 		return
 	}
 
-	// 创建设备记录
-	device := &store.DeviceM{
-		Data: deviceData,
-	}
-
-	if err := h.biz.Device().Create(c, device); err != nil {
+	if err := h.biz.Device().Create(c, deviceData); err != nil {
 		core.WriteResponse(c, nil, err)
 		return
 	}
 
-	core.WriteResponse(c, device, nil)
+	core.WriteResponse(c, nil, nil)
 }
 
 // UpdateDevice 更新设备 - 演示MongoDB更新操作（无需登录）
@@ -57,18 +51,12 @@ func (h *Handler) UpdateDevice(c *gin.Context) {
 		return
 	}
 
-	// 更新设备信息
-	device := &store.DeviceM{
-		ID:   deviceID,
-		Data: updateData,
-	}
+	// if err := h.biz.Device().Update(c, device); err != nil {
+	// 	core.WriteResponse(c, nil, err)
+	// 	return
+	// }
 
-	if err := h.biz.Device().Update(c, device); err != nil {
-		core.WriteResponse(c, nil, err)
-		return
-	}
-
-	core.WriteResponse(c, device, nil)
+	core.WriteResponse(c, nil, nil)
 }
 
 // DeleteDevice 删除设备 - 演示MongoDB删除操作（无需登录）

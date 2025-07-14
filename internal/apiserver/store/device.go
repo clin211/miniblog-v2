@@ -11,16 +11,16 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
+	"github.com/clin211/miniblog-v2/pkg/copier"
 )
 
 // DeviceStore 定义了 device 模块在 store 层所实现的方法，演示 MongoDB 的使用.
 type DeviceStore interface {
-	Create(ctx context.Context, device *DeviceM) error
+	Create(ctx context.Context, device any) error
 	Update(ctx context.Context, device *DeviceM) error
 	Delete(ctx context.Context, deviceID string) error
 	Get(ctx context.Context, deviceID string) (*DeviceM, error)
@@ -29,12 +29,7 @@ type DeviceStore interface {
 
 // DeviceM 定义设备模型，用于演示 MongoDB 的使用.
 // 完全扁平化的结构，可以存储任意数据，无需登录
-type DeviceM struct {
-	ID        string                 `bson:"_id,omitempty" json:"id,omitempty"`
-	Data      map[string]interface{} `bson:"data" json:"data"` // 扁平化存储，直接展开到根级别
-	CreatedAt int64                  `bson:"created_at" json:"created_at"`
-	UpdatedAt int64                  `bson:"updated_at" json:"updated_at"`
-}
+type DeviceM struct{}
 
 // deviceStore 是 DeviceStore 接口的实现，演示 MongoDB 的使用.
 type deviceStore struct {
@@ -55,63 +50,27 @@ func (s *deviceStore) getCollection() *mongo.Collection {
 }
 
 // Create 创建新设备记录
-func (s *deviceStore) Create(ctx context.Context, device *DeviceM) error {
+func (s *deviceStore) Create(ctx context.Context, device any) error {
 	collection := s.getCollection()
+	data := make(map[string]interface{})
+	data["created_at"] = time.Now().Unix()
+	data["updated_at"] = time.Now().Unix()
+	copier.Copy(&data, device)
 
-	// 如果没有提供ID，生成一个新的ObjectID
-	if device.ID == "" {
-		device.ID = primitive.NewObjectID().Hex()
-	}
-
-	// 设置时间戳
-	now := time.Now().Unix()
-	device.CreatedAt = now
-	device.UpdatedAt = now
-
-	// 确保Data字段不为nil
-	if device.Data == nil {
-		device.Data = make(map[string]interface{})
-	}
-
-	_, err := collection.InsertOne(ctx, device)
+	result, err := collection.InsertOne(ctx, data)
 	if err != nil {
-		log.Errorw("Failed to insert device into MongoDB", "err", err, "device_id", device.ID)
+		log.Errorw("Failed to insert device into MongoDB", "err", err, "device_id", result.InsertedID)
 		return err
 	}
 
-	log.Infow("Device created successfully", "device_id", device.ID)
+	log.Infow("Device created successfully", "device_id", result.InsertedID)
 
 	return nil
 }
 
 // Update 更新设备记录
 func (s *deviceStore) Update(ctx context.Context, device *DeviceM) error {
-	collection := s.getCollection()
 
-	// 更新时间戳
-	device.UpdatedAt = time.Now().Unix()
-
-	// 构建更新文档，包含所有数据字段
-	updateDoc := bson.M{"updated_at": device.UpdatedAt}
-	for key, value := range device.Data {
-		updateDoc[key] = value
-	}
-
-	filter := bson.M{"_id": device.ID}
-	update := bson.M{"$set": updateDoc}
-
-	result, err := collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		log.Errorw("Failed to update device in MongoDB", "err", err, "device_id", device.ID)
-		return err
-	}
-
-	if result.MatchedCount == 0 {
-		log.Warnw("Device not found for update", "device_id", device.ID)
-		return errors.New("device not found")
-	}
-
-	log.Infow("Device updated successfully", "device_id", device.ID, "matched", result.MatchedCount)
 	return nil
 }
 

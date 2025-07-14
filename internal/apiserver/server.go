@@ -14,7 +14,6 @@ import (
 
 	genericoptions "github.com/onexstack/onexstack/pkg/options"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
@@ -162,23 +161,24 @@ func (cfg *Config) NewDB() (*gorm.DB, error) {
 }
 
 func (cfg *Config) NewMongoClient() (*mongo.Client, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), cfg.MongoOptions.Timeout)
-	defer cancel()
+	// ctx, cancel := context.WithTimeout(context.Background(), cfg.MongoOptions.Timeout)
+	// defer cancel()
 
-	// 使用URL创建MongoDB客户端
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.MongoOptions.URL))
-	if err != nil {
-		log.Errorw("Failed to connect to MongoDB", "err", err)
-		return nil, err
-	}
+	// // 使用URL创建MongoDB客户端
+	// client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.MongoOptions.URL))
+	// if err != nil {
+	// 	log.Errorw("Failed to connect to MongoDB", "err", err)
+	// 	return nil, err
+	// }
 
-	// 测试连接
-	if err := client.Ping(ctx, nil); err != nil {
-		log.Errorw("Failed to ping MongoDB", "err", err)
-		return nil, err
-	}
+	// // 测试连接
+	// if err := client.Ping(ctx, nil); err != nil {
+	// 	log.Errorw("Failed to ping MongoDB", "err", err)
+	// 	return nil, err
+	// }
 
-	return client, nil
+	// return client, nil
+	return cfg.MongoOptions.NewClient()
 }
 
 // UserRetriever 定义一个用户数据获取器. 用来获取用户信息.
