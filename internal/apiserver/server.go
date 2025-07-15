@@ -13,6 +13,7 @@ import (
 	"time"
 
 	genericoptions "github.com/onexstack/onexstack/pkg/options"
+	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 
@@ -54,6 +55,7 @@ type Config struct {
 	MySQLOptions *genericoptions.MySQLOptions
 	TLSOptions   *genericoptions.TLSOptions
 	MongoOptions *genericoptions.MongoOptions
+	RedisOptions *genericoptions.RedisOptions
 }
 
 // UnionServer 定义一个联合服务器. 根据 ServerMode 决定要启动的服务器类型.
@@ -138,7 +140,13 @@ func (cfg *Config) NewServerConfig() (*ServerConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	store := store.NewStore(db, m)
+
+	r, err := cfg.NewRedisClient()
+	if err != nil {
+		return nil, err
+	}
+
+	store := store.NewStore(db, m, r)
 
 	// 初始化权限认证模块
 	authz, err := auth.NewAuthz(store.DB(context.TODO()))
@@ -160,6 +168,7 @@ func (cfg *Config) NewDB() (*gorm.DB, error) {
 	return cfg.MySQLOptions.NewDB()
 }
 
+// NewMongoClient 创建一个 *mongo.Client 实例.
 func (cfg *Config) NewMongoClient() (*mongo.Client, error) {
 	// ctx, cancel := context.WithTimeout(context.Background(), cfg.MongoOptions.Timeout)
 	// defer cancel()
@@ -181,6 +190,11 @@ func (cfg *Config) NewMongoClient() (*mongo.Client, error) {
 	return cfg.MongoOptions.NewClient()
 }
 
+// NewRedisClient 创建一个 *redis.Client 实例.
+func (cfg *Config) NewRedisClient() (*redis.Client, error) {
+	return cfg.RedisOptions.NewClient()
+}
+
 // UserRetriever 定义一个用户数据获取器. 用来获取用户信息.
 type UserRetriever struct {
 	store store.IStore
@@ -199,6 +213,10 @@ func ProvideDB(cfg *Config) (*gorm.DB, error) {
 // ProvideMongoDB 根据配置t提供一个 MongoDB 数据库实例
 func ProvideMongoDB(cfg *Config) (*mongo.Client, error) {
 	return cfg.NewMongoClient()
+}
+
+func ProvideRedis(cfg *Config) (*redis.Client, error) {
+	return cfg.NewRedisClient()
 }
 
 func NewWebServer(serverMode string, serverConfig *ServerConfig) (server.Server, error) {

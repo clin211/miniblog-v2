@@ -42,6 +42,8 @@ type ServerOptions struct {
 	MySQLOptions *genericoptions.MySQLOptions `json:"mysql" mapstructure:"mysql"`
 	// MongoOptions 包含 MongoDB 选项
 	MongoOptions *genericoptions.MongoOptions `json:"mongodb" mapstructure:"mongo"`
+	// RedisOptions 包含 Redis 配置选项
+	RedisOptions *genericoptions.RedisOptions `json:"redis" mapstructure:"redis"`
 }
 
 // NewServerOptions 创建带有默认值的 ServerOptions 实例
@@ -55,6 +57,7 @@ func NewServerOptions() *ServerOptions {
 		GRPCOptions:  genericoptions.NewGRPCOptions(),
 		MySQLOptions: genericoptions.NewMySQLOptions(),
 		MongoOptions: genericoptions.NewMongoOptions(),
+		RedisOptions: genericoptions.NewRedisOptions(),
 	}
 	opts.HTTPOptions.Addr = ":5555"
 	opts.GRPCOptions.Addr = ":6666"
@@ -73,6 +76,7 @@ func (o *ServerOptions) AddFlags(fs *pflag.FlagSet) {
 	o.GRPCOptions.AddFlags(fs)
 	o.MySQLOptions.AddFlags(fs)
 	o.MongoOptions.AddFlags(fs)
+	o.RedisOptions.AddFlags(fs)
 }
 
 // Validate 检验 ServerOptions 中的选项是否合法
@@ -94,6 +98,7 @@ func (o *ServerOptions) Validate() error {
 	errs = append(errs, o.HTTPOptions.Validate()...)
 	errs = append(errs, o.MySQLOptions.Validate()...)
 	errs = append(errs, o.MongoOptions.Validate()...)
+	errs = append(errs, o.RedisOptions.Validate()...)
 
 	// 如果是 gRPC 或 gRPC-Gateway 模式，校验 gRPC 配置
 	if stringsutil.StringIn(o.ServerMode, []string{apiserver.GRPCServerMode, apiserver.GRPCGatewayServerMode}) {
@@ -115,5 +120,6 @@ func (o *ServerOptions) Config() (*apiserver.Config, error) {
 		GRPCOptions:  o.GRPCOptions,
 		MySQLOptions: o.MySQLOptions,
 		MongoOptions: o.MongoOptions,
+		RedisOptions: o.RedisOptions,
 	}, nil
 }

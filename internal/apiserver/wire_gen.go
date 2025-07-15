@@ -31,7 +31,11 @@ func InitializeWebServer(config *Config) (server.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	datastore := store.NewStore(db, client)
+	redisClient, err := ProvideRedis(config)
+	if err != nil {
+		return nil, err
+	}
+	datastore := store.NewStore(db, client, redisClient)
 	v := auth.DefaultOptions()
 	authz, err := auth.NewAuthz(db, v...)
 	if err != nil {

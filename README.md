@@ -11,6 +11,8 @@ MiniBlog 是一个基于 Go 语言开发的小型博客系统，旨在展示如�
 - **简洁架构**：采用清晰、易维护的架构设计
 - **标准目录结构**：遵循 project-layout 规范
 - **认证与授权**：基于 JWT 的认证和基于 Casbin 的授权
+- **多数据库支持**：集成 MySQL（主数据库）、MongoDB（文档存储）双数据库架构
+- **高性能缓存**：基于 Redis 的分布式缓存系统，支持数据缓存和会话管理
 - **日志与错误处理**：独立的日志包和错误码管理
 - **丰富的 Web 功能**：请求 ID、优雅关停、中间件、跨域处理、异常恢复等
 - **多服务器支持**：HTTP/HTTPS/gRPC 服务器和 HTTP 反向代理
@@ -24,11 +26,14 @@ MiniBlog 是一个基于 Go 语言开发的小型博客系统，旨在展示如�
 - **Web 框架**：gin
 - **命令行**：cobra, pflag
 - **配置管理**：viper
+- **数据库**：MySQL, MongoDB
 - **ORM**：gorm
+- **缓存**：Redis
 - **认证授权**：jwt-go, casbin
 - **日志**：zap
 - **API 文档**：swagger
 - **RPC**：grpc, protobuf, grpc-gateway
+- **容器化**：Docker, Docker Compose
 - **其他**：govalidator, uuid, pprof 等
 
 ## 快速开始
@@ -36,20 +41,130 @@ MiniBlog 是一个基于 Go 语言开发的小型博客系统，旨在展示如�
 ### 环境要求
 
 - Go 1.20+
+- Docker & Docker Compose
 - Make
 
-### 构建与运行
+### 启动步骤
 
-```bash
-# 克隆仓库
+#### 1. 克隆仓库
+
+```sh
 git clone https://github.com/clin211/miniblog-v2.git
 cd miniblog-v2
+```
 
-# 编译项目
+#### 2. 启动数据库服务
+
+使用 Docker Compose 启动 MySQL、MongoDB 和 Redis 服务：
+
+```sh
+# 进入 Docker 配置目录
+cd deployment/docker/dev
+
+# 启动所有数据库服务
+docker compose -f docker-compose.env.yml up -d
+
+# 检查服务状态
+docker compose -f docker-compose.env.yml ps
+```
+
+#### 3. 初始化数据库
+
+启动数据库服务后，需要初始化 MySQL 数据库表结构。提供两种方式：
+
+- **方式一：使用自动化脚本（推荐）**
+
+  ```sh
+  # 回到项目根目录
+  cd ../../../
+
+  # 运行自动化初始化脚本
+  ./scripts/init-database.sh
+  ```
+
+- **方式二：手动执行**
+
+  ```sh
+  # 回到项目根目录
+  cd ../../../
+
+  # 等待 MySQL 完全启动（重要！）
+  echo "等待 MySQL 启动完成..."
+  sleep 10
+
+  # 导入数据库表结构
+  docker exec -i miniblog-mysql mysql -u root -p123456 miniblog_v2 < configs/miniblog.sql
+
+  # 验证数据库表是否创建成功
+  docker exec -it miniblog-mysql mysql -u root -p123456 -e "USE miniblog_v2; SHOW TABLES;"
+  ```
+
+**故障排除**：如果遇到连接错误，请：
+
+1. 确认容器正在运行：`docker compose -f deployment/docker/dev/docker-compose.env.yml ps`
+2. 检查 MySQL 日志：`docker logs miniblog-mysql --tail 20`
+3. 等待更长时间再重试（MySQL 首次启动可能需要 1-2 分钟）
+
+#### 4. 启动应用程序
+
+```sh
+# 方式一：直接运行（推荐用于开发）
+air
+
+# 方式二：编译后运行
 make build
+./_output/mb-apiserver --config configs/mb-apiserver.yaml
+```
 
-# 运行项目
-./_output/mb-apiserver
+#### 5. 验证服务状态
+
+- 检查应用程序健康状态
+
+  可以在 `mb-apiserver.yaml` 文件中修改 server-mode 的模式，一共支持三种模式：`grpc`、`grpc-gateway`、`gin`！
+
+  ```sh
+  # http 或者 grpc-gateway 模式
+  curl http://localhost:5555/healthz
+
+  # grpc 模式
+  go run ./examples/client/health/main.go
+  ```
+
+- 检查 MySQL 连接（可选）
+
+  ```sh
+  docker exec -it miniblog-mysql mysql -u root -p123456 miniblog_v2 -e "SELECT COUNT(*) FROM user;"
+  ```
+
+- 检查 MongoDB 连接（可选）
+
+  ```sh
+  docker exec -it miniblog-mongo mongosh -u root -p r8SggC783Xh1 --authenticationDatabase admin miniblog_v2 --eval "db.getName()"
+  ```
+
+- 检查 Redis 缓存（可选）
+
+  ```sh
+  ./scripts/redis-inspect.sh
+  ```
+
+### 服务端口说明
+
+- **HTTP 服务器**: `http://localhost:5555`
+- **gRPC 服务器**: `localhost:6666`
+- **MySQL 数据库**: `localhost:11006`
+- **MongoDB 数据库**: `localhost:27001`
+- **Redis 缓存**: `localhost:63790`
+
+### 停止服务
+
+```sh
+# 停止应用程序
+# 使用 Ctrl+C 停止正在运行的应用程序
+
+# 停止数据库、缓存
+cd deployment/docker/dev
+docker compose -f docker-compose.env.yml down
 ```
 
 ## 开发指南
@@ -109,7 +224,7 @@ Handler 层 -> Biz 层 -> Store 层 -> 数据库
 
 ### 常用命令
 
-```bash
+```sh
 # 执行下面所有伪目标（因为设置了 .DEFAULT_GOAL）
 make
 

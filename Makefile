@@ -109,8 +109,15 @@ lint: # 执行静态代码检查.
 	@golangci-lint run -c $(PROJ_ROOT_DIR)/.golangci.yaml $(PROJ_ROOT_DIR)/...
 
 
-.PHONY: dev
-dev:
+.PHONY: dev-start
+dev-start:
 	@docker compose -f $(PROJ_ROOT_DIR)/deployment/docker/dev/docker-compose.env.yml up -d
 	@mkdir -p $(PROJ_ROOT_DIR)/tmp
 	@air
+
+.PHONY: dev-stop
+dev-stop:
+	@docker compose -f $(PROJ_ROOT_DIR)/deployment/docker/dev/docker-compose.env.yml down
+
+.PHONY: dev-restart
+dev-restart: dev-stop dev-start

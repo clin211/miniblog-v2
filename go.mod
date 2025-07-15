@@ -17,6 +17,7 @@ require (
 	github.com/jinzhu/copier v0.4.0
 	github.com/onexstack/onexstack v0.0.2
 	github.com/prometheus/common v0.55.0
+	github.com/redis/go-redis/v9 v9.11.0
 	github.com/sony/sonyflake v1.2.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
@@ -101,7 +102,6 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/redis/go-redis/extra/rediscensus/v9 v9.7.0 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.7.0 // indirect
-	github.com/redis/go-redis/v9 v9.7.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230126093431-47fa9a501578 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect

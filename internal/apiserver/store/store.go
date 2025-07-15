@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/google/wire"
+	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 
@@ -36,8 +37,10 @@ type IStore interface {
 	DB(ctx context.Context, wheres ...where.Where) *gorm.DB
 	// 返回 Store 层的 *mongo.Client 实例，用于 MongoDB 操作.
 	MongoDB(ctx context.Context) *mongo.Client
+	// 返回 Store 层的 *redis.Client 实例，用于 Redis 操作.
+	Redis(ctx context.Context) *redis.Client
+	// 返回一个新的事务实例.
 	TX(ctx context.Context, fn func(ctx context.Context) error) error
-
 	User() UserStore
 	Post() PostStore
 	Tag() TagStore
@@ -55,6 +58,7 @@ type transactionKey struct{}
 type datastore struct {
 	core  *gorm.DB
 	mongo *mongo.Client
+	redis *redis.Client
 	// 可以根据需要添加其他数据库实例
 	// fake *gorm.DB
 }
@@ -63,12 +67,13 @@ type datastore struct {
 var _ IStore = (*datastore)(nil)
 
 // NewStore 创建一个 IStore 类型的实例.
-func NewStore(db *gorm.DB, md *mongo.Client) *datastore {
+func NewStore(db *gorm.DB, md *mongo.Client, r *redis.Client) *datastore {
 	// 确保 S 只被初始化一次
 	once.Do(func() {
 		S = &datastore{
 			core:  db,
 			mongo: md,
+			redis: r,
 		}
 	})
 
@@ -89,6 +94,16 @@ func (store *datastore) DB(ctx context.Context, wheres ...where.Where) *gorm.DB 
 		db = whr.Where(db)
 	}
 	return db
+}
+
+// MongoDB 返回 MongoDB 客户端实例.
+func (store *datastore) MongoDB(ctx context.Context) *mongo.Client {
+	return store.mongo
+}
+
+// Redis 返回 Redis 客户端实例.
+func (store *datastore) Redis(ctx context.Context) *redis.Client {
+	return store.redis
 }
 
 // TX 返回一个新的事务实例.
@@ -117,11 +132,6 @@ func (store *datastore) PostTag() PostTagStore {
 
 func (store *datastore) Tag() TagStore {
 	return newTagStore(store)
-}
-
-// MongoDB 返回 MongoDB 客户端实例.
-func (store *datastore) MongoDB(ctx context.Context) *mongo.Client {
-	return store.mongo
 }
 
 // ConcretePosts 返回一个实现了 ConcretePostStore 接口的实例.

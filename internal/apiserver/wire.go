@@ -26,6 +26,7 @@ func InitializeWebServer(*Config) (server.Server, error) {
 		wire.NewSet(store.ProviderSet, biz.ProviderSet),
 		ProvideDB, // 提供数据库实例
 		ProvideMongoDB,
+		ProvideRedis,
 		validation.ProviderSet,
 		wire.NewSet(
 			wire.Struct(new(UserRetriever), "*"),

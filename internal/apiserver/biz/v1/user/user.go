@@ -7,6 +7,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -135,6 +136,11 @@ func (b *userBiz) Create(ctx context.Context, rq *apiv1.CreateUserRequest) (*api
 		log.W(ctx).Errorw("Failed to add grouping policy for user", "user", userM.UserID, "role", known.RoleUser)
 		return nil, errno.ErrAddRole.WithMessage("%s", err.Error())
 	}
+
+	// 将用户信息缓存到 Redis 中
+	cacheKey := fmt.Sprintf("user:%s", userM.UserID)
+	cacheValue := fmt.Sprintf("username:%s,email:%s,phone:%s", userM.Username, userM.Email, userM.Phone)
+	b.store.Redis(ctx).Set(ctx, cacheKey, cacheValue, 0)
 
 	return &apiv1.CreateUserResponse{UserID: userM.UserID}, nil
 }
