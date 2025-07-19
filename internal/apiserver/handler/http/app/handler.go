@@ -3,23 +3,23 @@
 // license that can be found in the LICENSE file. The original repo for
 // this file is https://github.com/clin211/miniblog-v2.git.
 
-package grpc
+package app
 
 import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
-	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
+	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/validation"
 )
 
-// Handler 负责处理博客模块的请求.
+// Handler 处理博客模块的请求.
 type Handler struct {
-	appv1.UnimplementedMiniBlogServer
-
 	biz biz.IBiz
+	val *validation.Validator
 }
 
-// NewHandler 创建一个新的 Handler 实例.
-func NewHandler(biz biz.IBiz) *Handler {
+// NewHandler 创建新的 Handler 实例.
+func NewHandler(biz biz.IBiz, val *validation.Validator) *Handler {
 	return &Handler{
 		biz: biz,
+		val: val,
 	}
 }

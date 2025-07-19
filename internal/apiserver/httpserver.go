@@ -11,7 +11,7 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 
-	handler "github.com/clin211/miniblog-v2/internal/apiserver/handler/http"
+	handler "github.com/clin211/miniblog-v2/internal/apiserver/handler/http/app"
 	"github.com/clin211/miniblog-v2/internal/pkg/core"
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
 	mw "github.com/clin211/miniblog-v2/internal/pkg/middleware/gin"
@@ -53,16 +53,19 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 	// 注册健康检查接口
 	engine.GET("/healthz", handler.Healthz)
 
-	// 注册用户登录和令牌刷新接口。这2个接口比较简单，所以没有 API 版本
-	engine.POST("/login", handler.Login)
-	// 注意：认证中间件要在 handler.RefreshToken 之前加载
-	engine.PUT("/refresh-token", mw.AuthnMiddleware(c.retriever), handler.RefreshToken)
-
 	authMiddlewares := []gin.HandlerFunc{mw.AuthnMiddleware(c.retriever), mw.AuthzMiddleware(c.authz)}
 
 	// 注册 v1 版本 API 路由分组
-	v1 := engine.Group("/v1")
+	v1 := engine.Group("/v1/app")
 	{
+
+		// auth
+		authv1 := v1.Group("/auth")
+		{
+			authv1.POST("/login", handler.Login)
+			authv1.PUT("/refresh-token", mw.AuthnMiddleware(c.retriever), handler.RefreshToken)
+		}
+
 		// 用户相关路由
 		userv1 := v1.Group("/users")
 		{
@@ -87,7 +90,7 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 		}
 
 		// 标签相关路由
-		tagv1 := v1.Group("/tags")
+		tagv1 := v1.Group("/post-tags")
 		{
 			tagv1.POST("", handler.CreateTag)      // 创建标签
 			tagv1.PUT(":id", handler.UpdateTag)    // 更新标签

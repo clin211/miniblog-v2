@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 
-	apiv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
+	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
 )
 
 var (
@@ -40,7 +40,7 @@ func main() {
 	defer conn.Close() // 确保在函数结束时关闭连接，避免资源泄漏
 
 	// 创建 MiniBlog 客户端
-	client := apiv1.NewMiniBlogClient(conn) // 使用连接创建一个 MiniBlog 的 gRPC 客户端实例
+	client := appv1.NewMiniBlogClient(conn) // 使用连接创建一个 MiniBlog 的 gRPC 客户端实例
 
 	// 设置上下文，带有 3 秒的超时时间
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

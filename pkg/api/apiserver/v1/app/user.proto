@@ -1,0 +1,217 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
+// User API 定义，包含用户信息、登录请求和响应等相关消息
+syntax = "proto3";
+
+package v1;
+
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app;v1";
+
+// Gender 表示用户性别
+enum Gender {
+    GENDER_UNSPECIFIED = 0; // 未设置
+    GENDER_MALE = 1;        // 男
+    GENDER_FEMALE = 2;      // 女
+    GENDER_OTHER = 3;       // 其他
+}
+
+// RegisterSource 表示用户注册来源
+enum RegisterSource {
+    REGISTER_SOURCE_UNSPECIFIED = 0; // 未指定
+    REGISTER_SOURCE_WEB = 1;         // Web
+    REGISTER_SOURCE_APP = 2;         // App
+    REGISTER_SOURCE_WECHAT = 3;      // 微信
+    REGISTER_SOURCE_QQ = 4;          // QQ
+    REGISTER_SOURCE_GITHUB = 5;      // GitHub
+    REGISTER_SOURCE_GOOGLE = 6;      // Google
+}
+
+// User 表示用户信息
+message User {
+    // userID 表示用户 ID
+    string userID = 1;
+    // username 表示用户名称
+    string username = 2;
+    // age 表示用户年龄
+    optional int32 age = 3;
+    // avatar 表示用户头像URL
+    optional string avatar = 4;
+    // email 表示用户电子邮箱
+    string email = 5;
+    // emailVerified 表示邮箱是否已验证
+    bool emailVerified = 6;
+    // phone 表示用户手机号
+    string phone = 7;
+    // phoneVerified 表示手机号是否已验证
+    bool phoneVerified = 8;
+    // gender 表示用户性别
+    Gender gender = 9;
+    // status 表示用户状态：1-正常，0-禁用
+    int32 status = 10;
+    // failedLoginAttempts 表示失败登录次数
+    int32 failedLoginAttempts = 11;
+    // lastLoginAt 表示最后登录时间（Unix 时间戳）
+    optional int64 lastLoginAt = 12;
+    // lastLoginIP 表示最后登录IP
+    optional string lastLoginIP = 13;
+    // lastLoginDevice 表示最后登录设备
+    optional string lastLoginDevice = 14;
+    // isRisk 表示是否为风险用户
+    bool isRisk = 15;
+    // registerSource 表示注册来源
+    RegisterSource registerSource = 16;
+    // registerIP 表示注册IP
+    optional string registerIP = 17;
+    // wechatOpenID 表示微信OpenID
+    optional string wechatOpenID = 18;
+    // passwordUpdatedAt 表示密码更新时间（Unix 时间戳）
+    optional int64 passwordUpdatedAt = 19;
+    // createdAt 表示用户注册时间（Unix 时间戳）
+    int64 createdAt = 20;
+    // updatedAt 表示用户最后更新时间（Unix 时间戳）
+    int64 updatedAt = 21;
+}
+
+// LoginRequest 表示登录请求
+message LoginRequest {
+    // username 表示用户名称
+    string username = 1;
+    // password 表示用户密码
+    string password = 2;
+}
+
+// LoginResponse 表示登录响应
+message LoginResponse {
+    // token 表示返回的身份验证令牌
+    string token = 1;
+    // expireAt 表示该 token 的过期时间（Unix 时间戳）
+    int64 expireAt = 2;
+}
+
+// RefreshTokenRequest 表示刷新令牌的请求
+message RefreshTokenRequest {
+    // 该请求无需额外字段，仅通过现有的认证信息（如旧的 token）进行刷新
+}
+
+// RefreshTokenResponse 表示刷新令牌的响应
+message RefreshTokenResponse {
+    // token 表示返回的身份验证令牌
+    string token = 1;
+    // expireAt 表示该 token 的过期时间（Unix 时间戳）
+    int64 expireAt = 2;
+}
+
+// ChangePasswordRequest 表示修改密码请求
+message ChangePasswordRequest {
+    // userID 表示用户 ID
+    // @gotags: uri:"userID"
+    string userID = 1;
+    // oldPassword 表示当前密码
+    string oldPassword = 2;
+    // newPassword 表示准备修改的新密码
+    string newPassword = 3;
+}
+
+// ChangePasswordResponse 表示修改密码响应
+message ChangePasswordResponse {
+}
+
+// CreateUserRequest 表示创建用户请求
+message CreateUserRequest {
+    // username 表示用户名称
+    string username = 1;
+    // password 表示用户密码
+    string password = 2;
+    // age 表示用户年龄
+    optional int32 age = 3;
+    // avatar 表示用户头像URL
+    optional string avatar = 4;
+    // email 表示用户电子邮箱
+    string email = 5;
+    // phone 表示用户手机号
+    optional string phone = 6;
+    // gender 表示用户性别
+    optional Gender gender = 7;
+    // registerSource 表示注册来源
+    RegisterSource registerSource = 8;
+    // registerIP 表示注册IP
+    optional string registerIP = 9;
+    // wechatOpenID 表示微信OpenID
+    optional string wechatOpenID = 10;
+}
+
+// CreateUserResponse 表示创建用户响应
+message CreateUserResponse {
+    // userID 表示新创建的用户 ID
+    string userID = 1;
+}
+
+// UpdateUserRequest 表示更新用户请求
+message UpdateUserRequest {
+    // userID 表示用户 ID
+    // @gotags: uri:"userID"
+    string userID = 1;
+    // username 表示可选的用户名称
+    optional string username = 2;
+    // age 表示可选的用户年龄
+    optional int32 age = 3;
+    // avatar 表示可选的用户头像URL
+    optional string avatar = 4;
+    // email 表示可选的用户电子邮箱
+    optional string email = 5;
+    // phone 表示可选的用户手机号
+    optional string phone = 6;
+    // gender 表示可选的用户性别
+    optional Gender gender = 7;
+    // status 表示可选的用户状态
+    optional int32 status = 8;
+    // isRisk 表示可选的用户风险状态
+    optional bool isRisk = 9;
+}
+
+// UpdateUserResponse 表示更新用户响应
+message UpdateUserResponse {
+}
+
+// DeleteUserRequest 表示删除用户请求
+message DeleteUserRequest {
+    // userID 表示用户 ID
+    // @gotags: uri:"userID"
+    string userID = 1;
+}
+
+// DeleteUserResponse 表示删除用户响应
+message DeleteUserResponse {
+}
+
+// GetUserRequest 表示获取用户请求
+message GetUserRequest {
+    // userID 表示用户 ID
+    // @gotags: uri:"userID"
+    string userID = 1;
+}
+
+// GetUserResponse 表示获取用户响应
+message GetUserResponse {
+    // user 表示返回的用户信息
+    User user = 1;
+}
+
+// ListUserRequest 表示获取用户列表请求
+message ListUserRequest {
+    // offset 表示分页偏移量
+    int64 offset = 1;
+    // limit 表示每页数量
+    int64 limit = 2;
+}
+
+// ListUserResponse 表示获取用户列表响应
+message ListUserResponse {
+    // totalCount 表示用户总数
+    int64 totalCount = 1;
+    // users 表示用户列表
+    repeated User users = 2;
+}

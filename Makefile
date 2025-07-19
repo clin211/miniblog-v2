@@ -4,10 +4,10 @@ SHELL := /bin/bash
 # 定义全局 Makefile 变量方便后面引用
 
 COMMON_SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-# Protobuf 文件存放路径
-APIROOT=$(PROJ_ROOT_DIR)/pkg/api
 # 项目根目录
 PROJ_ROOT_DIR := $(abspath $(shell cd $(COMMON_SELF_DIR)/ && pwd -P))
+# Protobuf 文件存放路径
+APIROOT=$(PROJ_ROOT_DIR)/pkg/api
 # 构建产物、临时文件存放目录
 OUTPUT_DIR := $(PROJ_ROOT_DIR)/_output
 

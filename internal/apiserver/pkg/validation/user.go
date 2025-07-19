@@ -14,7 +14,7 @@ import (
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
 	genericvalidation "github.com/onexstack/onexstack/pkg/validation"
 
-	apiv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
+	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
 )
 
 // ValidateUserRules 定义用户相关的校验规则
@@ -53,10 +53,10 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 	// 性别校验函数
 	validateGender := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
-			gender := value.(apiv1.Gender)
+			gender := value.(appv1.Gender)
 			// 只允许已定义的枚举值
 			switch gender {
-			case apiv1.Gender_GENDER_UNSPECIFIED, apiv1.Gender_GENDER_MALE, apiv1.Gender_GENDER_FEMALE, apiv1.Gender_GENDER_OTHER:
+			case appv1.Gender_GENDER_UNSPECIFIED, appv1.Gender_GENDER_MALE, appv1.Gender_GENDER_FEMALE, appv1.Gender_GENDER_OTHER:
 				return nil
 			default:
 				return errno.ErrInvalidArgument.WithMessage("invalid gender value")
@@ -92,13 +92,13 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 	// 注册来源校验函数
 	validateRegisterSource := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
-			source := value.(apiv1.RegisterSource)
+			source := value.(appv1.RegisterSource)
 			// 只允许已定义的枚举值
 			switch source {
-			case apiv1.RegisterSource_REGISTER_SOURCE_UNSPECIFIED, apiv1.RegisterSource_REGISTER_SOURCE_WEB,
-				apiv1.RegisterSource_REGISTER_SOURCE_APP, apiv1.RegisterSource_REGISTER_SOURCE_WECHAT,
-				apiv1.RegisterSource_REGISTER_SOURCE_QQ, apiv1.RegisterSource_REGISTER_SOURCE_GITHUB,
-				apiv1.RegisterSource_REGISTER_SOURCE_GOOGLE:
+			case appv1.RegisterSource_REGISTER_SOURCE_UNSPECIFIED, appv1.RegisterSource_REGISTER_SOURCE_WEB,
+				appv1.RegisterSource_REGISTER_SOURCE_APP, appv1.RegisterSource_REGISTER_SOURCE_WECHAT,
+				appv1.RegisterSource_REGISTER_SOURCE_QQ, appv1.RegisterSource_REGISTER_SOURCE_GITHUB,
+				appv1.RegisterSource_REGISTER_SOURCE_GOOGLE:
 				return nil
 			default:
 				return errno.ErrInvalidArgument.WithMessage("invalid register source value")
@@ -177,12 +177,12 @@ func (v *Validator) ValidateUserRules() genericvalidation.Rules {
 }
 
 // ValidateLogin 校验修改密码请求.
-func (v *Validator) ValidateLoginRequest(ctx context.Context, rq *apiv1.LoginRequest) error {
+func (v *Validator) ValidateLoginRequest(ctx context.Context, rq *appv1.LoginRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidateUserRules())
 }
 
 // ValidateChangePasswordRequest 校验 ChangePasswordRequest 结构体的有效性.
-func (v *Validator) ValidateChangePasswordRequest(ctx context.Context, rq *apiv1.ChangePasswordRequest) error {
+func (v *Validator) ValidateChangePasswordRequest(ctx context.Context, rq *appv1.ChangePasswordRequest) error {
 	if rq.GetUserID() != contextx.UserID(ctx) {
 		return errno.ErrPermissionDenied.WithMessage("The logged-in user `%s` does not match request user `%s`", contextx.UserID(ctx), rq.GetUserID())
 	}
@@ -190,12 +190,12 @@ func (v *Validator) ValidateChangePasswordRequest(ctx context.Context, rq *apiv1
 }
 
 // ValidateCreateUserRequest 校验 CreateUserRequest 结构体的有效性.
-func (v *Validator) ValidateCreateUserRequest(ctx context.Context, rq *apiv1.CreateUserRequest) error {
+func (v *Validator) ValidateCreateUserRequest(ctx context.Context, rq *appv1.CreateUserRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidateUserRules())
 }
 
 // ValidateUpdateUserRequest 校验更新用户请求.
-func (v *Validator) ValidateUpdateUserRequest(ctx context.Context, rq *apiv1.UpdateUserRequest) error {
+func (v *Validator) ValidateUpdateUserRequest(ctx context.Context, rq *appv1.UpdateUserRequest) error {
 	if rq.GetUserID() != contextx.UserID(ctx) {
 		return errno.ErrPermissionDenied.WithMessage("The logged-in user `%s` does not match request user `%s`", contextx.UserID(ctx), rq.GetUserID())
 	}
@@ -203,12 +203,12 @@ func (v *Validator) ValidateUpdateUserRequest(ctx context.Context, rq *apiv1.Upd
 }
 
 // ValidateDeleteUserRequest 校验 DeleteUserRequest 结构体的有效性.
-func (v *Validator) ValidateDeleteUserRequest(ctx context.Context, rq *apiv1.DeleteUserRequest) error {
+func (v *Validator) ValidateDeleteUserRequest(ctx context.Context, rq *appv1.DeleteUserRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidateUserRules())
 }
 
 // ValidateGetUserRequest 校验 GetUserRequest 结构体的有效性.
-func (v *Validator) ValidateGetUserRequest(ctx context.Context, rq *apiv1.GetUserRequest) error {
+func (v *Validator) ValidateGetUserRequest(ctx context.Context, rq *appv1.GetUserRequest) error {
 	if rq.GetUserID() != contextx.UserID(ctx) {
 		return errno.ErrPermissionDenied.WithMessage("The logged-in user `%s` does not match request user `%s`", contextx.UserID(ctx), rq.GetUserID())
 	}
@@ -216,6 +216,6 @@ func (v *Validator) ValidateGetUserRequest(ctx context.Context, rq *apiv1.GetUse
 }
 
 // ValidateListUserRequest 校验 ListUserRequest 结构体的有效性.
-func (v *Validator) ValidateListUserRequest(ctx context.Context, rq *apiv1.ListUserRequest) error {
+func (v *Validator) ValidateListUserRequest(ctx context.Context, rq *appv1.ListUserRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidateUserRules())
 }

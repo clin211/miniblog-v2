@@ -1,0 +1,2055 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "miniblog API",
+    "version": "1.0",
+    "contact": {
+      "name": "小而美的博客项目",
+      "url": "https://github.com/clin211/miniblog-v2",
+      "email": "76742542lin@gmail.com"
+    },
+    "license": {
+      "name": "MIT License",
+      "url": "https://github.com/clin211/miniblog-v2/blob/master/LICENSE"
+    }
+  },
+  "tags": [
+    {
+      "name": "MiniBlog"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "summary": "服务健康检查",
+        "operationId": "Healthz",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1HealthzResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "服务治理"
+        ]
+      }
+    },
+    "/v1/app/auth/login": {
+      "post": {
+        "summary": "用户登录",
+        "operationId": "Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "用户管理"
+        ]
+      }
+    },
+    "/v1/app/auth/refresh-token": {
+      "put": {
+        "summary": "刷新令牌",
+        "operationId": "RefreshToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RefreshTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "该请求无需额外字段，仅通过现有的认证信息（如旧的 token）进行刷新",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RefreshTokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "用户管理"
+        ]
+      }
+    },
+    "/v1/app/categories": {
+      "get": {
+        "summary": "列出所有分类",
+        "operationId": "ListCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parentID",
+            "description": "parentID 表示可选的父分类ID过滤",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "isActive",
+            "description": "isActive 表示可选的激活状态过滤",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "分类管理"
+        ]
+      },
+      "post": {
+        "summary": "创建分类",
+        "operationId": "CreateCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCategoryRequest"
+            }
+          }
+        ],
+        "tags": [
+          "分类管理"
+        ]
+      }
+    },
+    "/v1/app/categories/{id}": {
+      "get": {
+        "summary": "获取分类信息",
+        "operationId": "GetCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id 表示要获取的分类 ID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "分类管理"
+        ]
+      },
+      "delete": {
+        "summary": "删除分类",
+        "operationId": "DeleteCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id 表示要删除的分类 ID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "分类管理"
+        ]
+      },
+      "put": {
+        "summary": "更新分类",
+        "operationId": "UpdateCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id 表示要更新的分类 ID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MiniBlogUpdateCategoryBody"
+            }
+          }
+        ],
+        "tags": [
+          "分类管理"
+        ]
+      }
+    },
+    "/v1/app/post-tags": {
+      "get": {
+        "summary": "列出文章标签关联",
+        "operationId": "ListPostTags",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPostTagsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "postID",
+            "description": "postID 表示可选的文章 ID 过滤",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tagID",
+            "description": "tagID 表示可选的标签 ID 过滤",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "文章标签管理"
+        ]
+      },
+      "delete": {
+        "summary": "删除文章标签关联",
+        "operationId": "DeletePostTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeletePostTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DeletePostTagRequest"
+            }
+          }
+        ],
+        "tags": [
+          "文章标签管理"
+        ]
+      },
+      "post": {
+        "summary": "创建文章标签关联",
+        "operationId": "CreatePostTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreatePostTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePostTagRequest"
+            }
+          }
+        ],
+        "tags": [
+          "文章标签管理"
+        ]
+      }
+    },
+    "/v1/app/post-tags/batch": {
+      "delete": {
+        "summary": "批量删除文章标签关联",
+        "operationId": "BatchDeletePostTags",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchDeletePostTagsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchDeletePostTagsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "文章标签管理"
+        ]
+      },
+      "post": {
+        "summary": "批量创建文章标签关联",
+        "operationId": "BatchCreatePostTags",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreatePostTagsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchCreatePostTagsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "文章标签管理"
+        ]
+      }
+    },
+    "/v1/app/posts": {
+      "get": {
+        "summary": "列出所有文章",
+        "operationId": "ListPost",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPostResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "offset",
+            "description": "offset 表示偏移量\n@gotags: form:\"offset\"",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "description": "limit 表示每页数量\n@gotags: form:\"limit\"",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "title",
+            "description": "title 表示可选的标题过滤",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "博客管理"
+        ]
+      },
+      "delete": {
+        "summary": "删除文章",
+        "operationId": "DeletePost",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeletePostResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DeletePostRequest"
+            }
+          }
+        ],
+        "tags": [
+          "博客管理"
+        ]
+      },
+      "post": {
+        "summary": "创建文章",
+        "operationId": "CreatePost",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreatePostResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePostRequest"
+            }
+          }
+        ],
+        "tags": [
+          "博客管理"
+        ]
+      }
+    },
+    "/v1/app/posts/{postID}": {
+      "get": {
+        "summary": "获取文章信息",
+        "operationId": "GetPost",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPostResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "postID",
+            "description": "postID 表示要获取的文章 ID\n@gotags: uri:\"postID\"",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "博客管理"
+        ]
+      },
+      "put": {
+        "summary": "更新文章",
+        "operationId": "UpdatePost",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdatePostResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "postID",
+            "description": "postID 表示要更新的文章 ID，对应 {postID}\n@gotags: uri:\"postID\"",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MiniBlogUpdatePostBody"
+            }
+          }
+        ],
+        "tags": [
+          "博客管理"
+        ]
+      }
+    },
+    "/v1/app/tags": {
+      "get": {
+        "summary": "列出所有标签",
+        "operationId": "ListTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "name 表示可选的标签名称过滤",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "标签管理"
+        ]
+      },
+      "post": {
+        "summary": "创建标签",
+        "operationId": "CreateTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateTagRequest"
+            }
+          }
+        ],
+        "tags": [
+          "标签管理"
+        ]
+      }
+    },
+    "/v1/app/tags/{id}": {
+      "get": {
+        "summary": "获取标签信息",
+        "operationId": "GetTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id 表示要获取的标签 ID\n@gotags: uri:\"id\"",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "标签管理"
+        ]
+      },
+      "delete": {
+        "summary": "删除标签",
+        "operationId": "DeleteTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id 表示要删除的标签 ID\n@gotags: uri:\"id\"",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "标签管理"
+        ]
+      },
+      "put": {
+        "summary": "更新标签",
+        "operationId": "UpdateTag",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateTagResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id 表示要更新的标签 ID\n@gotags: uri:\"id\"",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MiniBlogUpdateTagBody"
+            }
+          }
+        ],
+        "tags": [
+          "标签管理"
+        ]
+      }
+    },
+    "/v1/app/users": {
+      "get": {
+        "summary": "列出所有用户",
+        "operationId": "ListUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "offset",
+            "description": "offset 表示分页偏移量",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "description": "limit 表示每页数量",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "用户管理"
+        ]
+      },
+      "post": {
+        "summary": "创建用户",
+        "operationId": "CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "用户管理"
+        ]
+      }
+    },
+    "/v1/app/users/{userID}": {
+      "get": {
+        "summary": "获取用户信息",
+        "operationId": "GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userID",
+            "description": "userID 表示用户 ID\n@gotags: uri:\"userID\"",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "用户管理"
+        ]
+      },
+      "delete": {
+        "summary": "删除用户",
+        "operationId": "DeleteUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userID",
+            "description": "userID 表示用户 ID\n@gotags: uri:\"userID\"",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "用户管理"
+        ]
+      },
+      "put": {
+        "summary": "更新用户信息",
+        "operationId": "UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userID",
+            "description": "userID 表示用户 ID\n@gotags: uri:\"userID\"",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MiniBlogUpdateUserBody"
+            }
+          }
+        ],
+        "tags": [
+          "用户管理"
+        ]
+      }
+    },
+    "/v1/app/users/{userID}/change-password": {
+      "put": {
+        "summary": "修改密码",
+        "operationId": "ChangePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ChangePasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userID",
+            "description": "userID 表示用户 ID\n@gotags: uri:\"userID\"",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MiniBlogChangePasswordBody"
+            }
+          }
+        ],
+        "tags": [
+          "用户管理"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "MiniBlogChangePasswordBody": {
+      "type": "object",
+      "properties": {
+        "oldPassword": {
+          "type": "string",
+          "title": "oldPassword 表示当前密码"
+        },
+        "newPassword": {
+          "type": "string",
+          "title": "newPassword 表示准备修改的新密码"
+        }
+      },
+      "title": "ChangePasswordRequest 表示修改密码请求"
+    },
+    "MiniBlogUpdateCategoryBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name 表示可选的分类名称"
+        },
+        "description": {
+          "type": "string",
+          "title": "description 表示可选的分类描述"
+        },
+        "parentID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "parentID 表示可选的父分类ID"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32",
+          "title": "sortOrder 表示可选的排序值"
+        },
+        "isActive": {
+          "type": "boolean",
+          "title": "isActive 表示可选的激活状态"
+        }
+      },
+      "title": "UpdateCategoryRequest 表示更新分类请求"
+    },
+    "MiniBlogUpdatePostBody": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "title 表示更新后的博客标题"
+        },
+        "content": {
+          "type": "string",
+          "title": "content 表示更新后的博客内容"
+        },
+        "cover": {
+          "type": "string",
+          "title": "cover 表示更新后的文章封面"
+        },
+        "summary": {
+          "type": "string",
+          "title": "summary 表示更新后的文章摘要"
+        },
+        "categoryID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "categoryID 表示更新后的分类ID"
+        },
+        "postType": {
+          "$ref": "#/definitions/v1PostType",
+          "title": "postType 表示更新后的文章类型"
+        },
+        "originalAuthor": {
+          "type": "string",
+          "title": "originalAuthor 表示更新后的原作者姓名"
+        },
+        "originalSource": {
+          "type": "string",
+          "title": "originalSource 表示更新后的原文链接或来源"
+        },
+        "originalAuthorIntro": {
+          "type": "string",
+          "title": "originalAuthorIntro 表示更新后的原作者简介"
+        },
+        "position": {
+          "type": "integer",
+          "format": "int32",
+          "title": "position 表示更新后的文章排序"
+        },
+        "status": {
+          "$ref": "#/definitions/v1PostStatus",
+          "title": "status 表示更新后的文章状态"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "tags 表示更新后的文章标签，多个标签用逗号分隔"
+        }
+      },
+      "title": "UpdatePostRequest 表示更新文章请求"
+    },
+    "MiniBlogUpdateTagBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name 表示可选的标签名称"
+        },
+        "color": {
+          "type": "string",
+          "title": "color 表示可选的标签颜色"
+        }
+      },
+      "title": "UpdateTagRequest 表示更新标签请求"
+    },
+    "MiniBlogUpdateUserBody": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "title": "username 表示可选的用户名称"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32",
+          "title": "age 表示可选的用户年龄"
+        },
+        "avatar": {
+          "type": "string",
+          "title": "avatar 表示可选的用户头像URL"
+        },
+        "email": {
+          "type": "string",
+          "title": "email 表示可选的用户电子邮箱"
+        },
+        "phone": {
+          "type": "string",
+          "title": "phone 表示可选的用户手机号"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender",
+          "title": "gender 表示可选的用户性别"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "title": "status 表示可选的用户状态"
+        },
+        "isRisk": {
+          "type": "boolean",
+          "title": "isRisk 表示可选的用户风险状态"
+        }
+      },
+      "title": "UpdateUserRequest 表示更新用户请求"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchCreatePostTagsRequest": {
+      "type": "object",
+      "properties": {
+        "postID": {
+          "type": "string",
+          "title": "postID 表示文章 ID"
+        },
+        "tagIDs": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "tagIDs 表示标签 ID 列表"
+        }
+      },
+      "title": "BatchCreatePostTagsRequest 表示批量创建文章标签关联请求"
+    },
+    "v1BatchCreatePostTagsResponse": {
+      "type": "object",
+      "title": "BatchCreatePostTagsResponse 表示批量创建文章标签关联响应"
+    },
+    "v1BatchDeletePostTagsRequest": {
+      "type": "object",
+      "properties": {
+        "postID": {
+          "type": "string",
+          "title": "postID 表示文章 ID"
+        },
+        "tagIDs": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "tagIDs 表示标签 ID 列表"
+        }
+      },
+      "title": "BatchDeletePostTagsRequest 表示批量删除文章标签关联请求"
+    },
+    "v1BatchDeletePostTagsResponse": {
+      "type": "object",
+      "title": "BatchDeletePostTagsResponse 表示批量删除文章标签关联响应"
+    },
+    "v1Category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "id 表示分类 ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "name 表示分类名称"
+        },
+        "description": {
+          "type": "string",
+          "title": "description 表示分类描述"
+        },
+        "parentID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "parentID 表示父分类ID，0表示顶级分类"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32",
+          "title": "sortOrder 表示排序值"
+        },
+        "isActive": {
+          "type": "boolean",
+          "title": "isActive 表示是否激活"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "createdAt 表示创建时间（Unix 时间戳）"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "updatedAt 表示最后更新时间（Unix 时间戳）"
+        }
+      },
+      "title": "Category 表示文章分类"
+    },
+    "v1ChangePasswordResponse": {
+      "type": "object",
+      "title": "ChangePasswordResponse 表示修改密码响应"
+    },
+    "v1CreateCategoryRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name 表示分类名称"
+        },
+        "description": {
+          "type": "string",
+          "title": "description 表示分类描述"
+        },
+        "parentID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "parentID 表示父分类ID"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32",
+          "title": "sortOrder 表示排序值"
+        },
+        "isActive": {
+          "type": "boolean",
+          "title": "isActive 表示是否激活"
+        }
+      },
+      "title": "CreateCategoryRequest 表示创建分类请求"
+    },
+    "v1CreateCategoryResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "id 表示创建的分类 ID"
+        }
+      },
+      "title": "CreateCategoryResponse 表示创建分类响应"
+    },
+    "v1CreatePostRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "title 表示博客标题"
+        },
+        "content": {
+          "type": "string",
+          "title": "content 表示博客内容"
+        },
+        "cover": {
+          "type": "string",
+          "title": "cover 表示文章封面"
+        },
+        "summary": {
+          "type": "string",
+          "title": "summary 表示文章摘要"
+        },
+        "categoryID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "categoryID 表示分类ID"
+        },
+        "postType": {
+          "$ref": "#/definitions/v1PostType",
+          "title": "postType 表示文章类型，默认原创"
+        },
+        "originalAuthor": {
+          "type": "string",
+          "title": "originalAuthor 表示原作者姓名（转载/投稿时使用），原创时则是登录用户名"
+        },
+        "originalSource": {
+          "type": "string",
+          "title": "originalSource 表示原文链接或来源（转载时使用），原创时为空"
+        },
+        "originalAuthorIntro": {
+          "type": "string",
+          "title": "originalAuthorIntro 表示原作者简介（投稿时使用），原创时为空"
+        },
+        "position": {
+          "type": "integer",
+          "format": "int32",
+          "title": "position 表示文章排序"
+        },
+        "status": {
+          "$ref": "#/definitions/v1PostStatus",
+          "title": "status 表示文章状态"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "tags 表示文章标签，多个标签用逗号分隔"
+        }
+      },
+      "title": "CreatePostRequest 表示创建文章请求"
+    },
+    "v1CreatePostResponse": {
+      "type": "object",
+      "properties": {
+        "postID": {
+          "type": "string",
+          "title": "postID 表示创建的文章 ID"
+        }
+      },
+      "title": "CreatePostResponse 表示创建文章响应"
+    },
+    "v1CreatePostTagRequest": {
+      "type": "object",
+      "properties": {
+        "postID": {
+          "type": "string",
+          "title": "postID 表示文章 ID"
+        },
+        "tagID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "tagID 表示标签 ID"
+        }
+      },
+      "title": "CreatePostTagRequest 表示创建文章标签关联请求"
+    },
+    "v1CreatePostTagResponse": {
+      "type": "object",
+      "title": "CreatePostTagResponse 表示创建文章标签关联响应"
+    },
+    "v1CreateTagRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name 表示标签名称"
+        },
+        "color": {
+          "type": "string",
+          "title": "color 表示标签颜色"
+        }
+      },
+      "title": "CreateTagRequest 表示创建标签请求"
+    },
+    "v1CreateTagResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "id 表示创建的标签 ID"
+        }
+      },
+      "title": "CreateTagResponse 表示创建标签响应"
+    },
+    "v1CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "title": "username 表示用户名称"
+        },
+        "password": {
+          "type": "string",
+          "title": "password 表示用户密码"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32",
+          "title": "age 表示用户年龄"
+        },
+        "avatar": {
+          "type": "string",
+          "title": "avatar 表示用户头像URL"
+        },
+        "email": {
+          "type": "string",
+          "title": "email 表示用户电子邮箱"
+        },
+        "phone": {
+          "type": "string",
+          "title": "phone 表示用户手机号"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender",
+          "title": "gender 表示用户性别"
+        },
+        "registerSource": {
+          "$ref": "#/definitions/v1RegisterSource",
+          "title": "registerSource 表示注册来源"
+        },
+        "registerIP": {
+          "type": "string",
+          "title": "registerIP 表示注册IP"
+        },
+        "wechatOpenID": {
+          "type": "string",
+          "title": "wechatOpenID 表示微信OpenID"
+        }
+      },
+      "title": "CreateUserRequest 表示创建用户请求"
+    },
+    "v1CreateUserResponse": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "string",
+          "title": "userID 表示新创建的用户 ID"
+        }
+      },
+      "title": "CreateUserResponse 表示创建用户响应"
+    },
+    "v1DeleteCategoryResponse": {
+      "type": "object",
+      "title": "DeleteCategoryResponse 表示删除分类响应"
+    },
+    "v1DeletePostRequest": {
+      "type": "object",
+      "properties": {
+        "postIDs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "postIDs 表示要删除的文章 ID 列表"
+        }
+      },
+      "title": "DeletePostRequest 表示删除文章请求"
+    },
+    "v1DeletePostResponse": {
+      "type": "object",
+      "title": "DeletePostResponse 表示删除文章响应"
+    },
+    "v1DeletePostTagRequest": {
+      "type": "object",
+      "properties": {
+        "postID": {
+          "type": "string",
+          "title": "postID 表示文章 ID"
+        },
+        "tagID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "tagID 表示标签 ID"
+        }
+      },
+      "title": "DeletePostTagRequest 表示删除文章标签关联请求"
+    },
+    "v1DeletePostTagResponse": {
+      "type": "object",
+      "title": "DeletePostTagResponse 表示删除文章标签关联响应"
+    },
+    "v1DeleteTagResponse": {
+      "type": "object",
+      "title": "DeleteTagResponse 表示删除标签响应"
+    },
+    "v1DeleteUserResponse": {
+      "type": "object",
+      "title": "DeleteUserResponse 表示删除用户响应"
+    },
+    "v1Gender": {
+      "type": "string",
+      "enum": [
+        "GENDER_UNSPECIFIED",
+        "GENDER_MALE",
+        "GENDER_FEMALE",
+        "GENDER_OTHER"
+      ],
+      "default": "GENDER_UNSPECIFIED",
+      "description": "- GENDER_UNSPECIFIED: 未设置\n - GENDER_MALE: 男\n - GENDER_FEMALE: 女\n - GENDER_OTHER: 其他",
+      "title": "Gender 表示用户性别"
+    },
+    "v1GetCategoryResponse": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "$ref": "#/definitions/v1Category",
+          "title": "category 表示返回的分类信息"
+        }
+      },
+      "title": "GetCategoryResponse 表示获取分类响应"
+    },
+    "v1GetPostResponse": {
+      "type": "object",
+      "properties": {
+        "post": {
+          "$ref": "#/definitions/v1Post",
+          "title": "post 表示返回的文章信息"
+        }
+      },
+      "title": "GetPostResponse 表示获取文章响应"
+    },
+    "v1GetTagResponse": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "$ref": "#/definitions/v1Tag",
+          "title": "tag 表示返回的标签信息"
+        }
+      },
+      "title": "GetTagResponse 表示获取标签响应"
+    },
+    "v1GetUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1User",
+          "title": "user 表示返回的用户信息"
+        }
+      },
+      "title": "GetUserResponse 表示获取用户响应"
+    },
+    "v1HealthzResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/v1ServiceStatus",
+          "title": "status 表示服务的健康状态"
+        },
+        "timestamp": {
+          "type": "string",
+          "title": "timestamp 表示请求的时间戳"
+        },
+        "message": {
+          "type": "string",
+          "title": "message 表示可选的状态消息，描述服务健康的更多信息"
+        }
+      },
+      "title": "HealthzResponse 表示健康检查的响应结构体"
+    },
+    "v1ListCategoryResponse": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Category"
+          },
+          "title": "categories 表示分类列表"
+        }
+      },
+      "title": "ListCategoryResponse 表示获取分类列表响应"
+    },
+    "v1ListPostResponse": {
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "string",
+          "format": "int64",
+          "title": "total_count 表示总文章数"
+        },
+        "posts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Post"
+          },
+          "title": "posts 表示文章列表"
+        }
+      },
+      "title": "ListPostResponse 表示获取文章列表响应"
+    },
+    "v1ListPostTagsResponse": {
+      "type": "object",
+      "properties": {
+        "postTags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PostTag"
+          },
+          "title": "postTags 表示文章标签关联列表"
+        }
+      },
+      "title": "ListPostTagsResponse 表示获取文章标签关联列表响应"
+    },
+    "v1ListTagResponse": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Tag"
+          },
+          "title": "tags 表示标签列表"
+        }
+      },
+      "title": "ListTagResponse 表示获取标签列表响应"
+    },
+    "v1ListUserResponse": {
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "string",
+          "format": "int64",
+          "title": "totalCount 表示用户总数"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1User"
+          },
+          "title": "users 表示用户列表"
+        }
+      },
+      "title": "ListUserResponse 表示获取用户列表响应"
+    },
+    "v1LoginRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "title": "username 表示用户名称"
+        },
+        "password": {
+          "type": "string",
+          "title": "password 表示用户密码"
+        }
+      },
+      "title": "LoginRequest 表示登录请求"
+    },
+    "v1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "title": "token 表示返回的身份验证令牌"
+        },
+        "expireAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "expireAt 表示该 token 的过期时间（Unix 时间戳）"
+        }
+      },
+      "title": "LoginResponse 表示登录响应"
+    },
+    "v1Post": {
+      "type": "object",
+      "properties": {
+        "postID": {
+          "type": "string",
+          "title": "postID 表示博文 ID"
+        },
+        "title": {
+          "type": "string",
+          "title": "title 表示博客标题"
+        },
+        "content": {
+          "type": "string",
+          "title": "content 表示博客内容"
+        },
+        "cover": {
+          "type": "string",
+          "title": "cover 表示文章封面"
+        },
+        "summary": {
+          "type": "string",
+          "title": "summary 表示文章摘要"
+        },
+        "userID": {
+          "type": "string",
+          "title": "userID 表示用户ID"
+        },
+        "categoryID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "categoryID 表示分类ID"
+        },
+        "postType": {
+          "$ref": "#/definitions/v1PostType",
+          "title": "postType 表示文章类型"
+        },
+        "originalAuthor": {
+          "type": "string",
+          "title": "originalAuthor 表示原作者姓名（转载/投稿时使用）"
+        },
+        "originalSource": {
+          "type": "string",
+          "title": "originalSource 表示原文链接或来源（转载时使用）"
+        },
+        "originalAuthorIntro": {
+          "type": "string",
+          "title": "originalAuthorIntro 表示原作者简介（投稿时使用）"
+        },
+        "position": {
+          "type": "integer",
+          "format": "int32",
+          "title": "position 表示文章排序，0-默认排序，1-置顶，数字越大越靠前"
+        },
+        "viewCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "viewCount 表示阅读次数"
+        },
+        "likeCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "likeCount 表示点赞数"
+        },
+        "status": {
+          "$ref": "#/definitions/v1PostStatus",
+          "title": "status 表示文章状态"
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "publishedAt 表示发布时间（Unix 时间戳）"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "createdAt 表示博客创建时间（Unix 时间戳）"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "updatedAt 表示博客最后更新时间（Unix 时间戳）"
+        }
+      },
+      "title": "Post 表示博客文章"
+    },
+    "v1PostStatus": {
+      "type": "string",
+      "enum": [
+        "POST_STATUS_UNSPECIFIED",
+        "POST_STATUS_DRAFT",
+        "POST_STATUS_PUBLISHED",
+        "POST_STATUS_ARCHIVED"
+      ],
+      "default": "POST_STATUS_UNSPECIFIED",
+      "description": "- POST_STATUS_UNSPECIFIED: 未指定\n - POST_STATUS_DRAFT: 草稿\n - POST_STATUS_PUBLISHED: 已发布\n - POST_STATUS_ARCHIVED: 已归档",
+      "title": "PostStatus 表示文章状态"
+    },
+    "v1PostTag": {
+      "type": "object",
+      "properties": {
+        "postID": {
+          "type": "string",
+          "title": "postID 表示文章 ID"
+        },
+        "tagID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "tagID 表示标签 ID"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "createdAt 表示创建时间"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "updatedAt 表示最后更新时间"
+        }
+      },
+      "title": "PostTag 表示文章标签关联"
+    },
+    "v1PostType": {
+      "type": "string",
+      "enum": [
+        "POST_TYPE_UNSPECIFIED",
+        "POST_TYPE_ORIGINAL",
+        "POST_TYPE_REPOST",
+        "POST_TYPE_CONTRIBUTION"
+      ],
+      "default": "POST_TYPE_UNSPECIFIED",
+      "description": "- POST_TYPE_UNSPECIFIED: 未指定\n - POST_TYPE_ORIGINAL: 原创\n - POST_TYPE_REPOST: 转载\n - POST_TYPE_CONTRIBUTION: 投稿",
+      "title": "PostType 表示文章类型"
+    },
+    "v1RefreshTokenRequest": {
+      "type": "object",
+      "description": "该请求无需额外字段，仅通过现有的认证信息（如旧的 token）进行刷新",
+      "title": "RefreshTokenRequest 表示刷新令牌的请求"
+    },
+    "v1RefreshTokenResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "title": "token 表示返回的身份验证令牌"
+        },
+        "expireAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "expireAt 表示该 token 的过期时间（Unix 时间戳）"
+        }
+      },
+      "title": "RefreshTokenResponse 表示刷新令牌的响应"
+    },
+    "v1RegisterSource": {
+      "type": "string",
+      "enum": [
+        "REGISTER_SOURCE_UNSPECIFIED",
+        "REGISTER_SOURCE_WEB",
+        "REGISTER_SOURCE_APP",
+        "REGISTER_SOURCE_WECHAT",
+        "REGISTER_SOURCE_QQ",
+        "REGISTER_SOURCE_GITHUB",
+        "REGISTER_SOURCE_GOOGLE"
+      ],
+      "default": "REGISTER_SOURCE_UNSPECIFIED",
+      "description": "- REGISTER_SOURCE_UNSPECIFIED: 未指定\n - REGISTER_SOURCE_WEB: Web\n - REGISTER_SOURCE_APP: App\n - REGISTER_SOURCE_WECHAT: 微信\n - REGISTER_SOURCE_QQ: QQ\n - REGISTER_SOURCE_GITHUB: GitHub\n - REGISTER_SOURCE_GOOGLE: Google",
+      "title": "RegisterSource 表示用户注册来源"
+    },
+    "v1ServiceStatus": {
+      "type": "string",
+      "enum": [
+        "Healthy",
+        "Unhealthy"
+      ],
+      "default": "Healthy",
+      "description": "- Healthy: Healthy 表示服务健康\n - Unhealthy: Unhealthy 表示服务不健康",
+      "title": "ServiceStatus 表示服务的健康状态"
+    },
+    "v1Tag": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "id 表示标签 ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "name 表示标签名称"
+        },
+        "color": {
+          "type": "string",
+          "title": "color 表示标签颜色(hex 格式)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "createdAt 表示创建时间（Unix 时间戳）"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "updatedAt 表示最后更新时间（Unix 时间戳）"
+        }
+      },
+      "title": "Tag 表示文章标签"
+    },
+    "v1UpdateCategoryResponse": {
+      "type": "object",
+      "title": "UpdateCategoryResponse 表示更新分类响应"
+    },
+    "v1UpdatePostResponse": {
+      "type": "object",
+      "title": "UpdatePostResponse 表示更新文章响应"
+    },
+    "v1UpdateTagResponse": {
+      "type": "object",
+      "title": "UpdateTagResponse 表示更新标签响应"
+    },
+    "v1UpdateUserResponse": {
+      "type": "object",
+      "title": "UpdateUserResponse 表示更新用户响应"
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "userID": {
+          "type": "string",
+          "title": "userID 表示用户 ID"
+        },
+        "username": {
+          "type": "string",
+          "title": "username 表示用户名称"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32",
+          "title": "age 表示用户年龄"
+        },
+        "avatar": {
+          "type": "string",
+          "title": "avatar 表示用户头像URL"
+        },
+        "email": {
+          "type": "string",
+          "title": "email 表示用户电子邮箱"
+        },
+        "emailVerified": {
+          "type": "boolean",
+          "title": "emailVerified 表示邮箱是否已验证"
+        },
+        "phone": {
+          "type": "string",
+          "title": "phone 表示用户手机号"
+        },
+        "phoneVerified": {
+          "type": "boolean",
+          "title": "phoneVerified 表示手机号是否已验证"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender",
+          "title": "gender 表示用户性别"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "title": "status 表示用户状态：1-正常，0-禁用"
+        },
+        "failedLoginAttempts": {
+          "type": "integer",
+          "format": "int32",
+          "title": "failedLoginAttempts 表示失败登录次数"
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "lastLoginAt 表示最后登录时间（Unix 时间戳）"
+        },
+        "lastLoginIP": {
+          "type": "string",
+          "title": "lastLoginIP 表示最后登录IP"
+        },
+        "lastLoginDevice": {
+          "type": "string",
+          "title": "lastLoginDevice 表示最后登录设备"
+        },
+        "isRisk": {
+          "type": "boolean",
+          "title": "isRisk 表示是否为风险用户"
+        },
+        "registerSource": {
+          "$ref": "#/definitions/v1RegisterSource",
+          "title": "registerSource 表示注册来源"
+        },
+        "registerIP": {
+          "type": "string",
+          "title": "registerIP 表示注册IP"
+        },
+        "wechatOpenID": {
+          "type": "string",
+          "title": "wechatOpenID 表示微信OpenID"
+        },
+        "passwordUpdatedAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "passwordUpdatedAt 表示密码更新时间（Unix 时间戳）"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "createdAt 表示用户注册时间（Unix 时间戳）"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "updatedAt 表示用户最后更新时间（Unix 时间戳）"
+        }
+      },
+      "title": "User 表示用户信息"
+    }
+  }
+}

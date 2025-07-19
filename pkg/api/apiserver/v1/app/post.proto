@@ -1,0 +1,179 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
+// Post API 定义，包含博客文章的请求和响应消息
+syntax = "proto3";
+
+package v1;
+
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app;v1";
+
+// PostType 表示文章类型
+enum PostType {
+    POST_TYPE_UNSPECIFIED = 0;  // 未指定
+    POST_TYPE_ORIGINAL = 1;     // 原创
+    POST_TYPE_REPOST = 2;       // 转载
+    POST_TYPE_CONTRIBUTION = 3; // 投稿
+}
+
+// PostStatus 表示文章状态
+enum PostStatus {
+    POST_STATUS_UNSPECIFIED = 0; // 未指定
+    POST_STATUS_DRAFT = 1;       // 草稿
+    POST_STATUS_PUBLISHED = 2;   // 已发布
+    POST_STATUS_ARCHIVED = 3;    // 已归档
+}
+
+// Post 表示博客文章
+message Post {
+    // postID 表示博文 ID
+    string postID = 1;
+    // title 表示博客标题
+    string title = 2;
+    // content 表示博客内容
+    string content = 3;
+    // cover 表示文章封面
+    optional string cover = 4;
+    // summary 表示文章摘要
+    optional string summary = 5;
+    // userID 表示用户ID
+    string userID = 6;
+    // categoryID 表示分类ID
+    optional int32 categoryID = 7;
+    // postType 表示文章类型
+    PostType postType = 8;
+    // originalAuthor 表示原作者姓名（转载/投稿时使用）
+    optional string originalAuthor = 9;
+    // originalSource 表示原文链接或来源（转载时使用）
+    optional string originalSource = 10;
+    // originalAuthorIntro 表示原作者简介（投稿时使用）
+    optional string originalAuthorIntro = 11;
+    // position 表示文章排序，0-默认排序，1-置顶，数字越大越靠前
+    int32 position = 12;
+    // viewCount 表示阅读次数
+    int32 viewCount = 13;
+    // likeCount 表示点赞数
+    int32 likeCount = 14;
+    // status 表示文章状态
+    PostStatus status = 15;
+    // publishedAt 表示发布时间（Unix 时间戳）
+    optional int64 publishedAt = 16;
+    // createdAt 表示博客创建时间（Unix 时间戳）
+    int64 createdAt = 17;
+    // updatedAt 表示博客最后更新时间（Unix 时间戳）
+    int64 updatedAt = 18;
+}
+
+// CreatePostRequest 表示创建文章请求
+message CreatePostRequest {
+    // title 表示博客标题
+    string title = 1;
+    // content 表示博客内容
+    string content = 2;
+    // cover 表示文章封面
+    optional string cover = 3;
+    // summary 表示文章摘要
+    optional string summary = 4;
+    // categoryID 表示分类ID
+    int32 categoryID = 5;
+    // postType 表示文章类型，默认原创
+    PostType postType = 6;
+    // originalAuthor 表示原作者姓名（转载/投稿时使用），原创时则是登录用户名
+    optional string originalAuthor = 7;
+    // originalSource 表示原文链接或来源（转载时使用），原创时为空
+    optional string originalSource = 8;
+    // originalAuthorIntro 表示原作者简介（投稿时使用），原创时为空
+    optional string originalAuthorIntro = 9;
+    // position 表示文章排序
+    optional int32 position = 10;
+    // status 表示文章状态
+    PostStatus status = 11;
+    // tags 表示文章标签，多个标签用逗号分隔
+    repeated int32 tags = 12;
+}
+
+// CreatePostResponse 表示创建文章响应
+message CreatePostResponse {
+    // postID 表示创建的文章 ID
+    string postID = 1;
+}
+
+// UpdatePostRequest 表示更新文章请求
+message UpdatePostRequest {
+    // postID 表示要更新的文章 ID，对应 {postID}
+    // @gotags: uri:"postID"
+    string postID = 1;
+    // title 表示更新后的博客标题
+    optional string title = 2;
+    // content 表示更新后的博客内容
+    optional string content = 3;
+    // cover 表示更新后的文章封面
+    optional string cover = 4;
+    // summary 表示更新后的文章摘要
+    optional string summary = 5;
+    // categoryID 表示更新后的分类ID
+    optional int32 categoryID = 6;
+    // postType 表示更新后的文章类型
+    optional PostType postType = 7;
+    // originalAuthor 表示更新后的原作者姓名
+    optional string originalAuthor = 8;
+    // originalSource 表示更新后的原文链接或来源
+    optional string originalSource = 9;
+    // originalAuthorIntro 表示更新后的原作者简介
+    optional string originalAuthorIntro = 10;
+    // position 表示更新后的文章排序
+    optional int32 position = 11;
+    // status 表示更新后的文章状态
+    optional PostStatus status = 12;
+    // tags 表示更新后的文章标签，多个标签用逗号分隔
+    repeated int32 tags = 13;
+}
+
+// UpdatePostResponse 表示更新文章响应
+message UpdatePostResponse {
+}
+
+// DeletePostRequest 表示删除文章请求
+message DeletePostRequest {
+    // postIDs 表示要删除的文章 ID 列表
+    repeated string postIDs = 1;
+}
+
+// DeletePostResponse 表示删除文章响应
+message DeletePostResponse {
+}
+
+// GetPostRequest 表示获取文章请求
+message GetPostRequest {
+    // postID 表示要获取的文章 ID
+    // @gotags: uri:"postID"
+    string postID = 1;
+}
+
+// GetPostResponse 表示获取文章响应
+message GetPostResponse {
+    // post 表示返回的文章信息
+    Post post = 1;
+}
+
+// ListPostRequest 表示获取文章列表请求
+message ListPostRequest {
+    // offset 表示偏移量
+    // @gotags: form:"offset"
+    int64 offset = 1;
+    // limit 表示每页数量
+    // @gotags: form:"limit"
+    int64 limit = 2;
+    // title 表示可选的标题过滤
+    optional string title = 3;
+}
+
+// ListPostResponse 表示获取文章列表响应
+message ListPostResponse {
+    // total_count 表示总文章数
+    int64 total_count = 1;
+    // posts 表示文章列表
+    repeated Post posts = 2;
+}

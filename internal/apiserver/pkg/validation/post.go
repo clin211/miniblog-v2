@@ -13,7 +13,7 @@ import (
 	genericvalidation "github.com/onexstack/onexstack/pkg/validation"
 
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
-	apiv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
+	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
 )
 
 // ValidatePostRules 定义文章相关的校验规则
@@ -22,14 +22,14 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 	validatePostType := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
 			// 处理两种可能的类型：PostType 和 *PostType
-			var postType apiv1.PostType
+			var postType appv1.PostType
 			var hasPostType bool
 
 			switch v := value.(type) {
-			case apiv1.PostType:
+			case appv1.PostType:
 				postType = v
 				hasPostType = true
-			case *apiv1.PostType:
+			case *appv1.PostType:
 				if v != nil {
 					postType = *v
 					hasPostType = true
@@ -41,8 +41,8 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 			if hasPostType {
 				// 只允许已定义的枚举值
 				switch postType {
-				case apiv1.PostType_POST_TYPE_UNSPECIFIED, apiv1.PostType_POST_TYPE_ORIGINAL,
-					apiv1.PostType_POST_TYPE_REPOST, apiv1.PostType_POST_TYPE_CONTRIBUTION:
+				case appv1.PostType_POST_TYPE_UNSPECIFIED, appv1.PostType_POST_TYPE_ORIGINAL,
+					appv1.PostType_POST_TYPE_REPOST, appv1.PostType_POST_TYPE_CONTRIBUTION:
 					return nil
 				default:
 					return errno.ErrInvalidArgument.WithMessage("invalid post type value")
@@ -56,14 +56,14 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 	validatePostStatus := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
 			// 处理两种可能的类型：PostStatus 和 *PostStatus
-			var status apiv1.PostStatus
+			var status appv1.PostStatus
 			var hasStatus bool
 
 			switch v := value.(type) {
-			case apiv1.PostStatus:
+			case appv1.PostStatus:
 				status = v
 				hasStatus = true
-			case *apiv1.PostStatus:
+			case *appv1.PostStatus:
 				if v != nil {
 					status = *v
 					hasStatus = true
@@ -75,8 +75,8 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 			if hasStatus {
 				// 只允许已定义的枚举值
 				switch status {
-				case apiv1.PostStatus_POST_STATUS_UNSPECIFIED, apiv1.PostStatus_POST_STATUS_DRAFT,
-					apiv1.PostStatus_POST_STATUS_PUBLISHED, apiv1.PostStatus_POST_STATUS_ARCHIVED:
+				case appv1.PostStatus_POST_STATUS_UNSPECIFIED, appv1.PostStatus_POST_STATUS_DRAFT,
+					appv1.PostStatus_POST_STATUS_PUBLISHED, appv1.PostStatus_POST_STATUS_ARCHIVED:
 					return nil
 				default:
 					return errno.ErrInvalidArgument.WithMessage("invalid post status value")
@@ -409,17 +409,17 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 }
 
 // ValidateCreatePostRequest 校验 CreatePostRequest 结构体的有效性
-func (v *Validator) ValidateCreatePostRequest(ctx context.Context, rq *apiv1.CreatePostRequest) error {
+func (v *Validator) ValidateCreatePostRequest(ctx context.Context, rq *appv1.CreatePostRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidatePostRules())
 }
 
 // ValidateUpdatePostRequest 校验 UpdatePostRequest 结构体的有效性
-func (v *Validator) ValidateUpdatePostRequest(ctx context.Context, rq *apiv1.UpdatePostRequest) error {
+func (v *Validator) ValidateUpdatePostRequest(ctx context.Context, rq *appv1.UpdatePostRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidatePostRules())
 }
 
 // ValidateDeletePostRequest 校验 DeletePostRequest 结构体的有效性
-func (v *Validator) ValidateDeletePostRequest(ctx context.Context, rq *apiv1.DeletePostRequest) error {
+func (v *Validator) ValidateDeletePostRequest(ctx context.Context, rq *appv1.DeletePostRequest) error {
 	if len(rq.GetPostIDs()) == 0 {
 		return errno.ErrInvalidArgument.WithMessage("postIDs cannot be empty")
 	}
@@ -432,12 +432,12 @@ func (v *Validator) ValidateDeletePostRequest(ctx context.Context, rq *apiv1.Del
 }
 
 // ValidateGetPostRequest 校验 GetPostRequest 结构体的有效性
-func (v *Validator) ValidateGetPostRequest(ctx context.Context, rq *apiv1.GetPostRequest) error {
+func (v *Validator) ValidateGetPostRequest(ctx context.Context, rq *appv1.GetPostRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidatePostRules())
 }
 
 // ValidateListPostRequest 校验 ListPostRequest 结构体的有效性
-func (v *Validator) ValidateListPostRequest(ctx context.Context, rq *apiv1.ListPostRequest) error {
+func (v *Validator) ValidateListPostRequest(ctx context.Context, rq *appv1.ListPostRequest) error {
 	// 校验分页参数
 	rules := v.ValidatePostRules()
 	if err := rules["Offset"](rq.GetOffset()); err != nil {

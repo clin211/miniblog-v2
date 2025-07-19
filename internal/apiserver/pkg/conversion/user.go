@@ -9,22 +9,22 @@ import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
 	"github.com/clin211/miniblog-v2/pkg/copier"
 
-	apiv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
+	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
 )
 
 // UserModelToUserV1 将模型层的 UserM（用户模型对象）转换为 Protobuf 层的 User（v1 用户对象）.
-func UserModelToUserV1(userModel *model.UserM) *apiv1.User {
+func UserModelToUserV1(userModel *model.UserM) *appv1.User {
 	if userModel == nil {
 		return nil
 	}
 
-	var protoUser apiv1.User
+	var protoUser appv1.User
 	_ = copier.CopyWithConverters(&protoUser, userModel)
 	return &protoUser
 }
 
 // UserV1ToUserModel 将 Protobuf 层的 User（v1 用户对象）转换为模型层的 UserM（用户模型对象）.
-func UserV1ToUserModel(protoUser *apiv1.User) *model.UserM {
+func UserV1ToUserModel(protoUser *appv1.User) *model.UserM {
 	if protoUser == nil {
 		return nil
 	}

@@ -5,6 +5,8 @@
     "APIROOT",
     "apiserver",
     "apiv",
+    "appv",
+    "authv",
     "automaxprocs",
     "bsoncodec",
     "bsonrw",
