@@ -54,6 +54,8 @@ const (
 	MiniBlog_ListPostTags_FullMethodName        = "/v1.MiniBlog/ListPostTags"
 	MiniBlog_BatchCreatePostTags_FullMethodName = "/v1.MiniBlog/BatchCreatePostTags"
 	MiniBlog_BatchDeletePostTags_FullMethodName = "/v1.MiniBlog/BatchDeletePostTags"
+	MiniBlog_AppPostList_FullMethodName         = "/v1.MiniBlog/AppPostList"
+	MiniBlog_AppGetPost_FullMethodName          = "/v1.MiniBlog/AppGetPost"
 )
 
 // MiniBlogClient is the client API for MiniBlog service.
@@ -120,6 +122,10 @@ type MiniBlogClient interface {
 	BatchCreatePostTags(ctx context.Context, in *BatchCreatePostTagsRequest, opts ...grpc.CallOption) (*BatchCreatePostTagsResponse, error)
 	// BatchDeletePostTags 批量删除文章标签关联
 	BatchDeletePostTags(ctx context.Context, in *BatchDeletePostTagsRequest, opts ...grpc.CallOption) (*BatchDeletePostTagsResponse, error)
+	// --------------------------------- app ---------------------------------
+	AppPostList(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (*ListPostResponse, error)
+	// GetPost 获取文章信息
+	AppGetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error)
 }
 
 type miniBlogClient struct {
@@ -420,6 +426,26 @@ func (c *miniBlogClient) BatchDeletePostTags(ctx context.Context, in *BatchDelet
 	return out, nil
 }
 
+func (c *miniBlogClient) AppPostList(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (*ListPostResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPostResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_AppPostList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) AppGetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPostResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_AppGetPost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MiniBlogServer is the server API for MiniBlog service.
 // All implementations must embed UnimplementedMiniBlogServer
 // for forward compatibility.
@@ -484,6 +510,10 @@ type MiniBlogServer interface {
 	BatchCreatePostTags(context.Context, *BatchCreatePostTagsRequest) (*BatchCreatePostTagsResponse, error)
 	// BatchDeletePostTags 批量删除文章标签关联
 	BatchDeletePostTags(context.Context, *BatchDeletePostTagsRequest) (*BatchDeletePostTagsResponse, error)
+	// --------------------------------- app ---------------------------------
+	AppPostList(context.Context, *ListPostRequest) (*ListPostResponse, error)
+	// GetPost 获取文章信息
+	AppGetPost(context.Context, *GetPostRequest) (*GetPostResponse, error)
 	mustEmbedUnimplementedMiniBlogServer()
 }
 
@@ -580,6 +610,12 @@ func (UnimplementedMiniBlogServer) BatchCreatePostTags(context.Context, *BatchCr
 }
 func (UnimplementedMiniBlogServer) BatchDeletePostTags(context.Context, *BatchDeletePostTagsRequest) (*BatchDeletePostTagsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BatchDeletePostTags not implemented")
+}
+func (UnimplementedMiniBlogServer) AppPostList(context.Context, *ListPostRequest) (*ListPostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppPostList not implemented")
+}
+func (UnimplementedMiniBlogServer) AppGetPost(context.Context, *GetPostRequest) (*GetPostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppGetPost not implemented")
 }
 func (UnimplementedMiniBlogServer) mustEmbedUnimplementedMiniBlogServer() {}
 func (UnimplementedMiniBlogServer) testEmbeddedByValue()                  {}
@@ -1124,6 +1160,42 @@ func _MiniBlog_BatchDeletePostTags_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MiniBlog_AppPostList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).AppPostList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_AppPostList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).AppPostList(ctx, req.(*ListPostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_AppGetPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).AppGetPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_AppGetPost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).AppGetPost(ctx, req.(*GetPostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MiniBlog_ServiceDesc is the grpc.ServiceDesc for MiniBlog service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1246,6 +1318,14 @@ var MiniBlog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BatchDeletePostTags",
 			Handler:    _MiniBlog_BatchDeletePostTags_Handler,
+		},
+		{
+			MethodName: "AppPostList",
+			Handler:    _MiniBlog_AppPostList_Handler,
+		},
+		{
+			MethodName: "AppGetPost",
+			Handler:    _MiniBlog_AppGetPost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -86,7 +86,7 @@ service MiniBlog {
             summary: "用户登录";
             operation_id: "Login";
             description: "";
-            tags: "用户管理";
+            tags: "system/用户管理";
         };
     }
 
@@ -101,7 +101,7 @@ service MiniBlog {
             summary: "刷新令牌";
             operation_id: "RefreshToken";
             description: "";
-            tags: "用户管理";
+            tags: "system/用户管理";
         };
     }
 
@@ -116,7 +116,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "修改密码";
             operation_id: "ChangePassword";
-            tags: "用户管理";
+            tags: "system/用户管理";
         };
     }
 
@@ -130,7 +130,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "创建用户";
             operation_id: "CreateUser";
-            tags: "用户管理";
+            tags: "system/用户管理";
         };
     }
 
@@ -144,7 +144,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "更新用户信息";
             operation_id: "UpdateUser";
-            tags: "用户管理";
+            tags: "system/用户管理";
         };
     }
 
@@ -157,7 +157,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "删除用户";
             operation_id: "DeleteUser";
-            tags: "用户管理";
+            tags: "system/用户管理";
         };
     }
 
@@ -170,7 +170,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "获取用户信息";
             operation_id: "GetUser";
-            tags: "用户管理";
+            tags: "system/用户管理";
         };
     }
 
@@ -183,7 +183,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "列出所有用户";
             operation_id: "ListUser";
-            tags: "用户管理";
+            tags: "system/用户管理";
         };
     }
 
@@ -197,7 +197,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "创建文章";
             operation_id: "CreatePost";
-            tags: "博客管理";
+            tags: "system/博客管理";
         };
     }
 
@@ -219,7 +219,7 @@ service MiniBlog {
             // 为此操作指定唯一标识符（UpdatePost），便于跟踪
             operation_id: "UpdatePost";
             // 将此操作归类到 "博客管理" 标签组，方便在 OpenAPI 文档中组织接口分组
-            tags: "博客管理";
+            tags: "system/博客管理";
         };
     }
 
@@ -233,7 +233,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "删除文章";
             operation_id: "DeletePost";
-            tags: "博客管理";
+            tags: "system/博客管理";
         };
     }
 
@@ -246,7 +246,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "获取文章信息";
             operation_id: "GetPost";
-            tags: "博客管理";
+            tags: "system/博客管理";
         };
     }
 
@@ -259,7 +259,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "列出所有文章";
             operation_id: "ListPost";
-            tags: "博客管理";
+            tags: "system/博客管理";
         };
     }
 
@@ -273,7 +273,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "创建分类";
             operation_id: "CreateCategory";
-            tags: "分类管理";
+            tags: "system/分类管理";
         };
     }
 
@@ -287,7 +287,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "更新分类";
             operation_id: "UpdateCategory";
-            tags: "分类管理";
+            tags: "system/分类管理";
         };
     }
 
@@ -300,7 +300,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "删除分类";
             operation_id: "DeleteCategory";
-            tags: "分类管理";
+            tags: "system/分类管理";
         };
     }
 
@@ -313,7 +313,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "获取分类信息";
             operation_id: "GetCategory";
-            tags: "分类管理";
+            tags: "system/分类管理";
         };
     }
 
@@ -326,7 +326,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "列出所有分类";
             operation_id: "ListCategory";
-            tags: "分类管理";
+            tags: "system/分类管理";
         };
     }
 
@@ -340,7 +340,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "创建标签";
             operation_id: "CreateTag";
-            tags: "标签管理";
+            tags: "system/标签管理";
         };
     }
 
@@ -354,7 +354,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "更新标签";
             operation_id: "UpdateTag";
-            tags: "标签管理";
+            tags: "system/标签管理";
         };
     }
 
@@ -367,7 +367,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "删除标签";
             operation_id: "DeleteTag";
-            tags: "标签管理";
+            tags: "system/标签管理";
         };
     }
 
@@ -380,7 +380,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "获取标签信息";
             operation_id: "GetTag";
-            tags: "标签管理";
+            tags: "system/标签管理";
         };
     }
 
@@ -393,7 +393,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "列出所有标签";
             operation_id: "ListTag";
-            tags: "标签管理";
+            tags: "system/标签管理";
         };
     }
 
@@ -407,7 +407,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "创建文章标签关联";
             operation_id: "CreatePostTag";
-            tags: "文章标签管理";
+            tags: "system/文章标签管理";
         };
     }
 
@@ -421,7 +421,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "删除文章标签关联";
             operation_id: "DeletePostTag";
-            tags: "文章标签管理";
+            tags: "system/文章标签管理";
         };
     }
 
@@ -434,7 +434,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "列出文章标签关联";
             operation_id: "ListPostTags";
-            tags: "文章标签管理";
+            tags: "system/文章标签管理";
         };
     }
 
@@ -448,7 +448,7 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "批量创建文章标签关联";
             operation_id: "BatchCreatePostTags";
-            tags: "文章标签管理";
+            tags: "system/文章标签管理";
         };
     }
 
@@ -462,7 +462,34 @@ service MiniBlog {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "批量删除文章标签关联";
             operation_id: "BatchDeletePostTags";
-            tags: "文章标签管理";
+            tags: "system/文章标签管理";
+        };
+    }
+
+
+    // --------------------------------- app ---------------------------------
+    rpc AppPostList(ListPostRequest) returns (ListPostResponse) {
+        option (google.api.http) = {
+            get: "/v1/app/posts",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "列出文章";
+            operation_id: "AppPostList";
+            tags: "app/博客管理";
+        };
+    }
+
+        // GetPost 获取文章信息
+    rpc AppGetPost(GetPostRequest) returns (GetPostResponse) {
+        option (google.api.http) = {
+            get: "/v1/app/posts/{postID}",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "获取文章信息";
+            operation_id: "AppGetPost";
+            tags: "app/博客管理";
         };
     }
 }

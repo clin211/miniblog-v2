@@ -52,6 +52,86 @@
         ]
       }
     },
+    "/v1/app/posts": {
+      "get": {
+        "summary": "列出文章",
+        "operationId": "AppPostList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPostResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "offset",
+            "description": "offset 表示偏移量\n@gotags: form:\"offset\"",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "description": "limit 表示每页数量\n@gotags: form:\"limit\"",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "title",
+            "description": "title 表示可选的标题过滤",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "app/博客管理"
+        ]
+      }
+    },
+    "/v1/app/posts/{postID}": {
+      "get": {
+        "summary": "获取文章信息",
+        "operationId": "AppGetPost",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPostResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "postID",
+            "description": "postID 表示要获取的文章 ID\n@gotags: uri:\"postID\"",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "app/博客管理"
+        ]
+      }
+    },
     "/v1/system/auth/login": {
       "post": {
         "summary": "用户登录",
@@ -81,7 +161,7 @@
           }
         ],
         "tags": [
-          "用户管理"
+          "system/用户管理"
         ]
       }
     },
@@ -115,7 +195,7 @@
           }
         ],
         "tags": [
-          "用户管理"
+          "system/用户管理"
         ]
       }
     },
@@ -155,7 +235,7 @@
           }
         ],
         "tags": [
-          "分类管理"
+          "system/分类管理"
         ]
       },
       "post": {
@@ -186,7 +266,7 @@
           }
         ],
         "tags": [
-          "分类管理"
+          "system/分类管理"
         ]
       }
     },
@@ -219,7 +299,7 @@
           }
         ],
         "tags": [
-          "分类管理"
+          "system/分类管理"
         ]
       },
       "delete": {
@@ -250,7 +330,7 @@
           }
         ],
         "tags": [
-          "分类管理"
+          "system/分类管理"
         ]
       },
       "put": {
@@ -289,7 +369,7 @@
           }
         ],
         "tags": [
-          "分类管理"
+          "system/分类管理"
         ]
       }
     },
@@ -329,7 +409,7 @@
           }
         ],
         "tags": [
-          "文章标签管理"
+          "system/文章标签管理"
         ]
       },
       "delete": {
@@ -360,7 +440,7 @@
           }
         ],
         "tags": [
-          "文章标签管理"
+          "system/文章标签管理"
         ]
       },
       "post": {
@@ -391,7 +471,7 @@
           }
         ],
         "tags": [
-          "文章标签管理"
+          "system/文章标签管理"
         ]
       }
     },
@@ -424,7 +504,7 @@
           }
         ],
         "tags": [
-          "文章标签管理"
+          "system/文章标签管理"
         ]
       },
       "post": {
@@ -455,7 +535,7 @@
           }
         ],
         "tags": [
-          "文章标签管理"
+          "system/文章标签管理"
         ]
       }
     },
@@ -503,7 +583,7 @@
           }
         ],
         "tags": [
-          "博客管理"
+          "system/博客管理"
         ]
       },
       "delete": {
@@ -534,7 +614,7 @@
           }
         ],
         "tags": [
-          "博客管理"
+          "system/博客管理"
         ]
       },
       "post": {
@@ -565,7 +645,7 @@
           }
         ],
         "tags": [
-          "博客管理"
+          "system/博客管理"
         ]
       }
     },
@@ -597,7 +677,7 @@
           }
         ],
         "tags": [
-          "博客管理"
+          "system/博客管理"
         ]
       },
       "put": {
@@ -635,7 +715,7 @@
           }
         ],
         "tags": [
-          "博客管理"
+          "system/博客管理"
         ]
       }
     },
@@ -667,7 +747,7 @@
           }
         ],
         "tags": [
-          "标签管理"
+          "system/标签管理"
         ]
       },
       "post": {
@@ -698,7 +778,7 @@
           }
         ],
         "tags": [
-          "标签管理"
+          "system/标签管理"
         ]
       }
     },
@@ -731,7 +811,7 @@
           }
         ],
         "tags": [
-          "标签管理"
+          "system/标签管理"
         ]
       },
       "delete": {
@@ -762,7 +842,7 @@
           }
         ],
         "tags": [
-          "标签管理"
+          "system/标签管理"
         ]
       },
       "put": {
@@ -801,7 +881,7 @@
           }
         ],
         "tags": [
-          "标签管理"
+          "system/标签管理"
         ]
       }
     },
@@ -842,7 +922,7 @@
           }
         ],
         "tags": [
-          "用户管理"
+          "system/用户管理"
         ]
       },
       "post": {
@@ -873,7 +953,7 @@
           }
         ],
         "tags": [
-          "用户管理"
+          "system/用户管理"
         ]
       }
     },
@@ -905,7 +985,7 @@
           }
         ],
         "tags": [
-          "用户管理"
+          "system/用户管理"
         ]
       },
       "delete": {
@@ -935,7 +1015,7 @@
           }
         ],
         "tags": [
-          "用户管理"
+          "system/用户管理"
         ]
       },
       "put": {
@@ -973,7 +1053,7 @@
           }
         ],
         "tags": [
-          "用户管理"
+          "system/用户管理"
         ]
       }
     },
@@ -1013,7 +1093,7 @@
           }
         ],
         "tags": [
-          "用户管理"
+          "system/用户管理"
         ]
       }
     }
