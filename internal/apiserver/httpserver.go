@@ -101,6 +101,16 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 			tag.GET("", sys.ListTag)         // 查询标签列表
 		}
 
+		// 分类相关路由
+		category := sysv1.Group("/categories")
+		{
+			category.POST("", sys.CreateCategory)      // 创建分类
+			category.PUT(":id", sys.UpdateCategory)    // 更新分类
+			category.DELETE(":id", sys.DeleteCategory) // 删除分类
+			category.GET(":id", sys.GetCategory)       // 查询分类详情
+			category.GET("", sys.ListCategory)         // 查询分类列表
+		}
+
 		// 设备相关路由
 		device := sysv1.Group("/devices")
 		{

@@ -45,6 +45,7 @@ type IStore interface {
 	Post() PostStore
 	Tag() TagStore
 	PostTag() PostTagStore
+	Category() CategoryStore
 	// ConcretePosts 是一个示例 store 实现，用来演示在 Go 中如何直接与 DB 交互.
 	ConcretePost() ConcretePostStore
 	// Device 返回一个实现了 DeviceStore 接口的实例，用于演示 MongoDB 的使用.
@@ -132,6 +133,10 @@ func (store *datastore) PostTag() PostTagStore {
 
 func (store *datastore) Tag() TagStore {
 	return newTagStore(store)
+}
+
+func (store *datastore) Category() CategoryStore {
+	return newCategoryStore(store)
 }
 
 // ConcretePosts 返回一个实现了 ConcretePostStore 接口的实例.

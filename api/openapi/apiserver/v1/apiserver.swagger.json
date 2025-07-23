@@ -225,13 +225,6 @@
             "required": false,
             "type": "integer",
             "format": "int32"
-          },
-          {
-            "name": "isActive",
-            "description": "isActive 表示可选的激活状态过滤",
-            "in": "query",
-            "required": false,
-            "type": "boolean"
           }
         ],
         "tags": [
@@ -1099,6 +1092,57 @@
     }
   },
   "definitions": {
+    "ListCategoryResponseCategories": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "id 表示分类 ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "name 表示分类名称"
+        },
+        "description": {
+          "type": "string",
+          "title": "description 表示分类描述"
+        },
+        "parentID": {
+          "type": "integer",
+          "format": "int32",
+          "title": "parentID 表示父分类ID，0表示顶级分类"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32",
+          "title": "sortOrder 表示排序值"
+        },
+        "isActive": {
+          "type": "integer",
+          "format": "int32",
+          "title": "isActive 表示是否激活"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "createdAt 表示创建时间（Unix 时间戳）"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "int64",
+          "title": "updatedAt 表示最后更新时间（Unix 时间戳）"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Category"
+          },
+          "title": "children 表示子分类"
+        }
+      }
+    },
     "MiniBlogChangePasswordBody": {
       "type": "object",
       "properties": {
@@ -1135,7 +1179,8 @@
           "title": "sortOrder 表示可选的排序值"
         },
         "isActive": {
-          "type": "boolean",
+          "type": "integer",
+          "format": "int32",
           "title": "isActive 表示可选的激活状态"
         }
       },
@@ -1354,7 +1399,8 @@
           "title": "sortOrder 表示排序值"
         },
         "isActive": {
-          "type": "boolean",
+          "type": "integer",
+          "format": "int32",
           "title": "isActive 表示是否激活"
         },
         "createdAt": {
@@ -1701,11 +1747,15 @@
     "v1ListCategoryResponse": {
       "type": "object",
       "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
         "categories": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Category"
+            "$ref": "#/definitions/ListCategoryResponseCategories"
           },
           "title": "categories 表示分类列表"
         }
