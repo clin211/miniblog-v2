@@ -8,7 +8,7 @@ syntax = "proto3";
 
 package v1;
 
-option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app;v1";
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 
 // Gender 表示用户性别
 enum Gender {
@@ -137,10 +137,8 @@ message CreateUserRequest {
     optional Gender gender = 7;
     // registerSource 表示注册来源
     RegisterSource registerSource = 8;
-    // registerIP 表示注册IP
-    optional string registerIP = 9;
     // wechatOpenID 表示微信OpenID
-    optional string wechatOpenID = 10;
+    optional string wechatOpenID = 9;
 }
 
 // CreateUserResponse 表示创建用户响应

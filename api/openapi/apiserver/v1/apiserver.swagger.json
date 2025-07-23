@@ -1,7 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "miniblog API",
+    "title": "miniblog v2",
+    "description": "MiniBlog 是一个基于 gRPC 的博客系统 API 服务，提供完整的博客管理功能，包括：\n- 用户认证与管理\n- 博客文章管理\n- 分类管理\n- 标签管理\n- 文章标签关联管理\n\n采用 RESTful 风格设计，支持通过 HTTP/JSON 访问所有 gRPC 接口",
     "version": "1.0",
     "contact": {
       "name": "小而美的博客项目",
@@ -51,7 +52,7 @@
         ]
       }
     },
-    "/v1/app/auth/login": {
+    "/v1/system/auth/login": {
       "post": {
         "summary": "用户登录",
         "operationId": "Login",
@@ -84,7 +85,7 @@
         ]
       }
     },
-    "/v1/app/auth/refresh-token": {
+    "/v1/system/auth/refresh-token": {
       "put": {
         "summary": "刷新令牌",
         "operationId": "RefreshToken",
@@ -118,7 +119,7 @@
         ]
       }
     },
-    "/v1/app/categories": {
+    "/v1/system/categories": {
       "get": {
         "summary": "列出所有分类",
         "operationId": "ListCategory",
@@ -189,7 +190,7 @@
         ]
       }
     },
-    "/v1/app/categories/{id}": {
+    "/v1/system/categories/{id}": {
       "get": {
         "summary": "获取分类信息",
         "operationId": "GetCategory",
@@ -292,7 +293,7 @@
         ]
       }
     },
-    "/v1/app/post-tags": {
+    "/v1/system/post-tags": {
       "get": {
         "summary": "列出文章标签关联",
         "operationId": "ListPostTags",
@@ -394,7 +395,7 @@
         ]
       }
     },
-    "/v1/app/post-tags/batch": {
+    "/v1/system/post-tags/batch": {
       "delete": {
         "summary": "批量删除文章标签关联",
         "operationId": "BatchDeletePostTags",
@@ -458,7 +459,7 @@
         ]
       }
     },
-    "/v1/app/posts": {
+    "/v1/system/posts": {
       "get": {
         "summary": "列出所有文章",
         "operationId": "ListPost",
@@ -568,7 +569,7 @@
         ]
       }
     },
-    "/v1/app/posts/{postID}": {
+    "/v1/system/posts/{postID}": {
       "get": {
         "summary": "获取文章信息",
         "operationId": "GetPost",
@@ -638,7 +639,7 @@
         ]
       }
     },
-    "/v1/app/tags": {
+    "/v1/system/tags": {
       "get": {
         "summary": "列出所有标签",
         "operationId": "ListTag",
@@ -701,7 +702,7 @@
         ]
       }
     },
-    "/v1/app/tags/{id}": {
+    "/v1/system/tags/{id}": {
       "get": {
         "summary": "获取标签信息",
         "operationId": "GetTag",
@@ -804,7 +805,7 @@
         ]
       }
     },
-    "/v1/app/users": {
+    "/v1/system/users": {
       "get": {
         "summary": "列出所有用户",
         "operationId": "ListUser",
@@ -876,7 +877,7 @@
         ]
       }
     },
-    "/v1/app/users/{userID}": {
+    "/v1/system/users/{userID}": {
       "get": {
         "summary": "获取用户信息",
         "operationId": "GetUser",
@@ -976,7 +977,7 @@
         ]
       }
     },
-    "/v1/app/users/{userID}/change-password": {
+    "/v1/system/users/{userID}/change-password": {
       "put": {
         "summary": "修改密码",
         "operationId": "ChangePassword",
@@ -1481,10 +1482,6 @@
         "registerSource": {
           "$ref": "#/definitions/v1RegisterSource",
           "title": "registerSource 表示注册来源"
-        },
-        "registerIP": {
-          "type": "string",
-          "title": "registerIP 表示注册IP"
         },
         "wechatOpenID": {
           "type": "string",

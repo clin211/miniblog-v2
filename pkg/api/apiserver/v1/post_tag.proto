@@ -10,7 +10,7 @@ package v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app;v1";
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 
 // PostTag 表示文章标签关联
 message PostTag {

@@ -3,20 +3,21 @@
 // license that can be found in the LICENSE file. The original repo for
 // this file is https://github.com/clin211/miniblog-v2.git.
 
-package app
+package grpc
 
 import (
+	"context"
 	"time"
 
-	"github.com/clin211/miniblog-v2/internal/pkg/core"
-	apiv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
-	"github.com/gin-gonic/gin"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+
+	v1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
 )
 
 // Healthz 服务健康检查.
-func (h *Handler) Healthz(c *gin.Context) {
-	core.WriteResponse(c, apiv1.HealthzResponse{
-		Status:    apiv1.ServiceStatus_Healthy,
+func (h *Handler) Healthz(ctx context.Context, rq *emptypb.Empty) (*v1.HealthzResponse, error) {
+	return &v1.HealthzResponse{
+		Status:    v1.ServiceStatus_Healthy,
 		Timestamp: time.Now().Format(time.DateTime),
-	}, nil)
+	}, nil
 }

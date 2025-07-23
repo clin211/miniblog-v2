@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "apiserver/v1/app/post.proto",
+    "title": "apiserver/v1/healthz.proto",
     "version": "version not set"
   },
   "consumes": [

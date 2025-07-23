@@ -11,7 +11,7 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 
-	handler "github.com/clin211/miniblog-v2/internal/apiserver/handler/http/app"
+	systemHandler "github.com/clin211/miniblog-v2/internal/apiserver/handler/http/system"
 	"github.com/clin211/miniblog-v2/internal/pkg/core"
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
 	mw "github.com/clin211/miniblog-v2/internal/pkg/middleware/gin"
@@ -48,65 +48,65 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 	InstallGenericAPI(engine)
 
 	// 创建核心业务处理器
-	handler := handler.NewHandler(c.biz, c.val)
+	sys := systemHandler.NewHandler(c.biz, c.val)
 
 	// 注册健康检查接口
-	engine.GET("/healthz", handler.Healthz)
+	engine.GET("/healthz", sys.Healthz)
 
 	authMiddlewares := []gin.HandlerFunc{mw.AuthnMiddleware(c.retriever), mw.AuthzMiddleware(c.authz)}
 
 	// 注册 v1 版本 API 路由分组
-	v1 := engine.Group("/v1/app")
+	v1 := engine.Group("/v1/system")
 	{
 
 		// auth
 		authv1 := v1.Group("/auth")
 		{
-			authv1.POST("/login", handler.Login)
-			authv1.PUT("/refresh-token", mw.AuthnMiddleware(c.retriever), handler.RefreshToken)
+			authv1.POST("/login", sys.Login)
+			authv1.PUT("/refresh-token", mw.AuthnMiddleware(c.retriever), sys.RefreshToken)
 		}
 
 		// 用户相关路由
 		userv1 := v1.Group("/users")
 		{
 			// 创建用户。这里要注意：创建用户是不用进行认证和授权的
-			userv1.POST("", handler.CreateUser)
+			userv1.POST("", sys.CreateUser)
 			userv1.Use(authMiddlewares...)
-			userv1.PUT(":userID/change-password", handler.ChangePassword) // 修改用户密码
-			userv1.PUT(":userID", handler.UpdateUser)                     // 更新用户信息
-			userv1.DELETE(":userID", handler.DeleteUser)                  // 删除用户
-			userv1.GET(":userID", handler.GetUser)                        // 查询用户详情
-			userv1.GET("", handler.ListUser)                              // 查询用户列表.
+			userv1.PUT(":userID/change-password", sys.ChangePassword) // 修改用户密码
+			userv1.PUT(":userID", sys.UpdateUser)                     // 更新用户信息
+			userv1.DELETE(":userID", sys.DeleteUser)                  // 删除用户
+			userv1.GET(":userID", sys.GetUser)                        // 查询用户详情
+			userv1.GET("", sys.ListUser)                              // 查询用户列表.
 		}
 
 		// 博客相关路由
 		postv1 := v1.Group("/posts", authMiddlewares...)
 		{
-			postv1.POST("", handler.CreatePost)       // 创建博客
-			postv1.PUT(":postID", handler.UpdatePost) // 更新博客
-			postv1.DELETE("", handler.DeletePost)     // 删除博客
-			postv1.GET(":postID", handler.GetPost)    // 查询博客详情
-			postv1.GET("", handler.ListPost)          // 查询博客列表
+			postv1.POST("", sys.CreatePost)       // 创建博客
+			postv1.PUT(":postID", sys.UpdatePost) // 更新博客
+			postv1.DELETE("", sys.DeletePost)     // 删除博客
+			postv1.GET(":postID", sys.GetPost)    // 查询博客详情
+			postv1.GET("", sys.ListPost)          // 查询博客列表
 		}
 
 		// 标签相关路由
 		tagv1 := v1.Group("/post-tags")
 		{
-			tagv1.POST("", handler.CreateTag)      // 创建标签
-			tagv1.PUT(":id", handler.UpdateTag)    // 更新标签
-			tagv1.DELETE(":id", handler.DeleteTag) // 删除标签
-			tagv1.GET(":id", handler.GetTag)       // 查询标签详情
-			tagv1.GET("", handler.ListTag)         // 查询标签列表
+			tagv1.POST("", sys.CreateTag)      // 创建标签
+			tagv1.PUT(":id", sys.UpdateTag)    // 更新标签
+			tagv1.DELETE(":id", sys.DeleteTag) // 删除标签
+			tagv1.GET(":id", sys.GetTag)       // 查询标签详情
+			tagv1.GET("", sys.ListTag)         // 查询标签列表
 		}
 
 		// 设备相关路由
 		devicev1 := v1.Group("/devices")
 		{
-			devicev1.POST("", handler.CreateDevice)      // 创建设备
-			devicev1.PUT(":id", handler.UpdateDevice)    // 更新设备
-			devicev1.DELETE(":id", handler.DeleteDevice) // 删除设备
-			devicev1.GET(":id", handler.GetDevice)       // 获取单个设备
-			devicev1.GET("", handler.ListDevices)        // 查询设备列表
+			devicev1.POST("", sys.CreateDevice)      // 创建设备
+			devicev1.PUT(":id", sys.UpdateDevice)    // 更新设备
+			devicev1.DELETE(":id", sys.DeleteDevice) // 删除设备
+			devicev1.GET(":id", sys.GetDevice)       // 获取单个设备
+			devicev1.GET("", sys.ListDevices)        // 查询设备列表
 		}
 	}
 }

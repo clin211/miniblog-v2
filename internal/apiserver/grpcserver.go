@@ -14,9 +14,9 @@ import (
 	genericvalidation "github.com/onexstack/onexstack/pkg/validation"
 	"google.golang.org/grpc"
 
-	handler "github.com/clin211/miniblog-v2/internal/apiserver/handler/grpc"
+	handler "github.com/clin211/miniblog-v2/internal/apiserver/handler/grpc/system"
 	mw "github.com/clin211/miniblog-v2/internal/pkg/middleware/grpc"
-	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
+	v1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
 	"github.com/clin211/miniblog-v2/pkg/server"
 )
 
@@ -65,7 +65,7 @@ func (c *ServerConfig) NewGRPCServerOr() (server.Server, error) {
 		serverOptions,
 		c.cfg.TLSOptions,
 		func(s grpc.ServiceRegistrar) {
-			appv1.RegisterMiniBlogServer(s, handler.NewHandler(c.biz))
+			v1.RegisterMiniBlogServer(s, handler.NewHandler(c.biz))
 		},
 	)
 	if err != nil {
@@ -89,7 +89,7 @@ func (c *ServerConfig) NewGRPCServerOr() (server.Server, error) {
 		c.cfg.GRPCOptions,
 		c.cfg.TLSOptions,
 		func(mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-			return appv1.RegisterMiniBlogHandler(context.Background(), mux, conn)
+			return v1.RegisterMiniBlogHandler(context.Background(), mux, conn)
 		},
 	)
 	if err != nil {
@@ -118,9 +118,9 @@ func (s *grpcServer) GracefulStop(ctx context.Context) {
 // NewAuthnWhiteListMatcher 创建认证白名单匹配器.
 func NewAuthnWhiteListMatcher() selector.Matcher {
 	whitelist := map[string]struct{}{
-		appv1.MiniBlog_Healthz_FullMethodName:    {},
-		appv1.MiniBlog_CreateUser_FullMethodName: {},
-		appv1.MiniBlog_Login_FullMethodName:      {},
+		v1.MiniBlog_Healthz_FullMethodName:    {},
+		v1.MiniBlog_CreateUser_FullMethodName: {},
+		v1.MiniBlog_Login_FullMethodName:      {},
 	}
 	return selector.MatchFunc(func(ctx context.Context, call interceptors.CallMeta) bool {
 		_, ok := whitelist[call.FullMethod()]
@@ -131,9 +131,9 @@ func NewAuthnWhiteListMatcher() selector.Matcher {
 // NewAuthzWhiteListMatcher 创建授权白名单匹配器.
 func NewAuthzWhiteListMatcher() selector.Matcher {
 	whitelist := map[string]struct{}{
-		appv1.MiniBlog_Healthz_FullMethodName:    {},
-		appv1.MiniBlog_CreateUser_FullMethodName: {},
-		appv1.MiniBlog_Login_FullMethodName:      {},
+		v1.MiniBlog_Healthz_FullMethodName:    {},
+		v1.MiniBlog_CreateUser_FullMethodName: {},
+		v1.MiniBlog_Login_FullMethodName:      {},
 	}
 	return selector.MatchFunc(func(ctx context.Context, call interceptors.CallMeta) bool {
 		_, ok := whitelist[call.FullMethod()]

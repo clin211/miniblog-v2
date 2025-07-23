@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "apiserver/v1/app/tag.proto",
+    "title": "apiserver/v1/category.proto",
     "version": "version not set"
   },
   "consumes": [

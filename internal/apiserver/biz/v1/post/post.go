@@ -16,17 +16,17 @@ import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/store"
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
-	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
+	v1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
 	"github.com/clin211/miniblog-v2/pkg/where"
 )
 
 // PostBiz 定义处理帖子请求所需的方法.
 type PostBiz interface {
-	Create(ctx context.Context, rq *appv1.CreatePostRequest) (*appv1.CreatePostResponse, error)
-	Update(ctx context.Context, rq *appv1.UpdatePostRequest) (*appv1.UpdatePostResponse, error)
-	Delete(ctx context.Context, rq *appv1.DeletePostRequest) (*appv1.DeletePostResponse, error)
-	Get(ctx context.Context, rq *appv1.GetPostRequest) (*appv1.GetPostResponse, error)
-	List(ctx context.Context, rq *appv1.ListPostRequest) (*appv1.ListPostResponse, error)
+	Create(ctx context.Context, rq *v1.CreatePostRequest) (*v1.CreatePostResponse, error)
+	Update(ctx context.Context, rq *v1.UpdatePostRequest) (*v1.UpdatePostResponse, error)
+	Delete(ctx context.Context, rq *v1.DeletePostRequest) (*v1.DeletePostResponse, error)
+	Get(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostResponse, error)
+	List(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error)
 
 	PostExpansion
 }
@@ -48,7 +48,7 @@ func New(store store.IStore) *postBiz {
 }
 
 // Create 实现 PostBiz 接口中的 Create 方法.
-func (b *postBiz) Create(ctx context.Context, rq *appv1.CreatePostRequest) (*appv1.CreatePostResponse, error) {
+func (b *postBiz) Create(ctx context.Context, rq *v1.CreatePostRequest) (*v1.CreatePostResponse, error) {
 	var postM model.PostM
 	_ = copier.Copy(&postM, rq)
 	postM.UserID = contextx.UserID(ctx)
@@ -88,11 +88,11 @@ func (b *postBiz) Create(ctx context.Context, rq *appv1.CreatePostRequest) (*app
 		return nil, err
 	}
 
-	return &appv1.CreatePostResponse{PostID: postM.PostID}, nil
+	return &v1.CreatePostResponse{PostID: postM.PostID}, nil
 }
 
 // Update 实现 PostBiz 接口中的 Update 方法.
-func (b *postBiz) Update(ctx context.Context, rq *appv1.UpdatePostRequest) (*appv1.UpdatePostResponse, error) {
+func (b *postBiz) Update(ctx context.Context, rq *v1.UpdatePostRequest) (*v1.UpdatePostResponse, error) {
 	whr := where.T(ctx).F("post_id", rq.GetPostID())
 	postM, err := b.store.Post().Get(ctx, whr)
 	if err != nil {
@@ -192,43 +192,43 @@ func (b *postBiz) Update(ctx context.Context, rq *appv1.UpdatePostRequest) (*app
 		return nil, err
 	}
 
-	return &appv1.UpdatePostResponse{}, nil
+	return &v1.UpdatePostResponse{}, nil
 }
 
 // Delete 实现 PostBiz 接口中的 Delete 方法.
-func (b *postBiz) Delete(ctx context.Context, rq *appv1.DeletePostRequest) (*appv1.DeletePostResponse, error) {
+func (b *postBiz) Delete(ctx context.Context, rq *v1.DeletePostRequest) (*v1.DeletePostResponse, error) {
 	whr := where.T(ctx).F("post_id", rq.GetPostIDs())
 	if err := b.store.Post().Delete(ctx, whr); err != nil {
 		return nil, err
 	}
 
-	return &appv1.DeletePostResponse{}, nil
+	return &v1.DeletePostResponse{}, nil
 }
 
 // Get 实现 PostBiz 接口中的 Get 方法.
-func (b *postBiz) Get(ctx context.Context, rq *appv1.GetPostRequest) (*appv1.GetPostResponse, error) {
+func (b *postBiz) Get(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostResponse, error) {
 	whr := where.T(ctx).F("post_id", rq.GetPostID())
 	postM, err := b.store.Post().Get(ctx, whr)
 	if err != nil {
 		return nil, err
 	}
 
-	return &appv1.GetPostResponse{Post: conversion.PostModelToPostV1(postM)}, nil
+	return &v1.GetPostResponse{Post: conversion.PostModelToPostV1(postM)}, nil
 }
 
 // List 实现 PostBiz 接口中的 List 方法.
-func (b *postBiz) List(ctx context.Context, rq *appv1.ListPostRequest) (*appv1.ListPostResponse, error) {
+func (b *postBiz) List(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error) {
 	whr := where.T(ctx).P(int(rq.GetOffset()), int(rq.GetLimit()))
 	count, postList, err := b.store.Post().List(ctx, whr)
 	if err != nil {
 		return nil, err
 	}
 
-	posts := make([]*appv1.Post, 0, len(postList))
+	posts := make([]*v1.Post, 0, len(postList))
 	for _, post := range postList {
 		converted := conversion.PostModelToPostV1(post)
 		posts = append(posts, converted)
 	}
 
-	return &appv1.ListPostResponse{TotalCount: count, Posts: posts}, nil
+	return &v1.ListPostResponse{TotalCount: count, Posts: posts}, nil
 }

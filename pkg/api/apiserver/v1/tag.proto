@@ -8,7 +8,7 @@ syntax = "proto3";
 
 package v1;
 
-option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app;v1";
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 
 // Tag 表示文章标签
 message Tag {

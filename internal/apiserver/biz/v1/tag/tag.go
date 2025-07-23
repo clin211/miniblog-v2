@@ -14,17 +14,17 @@ import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
 	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/conversion"
 	"github.com/clin211/miniblog-v2/internal/apiserver/store"
-	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
+	v1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
 	"github.com/clin211/miniblog-v2/pkg/where"
 )
 
 // TagBiz 定义处理标签请求所需的方法.
 type TagBiz interface {
-	Create(ctx context.Context, rq *appv1.CreateTagRequest) (*appv1.CreateTagResponse, error)
-	Update(ctx context.Context, rq *appv1.UpdateTagRequest) (*appv1.UpdateTagResponse, error)
-	Delete(ctx context.Context, rq *appv1.DeleteTagRequest) (*appv1.DeleteTagResponse, error)
-	Get(ctx context.Context, rq *appv1.GetTagRequest) (*appv1.GetTagResponse, error)
-	List(ctx context.Context, rq *appv1.ListTagRequest) (*appv1.ListTagResponse, error)
+	Create(ctx context.Context, rq *v1.CreateTagRequest) (*v1.CreateTagResponse, error)
+	Update(ctx context.Context, rq *v1.UpdateTagRequest) (*v1.UpdateTagResponse, error)
+	Delete(ctx context.Context, rq *v1.DeleteTagRequest) (*v1.DeleteTagResponse, error)
+	Get(ctx context.Context, rq *v1.GetTagRequest) (*v1.GetTagResponse, error)
+	List(ctx context.Context, rq *v1.ListTagRequest) (*v1.ListTagResponse, error)
 
 	TagExpansion
 }
@@ -46,7 +46,7 @@ func New(store store.IStore) *tagBiz {
 }
 
 // Create 实现 TagBiz 接口中的 Create 方法.
-func (b *tagBiz) Create(ctx context.Context, rq *appv1.CreateTagRequest) (*appv1.CreateTagResponse, error) {
+func (b *tagBiz) Create(ctx context.Context, rq *v1.CreateTagRequest) (*v1.CreateTagResponse, error) {
 	var tagM model.TagM
 	_ = copier.Copy(&tagM, rq)
 
@@ -59,11 +59,11 @@ func (b *tagBiz) Create(ctx context.Context, rq *appv1.CreateTagRequest) (*appv1
 		return nil, err
 	}
 
-	return &appv1.CreateTagResponse{Id: tagM.ID}, nil
+	return &v1.CreateTagResponse{Id: tagM.ID}, nil
 }
 
 // Update 实现 TagBiz 接口中的 Update 方法.
-func (b *tagBiz) Update(ctx context.Context, rq *appv1.UpdateTagRequest) (*appv1.UpdateTagResponse, error) {
+func (b *tagBiz) Update(ctx context.Context, rq *v1.UpdateTagRequest) (*v1.UpdateTagResponse, error) {
 	whr := where.F("id", rq.GetId())
 	tagM, err := b.store.Tag().Get(ctx, whr)
 	if err != nil {
@@ -87,32 +87,32 @@ func (b *tagBiz) Update(ctx context.Context, rq *appv1.UpdateTagRequest) (*appv1
 		return nil, err
 	}
 
-	return &appv1.UpdateTagResponse{}, nil
+	return &v1.UpdateTagResponse{}, nil
 }
 
 // Delete 实现 TagBiz 接口中的 Delete 方法.
-func (b *tagBiz) Delete(ctx context.Context, rq *appv1.DeleteTagRequest) (*appv1.DeleteTagResponse, error) {
+func (b *tagBiz) Delete(ctx context.Context, rq *v1.DeleteTagRequest) (*v1.DeleteTagResponse, error) {
 	whr := where.F("id", rq.GetId())
 	if err := b.store.Tag().Delete(ctx, whr); err != nil {
 		return nil, err
 	}
 
-	return &appv1.DeleteTagResponse{}, nil
+	return &v1.DeleteTagResponse{}, nil
 }
 
 // Get 实现 TagBiz 接口中的 Get 方法.
-func (b *tagBiz) Get(ctx context.Context, rq *appv1.GetTagRequest) (*appv1.GetTagResponse, error) {
+func (b *tagBiz) Get(ctx context.Context, rq *v1.GetTagRequest) (*v1.GetTagResponse, error) {
 	whr := where.F("id", rq.GetId())
 	tagM, err := b.store.Tag().Get(ctx, whr)
 	if err != nil {
 		return nil, err
 	}
 
-	return &appv1.GetTagResponse{Tag: conversion.TagModelToTagV1(tagM)}, nil
+	return &v1.GetTagResponse{Tag: conversion.TagModelToTagV1(tagM)}, nil
 }
 
 // List 实现 TagBiz 接口中的 List 方法.
-func (b *tagBiz) List(ctx context.Context, rq *appv1.ListTagRequest) (*appv1.ListTagResponse, error) {
+func (b *tagBiz) List(ctx context.Context, rq *v1.ListTagRequest) (*v1.ListTagResponse, error) {
 	whr := where.NewWhere()
 
 	// 如果有名称过滤参数，添加到查询条件中
@@ -125,11 +125,11 @@ func (b *tagBiz) List(ctx context.Context, rq *appv1.ListTagRequest) (*appv1.Lis
 		return nil, err
 	}
 
-	tags := make([]*appv1.Tag, 0, len(tagList))
+	tags := make([]*v1.Tag, 0, len(tagList))
 	for _, tag := range tagList {
 		converted := conversion.TagModelToTagV1(tag)
 		tags = append(tags, converted)
 	}
 
-	return &appv1.ListTagResponse{Tags: tags}, nil
+	return &v1.ListTagResponse{Tags: tags}, nil
 }

@@ -7,12 +7,12 @@ package grpc
 
 import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
-	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
+	v1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
 )
 
 // Handler 负责处理博客模块的请求.
 type Handler struct {
-	appv1.UnimplementedMiniBlogServer
+	v1.UnimplementedMiniBlogServer
 
 	biz biz.IBiz
 }

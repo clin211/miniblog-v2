@@ -12,31 +12,31 @@ import "google/api/annotations.proto";
 // 提供了一个标准的空消息类型 google.protobuf.Empty，适用于 RPC 方法不需要输入消息或输出消息的场景
 import "google/protobuf/empty.proto";
 // 定义当前服务所依赖的健康检查消息
-import "apiserver/v1/app/healthz.proto";
+import "apiserver/v1/healthz.proto";
 // 定义当前服务所依赖的博客消息
-import "apiserver/v1/app/post.proto";
+import "apiserver/v1/post.proto";
 // 定义当前服务所依赖的用户消息
-import "apiserver/v1/app/user.proto";
+import "apiserver/v1/user.proto";
 // 定义当前服务所依赖的分类消息
-import "apiserver/v1/app/category.proto";
+import "apiserver/v1/category.proto";
 // 定义当前服务所依赖的标签消息
-import "apiserver/v1/app/tag.proto";
+import "apiserver/v1/tag.proto";
 // 定义当前服务所依赖的文章标签关联消息
-import "apiserver/v1/app/post_tag.proto";
+import "apiserver/v1/post_tag.proto";
 // 为生成 OpenAPI 文档提供相关注释（如标题、版本、作者、许可证等信息）
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app;v1";
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 
 // OpenAPI 全局配置，提供详细配置信息，用于生成 OpenAPI 文档
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         // API名称
-        title: "miniblog API";
+        title: "miniblog v2";
         // API版本
         version: "1.0";
         // API 描述
-        description: "";
+        description: "MiniBlog 是一个基于 gRPC 的博客系统 API 服务，提供完整的博客管理功能，包括：\n- 用户认证与管理\n- 博客文章管理\n- 分类管理\n- 标签管理\n- 文章标签关联管理\n\n采用 RESTful 风格设计，支持通过 HTTP/JSON 访问所有 gRPC 接口";
         // 开发者的联系方式，包括项目名称、网址和电子邮件
         contact: {
             name: "小而美的博客项目";
@@ -78,7 +78,7 @@ service MiniBlog {
     // Login 用户登录
     rpc Login(LoginRequest) returns (LoginResponse) {
         option (google.api.http) = {
-            post: "/v1/app/auth/login",
+            post: "/v1/system/auth/login",
             body: "*",
         };
 
@@ -93,7 +93,7 @@ service MiniBlog {
     // RefreshToken 刷新令牌
     rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {
         option (google.api.http) = {
-          put: "/v1/app/auth/refresh-token",
+          put: "/v1/system/auth/refresh-token",
           body: "*",
         };
 
@@ -109,7 +109,7 @@ service MiniBlog {
     // ChangePassword 修改密码
     rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
         option (google.api.http) = {
-            put: "/v1/app/users/{userID}/change-password",
+            put: "/v1/system/users/{userID}/change-password",
             body: "*",
         };
 
@@ -123,7 +123,7 @@ service MiniBlog {
     // CreateUser 创建用户
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
         option (google.api.http) = {
-            post: "/v1/app/users",
+            post: "/v1/system/users",
             body: "*",
         };
 
@@ -137,7 +137,7 @@ service MiniBlog {
     // UpdateUser 更新用户信息
     rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
         option (google.api.http) = {
-            put: "/v1/app/users/{userID}",
+            put: "/v1/system/users/{userID}",
             body: "*",
         };
 
@@ -151,7 +151,7 @@ service MiniBlog {
     // DeleteUser 删除用户
     rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
         option (google.api.http) = {
-            delete: "/v1/app/users/{userID}",
+            delete: "/v1/system/users/{userID}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -164,7 +164,7 @@ service MiniBlog {
     // GetUser 获取用户信息
     rpc GetUser(GetUserRequest) returns (GetUserResponse) {
         option (google.api.http) = {
-            get: "/v1/app/users/{userID}",
+            get: "/v1/system/users/{userID}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -177,7 +177,7 @@ service MiniBlog {
     // ListUser 列出所有用户
     rpc ListUser(ListUserRequest) returns (ListUserResponse) {
         option (google.api.http) = {
-            get: "/v1/app/users",
+            get: "/v1/system/users",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -190,7 +190,7 @@ service MiniBlog {
     // CreatePost 创建文章
     rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {
         option (google.api.http) = {
-            post: "/v1/app/posts",
+            post: "/v1/system/posts",
             body: "*",
         };
 
@@ -203,12 +203,12 @@ service MiniBlog {
 
     // UpdatePost 更新文章
     rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse) {
-        // 将 UpdatePost 映射为 HTTP PUT 请求，并通过 URL /v1/app/posts/{postID} 访问
+        // 将 UpdatePost 映射为 HTTP PUT 请求，并通过 URL /v1/posts/{postID} 访问
         // {postID} 是一个路径参数，grpc-gateway 会根据 postID 名称，将其解析并映射到
         // UpdatePostRequest 类型中相应的字段.
         // body: "*" 表示请求体中的所有字段都会映射到 UpdatePostRequest 类型。
         option (google.api.http) = {
-            put: "/v1/app/posts/{postID}",
+            put: "/v1/system/posts/{postID}",
             body: "*",
         };
 
@@ -226,7 +226,7 @@ service MiniBlog {
     // DeletePost 删除文章
     rpc DeletePost(DeletePostRequest) returns (DeletePostResponse) {
         option (google.api.http) = {
-            delete: "/v1/app/posts",
+            delete: "/v1/system/posts",
             body: "*",
         };
 
@@ -240,7 +240,7 @@ service MiniBlog {
     // GetPost 获取文章信息
     rpc GetPost(GetPostRequest) returns (GetPostResponse) {
         option (google.api.http) = {
-            get: "/v1/app/posts/{postID}",
+            get: "/v1/system/posts/{postID}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -253,7 +253,7 @@ service MiniBlog {
     // ListPost 列出所有文章
     rpc ListPost(ListPostRequest) returns (ListPostResponse) {
         option (google.api.http) = {
-            get: "/v1/app/posts",
+            get: "/v1/system/posts",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -266,7 +266,7 @@ service MiniBlog {
     // CreateCategory 创建分类
     rpc CreateCategory(CreateCategoryRequest) returns (CreateCategoryResponse) {
         option (google.api.http) = {
-            post: "/v1/app/categories",
+            post: "/v1/system/categories",
             body: "*",
         };
 
@@ -280,7 +280,7 @@ service MiniBlog {
     // UpdateCategory 更新分类
     rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse) {
         option (google.api.http) = {
-            put: "/v1/app/categories/{id}",
+            put: "/v1/system/categories/{id}",
             body: "*",
         };
 
@@ -294,7 +294,7 @@ service MiniBlog {
     // DeleteCategory 删除分类
     rpc DeleteCategory(DeleteCategoryRequest) returns (DeleteCategoryResponse) {
         option (google.api.http) = {
-            delete: "/v1/app/categories/{id}",
+            delete: "/v1/system/categories/{id}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -307,7 +307,7 @@ service MiniBlog {
     // GetCategory 获取分类信息
     rpc GetCategory(GetCategoryRequest) returns (GetCategoryResponse) {
         option (google.api.http) = {
-            get: "/v1/app/categories/{id}",
+            get: "/v1/system/categories/{id}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -320,7 +320,7 @@ service MiniBlog {
     // ListCategory 列出所有分类
     rpc ListCategory(ListCategoryRequest) returns (ListCategoryResponse) {
         option (google.api.http) = {
-            get: "/v1/app/categories",
+            get: "/v1/system/categories",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -333,7 +333,7 @@ service MiniBlog {
     // CreateTag 创建标签
     rpc CreateTag(CreateTagRequest) returns (CreateTagResponse) {
         option (google.api.http) = {
-            post: "/v1/app/tags",
+            post: "/v1/system/tags",
             body: "*",
         };
 
@@ -347,7 +347,7 @@ service MiniBlog {
     // UpdateTag 更新标签
     rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse) {
         option (google.api.http) = {
-            put: "/v1/app/tags/{id}",
+            put: "/v1/system/tags/{id}",
             body: "*",
         };
 
@@ -361,7 +361,7 @@ service MiniBlog {
     // DeleteTag 删除标签
     rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse) {
         option (google.api.http) = {
-            delete: "/v1/app/tags/{id}",
+            delete: "/v1/system/tags/{id}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -374,7 +374,7 @@ service MiniBlog {
     // GetTag 获取标签信息
     rpc GetTag(GetTagRequest) returns (GetTagResponse) {
         option (google.api.http) = {
-            get: "/v1/app/tags/{id}",
+            get: "/v1/system/tags/{id}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -387,7 +387,7 @@ service MiniBlog {
     // ListTag 列出所有标签
     rpc ListTag(ListTagRequest) returns (ListTagResponse) {
         option (google.api.http) = {
-            get: "/v1/app/tags",
+            get: "/v1/system/tags",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -400,7 +400,7 @@ service MiniBlog {
     // CreatePostTag 创建文章标签关联
     rpc CreatePostTag(CreatePostTagRequest) returns (CreatePostTagResponse) {
         option (google.api.http) = {
-            post: "/v1/app/post-tags",
+            post: "/v1/system/post-tags",
             body: "*",
         };
 
@@ -414,7 +414,7 @@ service MiniBlog {
     // DeletePostTag 删除文章标签关联
     rpc DeletePostTag(DeletePostTagRequest) returns (DeletePostTagResponse) {
         option (google.api.http) = {
-            delete: "/v1/app/post-tags",
+            delete: "/v1/system/post-tags",
             body: "*",
         };
 
@@ -428,7 +428,7 @@ service MiniBlog {
     // ListPostTags 列出文章标签关联
     rpc ListPostTags(ListPostTagsRequest) returns (ListPostTagsResponse) {
         option (google.api.http) = {
-            get: "/v1/app/post-tags",
+            get: "/v1/system/post-tags",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -441,7 +441,7 @@ service MiniBlog {
     // BatchCreatePostTags 批量创建文章标签关联
     rpc BatchCreatePostTags(BatchCreatePostTagsRequest) returns (BatchCreatePostTagsResponse) {
         option (google.api.http) = {
-            post: "/v1/app/post-tags/batch",
+            post: "/v1/system/post-tags/batch",
             body: "*",
         };
 
@@ -455,7 +455,7 @@ service MiniBlog {
     // BatchDeletePostTags 批量删除文章标签关联
     rpc BatchDeletePostTags(BatchDeletePostTagsRequest) returns (BatchDeletePostTagsResponse) {
         option (google.api.http) = {
-            delete: "/v1/app/post-tags/batch",
+            delete: "/v1/system/post-tags/batch",
             body: "*",
         };
 

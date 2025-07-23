@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
-	appv1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1/app"
+	v1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"
 	genericvalidation "github.com/onexstack/onexstack/pkg/validation"
 )
 
@@ -52,12 +52,12 @@ func (v *Validator) ValidateTagRules() genericvalidation.Rules {
 }
 
 // ValidateCreateTagRequest 校验 CreateTagRequest 结构体的有效性.
-func (v *Validator) ValidateCreateTagRequest(ctx context.Context, rq *appv1.CreateTagRequest) error {
+func (v *Validator) ValidateCreateTagRequest(ctx context.Context, rq *v1.CreateTagRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidateTagRules())
 }
 
 // ValidateUpdateTagRequest 校验 UpdateTagRequest 结构体的有效性.
-func (v *Validator) ValidateUpdateTagRequest(ctx context.Context, rq *appv1.UpdateTagRequest) error {
+func (v *Validator) ValidateUpdateTagRequest(ctx context.Context, rq *v1.UpdateTagRequest) error {
 	// 先校验 ID 字段
 	if rq.GetId() <= 0 {
 		return errno.ErrInvalidArgument.WithMessage("tag ID must be positive")
@@ -66,7 +66,7 @@ func (v *Validator) ValidateUpdateTagRequest(ctx context.Context, rq *appv1.Upda
 }
 
 // ValidateDeleteTagRequest 校验 DeleteTagRequest 结构体的有效性.
-func (v *Validator) ValidateDeleteTagRequest(ctx context.Context, rq *appv1.DeleteTagRequest) error {
+func (v *Validator) ValidateDeleteTagRequest(ctx context.Context, rq *v1.DeleteTagRequest) error {
 	if rq.GetId() <= 0 {
 		return errno.ErrInvalidArgument.WithMessage("tag ID must be positive")
 	}
@@ -74,7 +74,7 @@ func (v *Validator) ValidateDeleteTagRequest(ctx context.Context, rq *appv1.Dele
 }
 
 // ValidateGetTagRequest 校验 GetTagRequest 结构体的有效性.
-func (v *Validator) ValidateGetTagRequest(ctx context.Context, rq *appv1.GetTagRequest) error {
+func (v *Validator) ValidateGetTagRequest(ctx context.Context, rq *v1.GetTagRequest) error {
 	if rq.GetId() <= 0 {
 		return errno.ErrInvalidArgument.WithMessage("tag ID must be positive")
 	}
@@ -82,7 +82,7 @@ func (v *Validator) ValidateGetTagRequest(ctx context.Context, rq *appv1.GetTagR
 }
 
 // ValidateListTagRequest 校验 ListTagRequest 结构体的有效性.
-func (v *Validator) ValidateListTagRequest(ctx context.Context, rq *appv1.ListTagRequest) error {
+func (v *Validator) ValidateListTagRequest(ctx context.Context, rq *v1.ListTagRequest) error {
 	// 校验可选的名称过滤参数
 	if name := rq.GetName(); name != "" {
 		if len(strings.TrimSpace(name)) == 0 {
