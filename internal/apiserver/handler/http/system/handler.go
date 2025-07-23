@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file. The original repo for
 // this file is https://github.com/clin211/miniblog-v2.git.
 
-package app
+package system
 
 import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
