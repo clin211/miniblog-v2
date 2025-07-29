@@ -156,6 +156,35 @@ make build
 - **MongoDB 数据库**: `localhost:27001`
 - **Redis 缓存**: `localhost:63790`
 
+### 注册登录接口
+
+#### 注册
+
+```sh
+curl --location --request POST 'http://localhost:5555/v1/system/users' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "username": "uploadfile",
+    "password": "kKOcmxVf99l9OFz",
+    "age": 52,
+    "avatar": "https://avatars.githubusercontent.com/u/66678446",
+    "email": "rmftt4.qj294@yahoo.com.cn",
+    "phone": "17809821686",
+    "gender": 0
+}'
+```
+
+#### 登录
+
+```sh
+curl --location --request POST 'http://localhost:5555/v1/system/auth/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "username": "uploadfile",
+    "password": "kKOcmxVf99l9OFz"
+}'
+```
+
 ### 停止服务
 
 ```sh

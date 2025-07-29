@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	genericoptions "github.com/onexstack/onexstack/pkg/options"
+	genericoptions "github.com/clin211/miniblog-v2/pkg/options"
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"

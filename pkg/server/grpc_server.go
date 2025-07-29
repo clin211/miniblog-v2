@@ -9,7 +9,7 @@ import (
 	"context"
 	"net"
 
-	genericoptions "github.com/onexstack/onexstack/pkg/options"
+	genericoptions "github.com/clin211/miniblog-v2/pkg/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health"

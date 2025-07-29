@@ -8,10 +8,10 @@ package apiserver
 import (
 	"context"
 
+	genericvalidation "github.com/clin211/miniblog-v2/pkg/validation"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	genericvalidation "github.com/onexstack/onexstack/pkg/validation"
 	"google.golang.org/grpc"
 
 	handler "github.com/clin211/miniblog-v2/internal/apiserver/handler/grpc/system"

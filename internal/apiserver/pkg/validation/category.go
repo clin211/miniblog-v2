@@ -9,7 +9,7 @@ import (
 	"context"
 	"strings"
 
-	genericvalidation "github.com/onexstack/onexstack/pkg/validation"
+	genericvalidation "github.com/clin211/miniblog-v2/pkg/validation"
 
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
 	v1 "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1"

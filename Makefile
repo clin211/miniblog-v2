@@ -113,7 +113,6 @@ lint: # 执行静态代码检查.
 dev-start:
 	@docker compose -f $(PROJ_ROOT_DIR)/deployment/docker/dev/docker-compose.env.yml up -d
 	@mkdir -p $(PROJ_ROOT_DIR)/tmp
-	@air
 
 .PHONY: dev-stop
 dev-stop:

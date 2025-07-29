@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver"
-	genericoptions "github.com/onexstack/onexstack/pkg/options"
-	stringsutil "github.com/onexstack/onexstack/pkg/util/strings"
+	genericoptions "github.com/clin211/miniblog-v2/pkg/options"
+	"github.com/clin211/miniblog-v2/pkg/strings"
 	"github.com/spf13/pflag"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -101,7 +101,7 @@ func (o *ServerOptions) Validate() error {
 	errs = append(errs, o.RedisOptions.Validate()...)
 
 	// 如果是 gRPC 或 gRPC-Gateway 模式，校验 gRPC 配置
-	if stringsutil.StringIn(o.ServerMode, []string{apiserver.GRPCServerMode, apiserver.GRPCGatewayServerMode}) {
+	if strings.StringIn(o.ServerMode, []string{apiserver.GRPCServerMode, apiserver.GRPCGatewayServerMode}) {
 		errs = append(errs, o.GRPCOptions.Validate()...)
 	}
 

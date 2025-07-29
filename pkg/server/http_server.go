@@ -11,7 +11,7 @@ import (
 	"errors"
 	"net/http"
 
-	genericoptions "github.com/onexstack/onexstack/pkg/options"
+	genericoptions "github.com/clin211/miniblog-v2/pkg/options"
 
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
 )
