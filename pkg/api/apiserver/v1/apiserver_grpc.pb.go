@@ -56,6 +56,8 @@ const (
 	MiniBlog_BatchDeletePostTags_FullMethodName = "/v1.MiniBlog/BatchDeletePostTags"
 	MiniBlog_AppPostList_FullMethodName         = "/v1.MiniBlog/AppPostList"
 	MiniBlog_AppGetPost_FullMethodName          = "/v1.MiniBlog/AppGetPost"
+	MiniBlog_AppGetCategory_FullMethodName      = "/v1.MiniBlog/AppGetCategory"
+	MiniBlog_AppListCategory_FullMethodName     = "/v1.MiniBlog/AppListCategory"
 )
 
 // MiniBlogClient is the client API for MiniBlog service.
@@ -126,6 +128,10 @@ type MiniBlogClient interface {
 	AppPostList(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (*ListPostResponse, error)
 	// GetPost 获取文章信息
 	AppGetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error)
+	// GetCategory 获取分类信息
+	AppGetCategory(ctx context.Context, in *GetCategoryRequest, opts ...grpc.CallOption) (*GetCategoryResponse, error)
+	// ListCategory 列出所有分类
+	AppListCategory(ctx context.Context, in *ListCategoryRequest, opts ...grpc.CallOption) (*ListCategoryResponse, error)
 }
 
 type miniBlogClient struct {
@@ -446,6 +452,26 @@ func (c *miniBlogClient) AppGetPost(ctx context.Context, in *GetPostRequest, opt
 	return out, nil
 }
 
+func (c *miniBlogClient) AppGetCategory(ctx context.Context, in *GetCategoryRequest, opts ...grpc.CallOption) (*GetCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCategoryResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_AppGetCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *miniBlogClient) AppListCategory(ctx context.Context, in *ListCategoryRequest, opts ...grpc.CallOption) (*ListCategoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCategoryResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_AppListCategory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MiniBlogServer is the server API for MiniBlog service.
 // All implementations must embed UnimplementedMiniBlogServer
 // for forward compatibility.
@@ -514,6 +540,10 @@ type MiniBlogServer interface {
 	AppPostList(context.Context, *ListPostRequest) (*ListPostResponse, error)
 	// GetPost 获取文章信息
 	AppGetPost(context.Context, *GetPostRequest) (*GetPostResponse, error)
+	// GetCategory 获取分类信息
+	AppGetCategory(context.Context, *GetCategoryRequest) (*GetCategoryResponse, error)
+	// ListCategory 列出所有分类
+	AppListCategory(context.Context, *ListCategoryRequest) (*ListCategoryResponse, error)
 	mustEmbedUnimplementedMiniBlogServer()
 }
 
@@ -616,6 +646,12 @@ func (UnimplementedMiniBlogServer) AppPostList(context.Context, *ListPostRequest
 }
 func (UnimplementedMiniBlogServer) AppGetPost(context.Context, *GetPostRequest) (*GetPostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AppGetPost not implemented")
+}
+func (UnimplementedMiniBlogServer) AppGetCategory(context.Context, *GetCategoryRequest) (*GetCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppGetCategory not implemented")
+}
+func (UnimplementedMiniBlogServer) AppListCategory(context.Context, *ListCategoryRequest) (*ListCategoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppListCategory not implemented")
 }
 func (UnimplementedMiniBlogServer) mustEmbedUnimplementedMiniBlogServer() {}
 func (UnimplementedMiniBlogServer) testEmbeddedByValue()                  {}
@@ -1196,6 +1232,42 @@ func _MiniBlog_AppGetPost_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MiniBlog_AppGetCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).AppGetCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_AppGetCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).AppGetCategory(ctx, req.(*GetCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MiniBlog_AppListCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).AppListCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_AppListCategory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).AppListCategory(ctx, req.(*ListCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MiniBlog_ServiceDesc is the grpc.ServiceDesc for MiniBlog service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1326,6 +1398,14 @@ var MiniBlog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AppGetPost",
 			Handler:    _MiniBlog_AppGetPost_Handler,
+		},
+		{
+			MethodName: "AppGetCategory",
+			Handler:    _MiniBlog_AppGetCategory_Handler,
+		},
+		{
+			MethodName: "AppListCategory",
+			Handler:    _MiniBlog_AppListCategory_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -242,10 +242,7 @@ func (v *Validator) ValidateDeleteCategoryRequest(ctx context.Context, rq *v1.De
 
 // ValidateGetCategoryRequest 校验 GetCategoryRequest 结构体的有效性
 func (v *Validator) ValidateGetCategoryRequest(ctx context.Context, rq *v1.GetCategoryRequest) error {
-	if rq.GetId() <= 0 {
-		return errno.ErrInvalidArgument.WithMessage("category ID must be positive")
-	}
-	return nil
+	return genericvalidation.ValidateAllFields(rq, v.ValidateCategoryRules())
 }
 
 // ValidateListCategoryRequest 校验 ListCategoryRequest 结构体的有效性

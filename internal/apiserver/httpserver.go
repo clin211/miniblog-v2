@@ -126,8 +126,14 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 	{
 		post := appv1.Group("/posts")
 		{
-			post.GET("", app.ListPost)        // 查询所有文章
-			post.POST(":postID", app.GetPost) // 查询单篇文章
+			post.GET("", app.ListPost)       // 查询所有文章
+			post.GET(":postID", app.GetPost) // 查询单篇文章
+		}
+
+		category := appv1.Group("/categories")
+		{
+			category.GET("", app.ListCategories) // 查询所有分类
+			category.GET(":id", app.GetCategory) // 查询单条分类
 		}
 	}
 }

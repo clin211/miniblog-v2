@@ -1,3 +1,8 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
 package category
 
 import (
@@ -19,6 +24,8 @@ type CategoryBiz interface {
 	Delete(ctx context.Context, rq *v1.DeleteCategoryRequest) (*v1.DeleteCategoryResponse, error)
 	Get(ctx context.Context, rq *v1.GetCategoryRequest) (*v1.GetCategoryResponse, error)
 	List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error)
+	// 客户端接口
+	AppList(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error)
 }
 
 type categoryBiz struct {
@@ -99,11 +106,46 @@ func (b *categoryBiz) List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1
 		return nil, err
 	}
 
+	return &v1.ListCategoryResponse{
+		Total:      int32(len(categoryList)),
+		Categories: buildHierarchicalCategories(categoryList),
+	}, nil
+}
+
+func (b *categoryBiz) AppList(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error) {
+	categories, err := b.store.Category().AppList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ListCategoryResponse{
+		Total:      int32(len(categories)),
+		Categories: buildHierarchicalCategories(categories),
+	}, nil
+}
+
+// sortFunc 对分类列表按 SortOrder 排序
+func sortFunc(categories []*model.CategoryM) {
+	sort.Slice(categories, func(i, j int) bool {
+		order1 := int32(0)
+		order2 := int32(0)
+		if categories[i].SortOrder != nil {
+			order1 = *categories[i].SortOrder
+		}
+		if categories[j].SortOrder != nil {
+			order2 = *categories[j].SortOrder
+		}
+		return order1 < order2
+	})
+}
+
+// buildHierarchicalCategories 构建分层的分类结构
+func buildHierarchicalCategories(categoryList []*model.CategoryM) []*v1.ListCategoryResponse_Categories {
 	// 构建父子关系映射
 	childrenMap := make(map[int32][]*model.CategoryM)
+	rootCategoriesMap := make(map[int32]*model.CategoryM)
 
 	// 一次遍历构建父子关系映射和根分类切片
-	rootCategoriesMap := make(map[int32]*model.CategoryM)
 	for _, category := range categoryList {
 		if category.ParentID == nil || *category.ParentID == 0 {
 			rootCategoriesMap[category.ID] = category
@@ -111,21 +153,6 @@ func (b *categoryBiz) List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1
 			parentID := *category.ParentID
 			childrenMap[parentID] = append(childrenMap[parentID], category)
 		}
-	}
-
-	// 使用 sort.Slice 替代冒泡排序，时间复杂度从 O(n²) 降低到 O(n log n)
-	sortFunc := func(categories []*model.CategoryM) {
-		sort.Slice(categories, func(i, j int) bool {
-			order1 := int32(0)
-			order2 := int32(0)
-			if categories[i].SortOrder != nil {
-				order1 = *categories[i].SortOrder
-			}
-			if categories[j].SortOrder != nil {
-				order2 = *categories[j].SortOrder
-			}
-			return order1 < order2
-		})
 	}
 
 	// 将 map 转换为切片并排序
@@ -177,8 +204,5 @@ func (b *categoryBiz) List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1
 		responseCategories = append(responseCategories, categoryWithChildren)
 	}
 
-	return &v1.ListCategoryResponse{
-		Total:      int32(len(categoryList)),
-		Categories: responseCategories,
-	}, nil
+	return responseCategories
 }

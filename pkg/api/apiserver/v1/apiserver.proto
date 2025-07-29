@@ -492,4 +492,30 @@ service MiniBlog {
             tags: "app/博客管理";
         };
     }
+
+    // GetCategory 获取分类信息
+    rpc AppGetCategory(GetCategoryRequest) returns (GetCategoryResponse) {
+        option (google.api.http) = {
+            get: "/v1/app/categories/{id}",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "获取分类信息";
+            operation_id: "GetCategory";
+            tags: "app/分类管理";
+        };
+    }
+
+    // ListCategory 列出所有分类
+    rpc AppListCategory(ListCategoryRequest) returns (ListCategoryResponse) {
+        option (google.api.http) = {
+            get: "/v1/app/categories",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "列出所有分类";
+            operation_id: "ListCategory";
+            tags: "app/分类管理";
+        };
+    }
 }

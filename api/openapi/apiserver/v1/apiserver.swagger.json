@@ -52,6 +52,72 @@
         ]
       }
     },
+    "/v1/app/categories": {
+      "get": {
+        "summary": "列出所有分类",
+        "operationId": "ListCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parentID",
+            "description": "parentID 表示可选的父分类ID过滤",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "app/分类管理"
+        ]
+      }
+    },
+    "/v1/app/categories/{id}": {
+      "get": {
+        "summary": "获取分类信息",
+        "operationId": "GetCategory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCategoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id 表示要获取的分类 ID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "app/分类管理"
+        ]
+      }
+    },
     "/v1/app/posts": {
       "get": {
         "summary": "列出文章",
