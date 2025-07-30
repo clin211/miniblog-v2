@@ -24,8 +24,6 @@ type CategoryBiz interface {
 	Delete(ctx context.Context, rq *v1.DeleteCategoryRequest) (*v1.DeleteCategoryResponse, error)
 	Get(ctx context.Context, rq *v1.GetCategoryRequest) (*v1.GetCategoryResponse, error)
 	List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error)
-	// 客户端接口
-	AppList(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error)
 }
 
 type categoryBiz struct {
@@ -109,18 +107,6 @@ func (b *categoryBiz) List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1
 	return &v1.ListCategoryResponse{
 		Total:      int32(len(categoryList)),
 		Categories: buildHierarchicalCategories(categoryList),
-	}, nil
-}
-
-func (b *categoryBiz) AppList(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error) {
-	categories, err := b.store.Category().AppList(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.ListCategoryResponse{
-		Total:      int32(len(categories)),
-		Categories: buildHierarchicalCategories(categories),
 	}, nil
 }
 

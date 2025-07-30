@@ -6,8 +6,6 @@
 package store
 
 import (
-	"context"
-
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
 	genericstore "github.com/clin211/miniblog-v2/pkg/store"
 )
@@ -15,14 +13,11 @@ import (
 // CategoryStore 定义了 category 模块在 store 层所实现的方法
 type CategoryStore interface {
 	genericstore.IStore[model.CategoryM]
-	// AppListCategories 查询所有分类
-	AppList(ctx context.Context) ([]*model.CategoryM, error)
 }
 
 // categoryStore 是 CategoryStore 接口的实现
 type categoryStore struct {
 	*genericstore.Store[model.CategoryM]
-	store *datastore // 添加对 datastore 的直接引用
 }
 
 // 确保 categoryStore 实现了 CategoryStore 接口
@@ -32,15 +27,5 @@ var _ CategoryStore = (*categoryStore)(nil)
 func newCategoryStore(store *datastore) *categoryStore {
 	return &categoryStore{
 		Store: genericstore.NewStore[model.CategoryM](store, genericstore.NewLogger()),
-		store: store, // 保存 datastore 引用
 	}
-}
-
-func (s *categoryStore) AppList(ctx context.Context) ([]*model.CategoryM, error) {
-	var categories []*model.CategoryM
-	// 直接使用 datastore 的 DB 方法，绕过租户过滤
-	if err := s.store.DB(ctx).Find(&categories).Error; err != nil {
-		return nil, err
-	}
-	return categories, nil
 }
