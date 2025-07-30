@@ -92,7 +92,7 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 		}
 
 		// 标签相关路由
-		tag := sysv1.Group("/post-tags")
+		tag := sysv1.Group("/post-tags", authMiddlewares...)
 		{
 			tag.POST("", sys.CreateTag)      // 创建标签
 			tag.PUT(":id", sys.UpdateTag)    // 更新标签
@@ -102,7 +102,7 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 		}
 
 		// 分类相关路由
-		category := sysv1.Group("/categories")
+		category := sysv1.Group("/categories", authMiddlewares...)
 		{
 			category.POST("", sys.CreateCategory)      // 创建分类
 			category.PUT(":id", sys.UpdateCategory)    // 更新分类
