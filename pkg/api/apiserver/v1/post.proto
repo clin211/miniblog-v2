@@ -166,8 +166,9 @@ message ListPostRequest {
     // limit 表示每页数量
     // @gotags: form:"limit"
     int64 limit = 2;
-    // title 表示可选的标题过滤
-    optional string title = 3;
+    // categoryID 表示可选的标题过滤
+    // @gotags: form:"categoryID"
+    optional int64 categoryID = 3;
 }
 
 // ListPostResponse 表示获取文章列表响应

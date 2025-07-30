@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handler) ListPost(c *gin.Context) {
-	core.HandleQueryRequest(c, h.biz.PostV1().List, h.val.ValidateListPostRequest)
+	core.HandleQueryRequest(c, h.biz.PostV1().AppList, h.val.ValidateListPostRequest)
 }
 
 func (h *Handler) GetPost(c *gin.Context) {

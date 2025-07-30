@@ -250,7 +250,7 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 				return errno.ErrInvalidArgument.WithMessage("category ID field type error")
 			}
 
-			if hasCategoryID && categoryID < 0 {
+			if hasCategoryID && categoryID <= 0 {
 				return errno.ErrInvalidArgument.WithMessage("category ID cannot be negative")
 			}
 			return nil
@@ -425,7 +425,7 @@ func (v *Validator) ValidateDeletePostRequest(ctx context.Context, rq *v1.Delete
 	}
 	for _, postID := range rq.GetPostIDs() {
 		if postID == "" {
-			return errno.ErrInvalidArgument.WithMessage("postID in the list cannot be empty")
+			return errno.ErrInvalidArgument.WithMessage("post ID in the list cannot be empty")
 		}
 	}
 	return nil
@@ -447,15 +447,10 @@ func (v *Validator) ValidateListPostRequest(ctx context.Context, rq *v1.ListPost
 		return err
 	}
 
-	// 校验可选的标题过滤参数
-	if title := rq.GetTitle(); title != "" {
-		if len(strings.TrimSpace(title)) == 0 {
-			return errno.ErrInvalidArgument.WithMessage("title filter cannot be whitespace only")
-		}
-		if len(title) > 200 {
-			return errno.ErrInvalidArgument.WithMessage("title filter is too long")
-		}
-	}
+	// 校验可选的 categoryID 过滤参数
+	if rq.CategoryID != nil && *rq.CategoryID <= 0 {
+		return errno.ErrInvalidArgument.WithMessage("category ID cannot be negative")
 
+	}
 	return nil
 }

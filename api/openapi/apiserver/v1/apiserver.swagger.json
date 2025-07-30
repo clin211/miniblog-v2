@@ -154,11 +154,12 @@
             "format": "int64"
           },
           {
-            "name": "title",
-            "description": "title 表示可选的标题过滤",
+            "name": "categoryID",
+            "description": "categoryID 表示可选的标题过滤\n@gotags: form:\"categoryID\"",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -634,11 +635,12 @@
             "format": "int64"
           },
           {
-            "name": "title",
-            "description": "title 表示可选的标题过滤",
+            "name": "categoryID",
+            "description": "categoryID 表示可选的标题过滤\n@gotags: form:\"categoryID\"",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [

@@ -32,7 +32,9 @@ type PostBiz interface {
 }
 
 // PostExpansion 定义额外的帖子操作方法.
-type PostExpansion interface{}
+type PostExpansion interface {
+	AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error)
+}
 
 // postBiz 是 PostBiz 接口的实现.
 type postBiz struct {
@@ -219,6 +221,29 @@ func (b *postBiz) Get(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostRe
 // List 实现 PostBiz 接口中的 List 方法.
 func (b *postBiz) List(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error) {
 	whr := where.T(ctx).P(int(rq.GetOffset()), int(rq.GetLimit()))
+	count, postList, err := b.store.Post().List(ctx, whr)
+	if err != nil {
+		return nil, err
+	}
+
+	posts := make([]*v1.Post, 0, len(postList))
+	for _, post := range postList {
+		converted := conversion.PostModelToPostV1(post)
+		posts = append(posts, converted)
+	}
+
+	return &v1.ListPostResponse{TotalCount: count, Posts: posts}, nil
+}
+
+func (b *postBiz) AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error) {
+	var whr *where.Options
+	// 检查 categoryID 是否提供
+	if rq.CategoryID != nil && *rq.CategoryID > 0 {
+		whr = where.F("category_id", *rq.CategoryID).P(int(rq.GetOffset()), int(rq.GetLimit()))
+	} else {
+		whr = where.P(int(rq.GetOffset()), int(rq.GetLimit()))
+	}
+
 	count, postList, err := b.store.Post().List(ctx, whr)
 	if err != nil {
 		return nil, err
