@@ -91,7 +91,7 @@ CREATE TABLE post (
 
 -- 分类表
 CREATE TABLE category (
-    `id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '分类ID',
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '分类ID',
     `category_id` VARCHAR(32) NOT NULL COMMENT '分类ID',
     `name` VARCHAR(50) NOT NULL COMMENT '分类名称',
     `description` TEXT COMMENT '分类描述',
@@ -109,7 +109,7 @@ CREATE TABLE category (
 
 -- 标签表
 CREATE TABLE tag (
-    `id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '标签ID',
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '标签ID',
     `tag_id` VARCHAR(32) NOT NULL COMMENT '标签ID',
     `name` VARCHAR(50) NOT NULL UNIQUE COMMENT '标签名称',
     `color` VARCHAR(7) DEFAULT '#007bff' COMMENT '标签颜色(hex 格式)',
@@ -121,16 +121,17 @@ CREATE TABLE tag (
 
 -- 文章标签关联表（多对多关系）
 CREATE TABLE post_tag (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
     `post_id` VARCHAR(32) NOT NULL COMMENT '文章ID',
     `tag_id` INT NOT NULL COMMENT '标签ID',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP() COMMENT '创建时间',
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP() COMMENT '更新时间',
     `deleted_at` TIMESTAMP NULL COMMENT '删除时间',
-    PRIMARY KEY (`post_id`, `tag_id`),
     INDEX idx_post_id (`post_id`),
     INDEX idx_tag_id (`tag_id`)
 ) COMMENT='文章标签关联表' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- casbin_rule
 CREATE TABLE `casbin_rule` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `ptype` varchar(100) DEFAULT NULL,

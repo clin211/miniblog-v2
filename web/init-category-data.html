@@ -10,403 +10,1765 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiniBlog 分类数据初始化</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiniBlog 分类数据初始化</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">MiniBlog 分类数据初始化</h1>
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+        MiniBlog 分类数据初始化
+      </h1>
 
-            <!-- 登录区域 -->
-            <div id="loginSection" class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">用户登录</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
-                        <input type="text" id="username" value="uploadfile"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
-                        <input type="password" id="password" value="kKOcmxVf99l9OFz"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                </div>
-                <button onclick="login()"
-                    class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
-                    登录
-                </button>
-                <div id="loginStatus" class="mt-2"></div>
-            </div>
-
-            <!-- 操作区域 -->
-            <div id="operationSection" class="bg-white rounded-lg shadow-md p-6 mb-6" style="display: none;">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">批量创建分类</h2>
-                <div class="flex flex-wrap gap-4 mb-4">
-                    <button onclick="createAllCategories()"
-                        class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
-                        创建所有分类
-                    </button>
-                    <button onclick="createPrimaryCategories()"
-                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
-                        仅创建一级分类
-                    </button>
-                    <button onclick="clearLogs()"
-                        class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
-                        清空日志
-                    </button>
-                </div>
-                <div class="mb-4">
-                    <div class="text-sm text-gray-600 mb-2">进度: <span id="progress">0/0</span></div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                            style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 日志区域 -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">操作日志</h2>
-                <div id="logs" class="bg-gray-50 rounded-md p-4 h-96 overflow-y-auto text-sm font-mono">
-                    <div class="text-gray-500">等待操作...</div>
-                </div>
-            </div>
+      <!-- 登录区域 -->
+      <div id="loginSection" class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">用户登录</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+            <input type="text" id="username" value="uploadfile"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+            <input type="password" id="password" value="kKOcmxVf99l9OFz"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
         </div>
+        <button onclick="login()"
+          class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+          登录
+        </button>
+        <div id="loginStatus" class="mt-2"></div>
+      </div>
+
+      <!-- 操作区域 -->
+      <div id="operationSection" class="bg-white rounded-lg shadow-md p-6 mb-6" style="display: none">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">批量创建分类</h2>
+        <div class="flex flex-wrap gap-4 mb-4">
+          <button onclick="createAllCategories()"
+            class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+            创建所有分类
+          </button>
+          <button onclick="createPrimaryCategories()"
+            class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+            仅创建一级分类
+          </button>
+          <button onclick="clearLogs()"
+            class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+            清空日志
+          </button>
+        </div>
+        <div class="mb-4">
+          <div class="text-sm text-gray-600 mb-2">
+            进度: <span id="progress">0/0</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 日志区域 -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">操作日志</h2>
+        <div id="logs" class="bg-gray-50 rounded-md p-4 h-96 overflow-y-auto text-sm font-mono">
+          <div class="text-gray-500">等待操作...</div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        let authToken = '';
-        const API_BASE = 'http://localhost:5555';
-        const categories = [
-            // 一级分类
-            { name: '前端', description: '前端技术相关文章，包括 HTML、CSS、JavaScript、TypeScript、Vue、React 等前端框架和工具', icon: 'code', theme: 'cyan', parentID: 0, sortOrder: 10, isActive: 1 },
-            { name: '后端', description: '后端技术相关文章，包括服务端开发、API 设计、Web 框架等后端开发技术', icon: 'server', theme: 'emerald', parentID: 0, sortOrder: 20, isActive: 1 },
-            { name: '跨端', description: '跨平台开发技术，包括移动端、桌面端、小程序等跨端解决方案', icon: 'smartphone', theme: 'violet', parentID: 0, sortOrder: 30, isActive: 1 },
-            { name: '数据库', description: '数据库设计、SQL 优化、数据建模等数据存储和管理相关内容', icon: 'database', theme: 'orange', parentID: 0, sortOrder: 40, isActive: 1 },
-            { name: '缓存', description: '缓存技术、缓存策略、Redis、Memcached 等缓存相关技术', icon: 'zap', theme: 'red', parentID: 0, sortOrder: 50, isActive: 1 },
-            { name: '消息队列', description: '消息队列技术、异步处理、RabbitMQ、Kafka 等消息中间件', icon: 'share', theme: 'pink', parentID: 0, sortOrder: 60, isActive: 1 },
-            { name: '算法与数据结构', description: '算法分析、数据结构实现、复杂度分析等计算机科学基础', icon: 'grid', theme: 'lime', parentID: 0, sortOrder: 70, isActive: 1 },
-            { name: '容器', description: '容器技术、Docker、Kubernetes、容器编排等容器化相关技术', icon: 'container', theme: 'sky', parentID: 0, sortOrder: 80, isActive: 1 },
-            { name: '阅读', description: '技术书籍阅读、文档学习、技术文章分享等学习资源', icon: 'book', theme: 'stone', parentID: 0, sortOrder: 90, isActive: 1 },
-            { name: '开发工具', description: '开发环境配置、编辑器使用、版本控制、构建工具等开发效率工具', icon: 'wrench', theme: 'zinc', parentID: 0, sortOrder: 100, isActive: 1 },
-            { name: '项目经验', description: '项目开发经验、架构设计、技术选型等实战项目分享', icon: 'target', theme: 'yellow', parentID: 0, sortOrder: 110, isActive: 1 },
-            { name: '面试', description: '技术面试、面试题解析、求职经验、职业发展等面试相关内容', icon: 'users', theme: 'fuchsia', parentID: 0, sortOrder: 120, isActive: 1 },
-            { name: '安全', description: 'Web 安全、网络安全、安全防护、漏洞分析等信息安全技术', icon: 'shield', theme: 'neutral', parentID: 0, sortOrder: 130, isActive: 1 },
-            { name: 'DevOps', description: 'DevOps 实践、CI/CD、自动化部署、持续集成等运维开发技术', icon: 'settings', theme: 'gray', parentID: 0, sortOrder: 140, isActive: 1 },
-            { name: '计算机系统', description: '操作系统、计算机原理、系统编程等计算机系统相关技术', icon: 'cpu', theme: 'blue', parentID: 0, sortOrder: 150, isActive: 1 },
-            { name: '网络', description: '网络协议、网络编程、网络安全等网络技术相关内容', icon: 'globe', theme: 'purple', parentID: 0, sortOrder: 160, isActive: 1 },
-            { name: '架构设计', description: '系统架构、软件设计、设计模式等架构设计相关技术', icon: 'layers', theme: 'green', parentID: 0, sortOrder: 170, isActive: 1 },
-            { name: '性能优化', description: '系统性能优化、代码优化、性能分析等性能提升技术', icon: 'trending', theme: 'amber', parentID: 0, sortOrder: 180, isActive: 1 },
-            { name: '测试', description: '软件测试、单元测试、集成测试、测试框架等测试相关技术', icon: 'monitor', theme: 'rose', parentID: 0, sortOrder: 190, isActive: 1 },
-            { name: '运维', description: '系统运维、服务器管理、监控告警等运维相关技术', icon: 'harddrive', theme: 'indigo', parentID: 0, sortOrder: 200, isActive: 1 },
-            { name: '人工智能', description: '机器学习、深度学习、AI 算法等人工智能相关技术', icon: 'lightbulb', theme: 'teal', parentID: 0, sortOrder: 210, isActive: 1 },
-            { name: '微服务', description: '微服务架构、服务治理、分布式系统等微服务相关技术', icon: 'git', theme: 'slate', parentID: 0, sortOrder: 220, isActive: 1 },
-            { name: '其他', description: '其他技术相关内容，不属于以上分类的技术文章', icon: 'folder', theme: 'neutral', parentID: 0, sortOrder: 230, isActive: 1 },
+  <script>
+    let authToken = "";
+    // const API_BASE = 'http://localhost:5555';
+    const API_BASE = "https://api.clin.pro";
+    const categories = [
+      // 一级分类
+      {
+        name: "前端",
+        description:
+          "前端技术相关文章，包括 HTML、CSS、JavaScript、TypeScript、Vue、React 等前端框架和工具",
+        icon: "code",
+        theme: "cyan",
+        parentID: 0,
+        sortOrder: 10,
+        isActive: 1,
+      },
+      {
+        name: "后端",
+        description:
+          "后端技术相关文章，包括服务端开发、API 设计、Web 框架等后端开发技术",
+        icon: "server",
+        theme: "emerald",
+        parentID: 0,
+        sortOrder: 20,
+        isActive: 1,
+      },
+      {
+        name: "跨端",
+        description:
+          "跨平台开发技术，包括移动端、桌面端、小程序等跨端解决方案",
+        icon: "smartphone",
+        theme: "violet",
+        parentID: 0,
+        sortOrder: 30,
+        isActive: 1,
+      },
+      {
+        name: "数据库",
+        description: "数据库设计、SQL 优化、数据建模等数据存储和管理相关内容",
+        icon: "database",
+        theme: "orange",
+        parentID: 0,
+        sortOrder: 40,
+        isActive: 1,
+      },
+      {
+        name: "缓存",
+        description: "缓存技术、缓存策略、Redis、Memcached 等缓存相关技术",
+        icon: "zap",
+        theme: "red",
+        parentID: 0,
+        sortOrder: 50,
+        isActive: 1,
+      },
+      {
+        name: "消息队列",
+        description: "消息队列技术、异步处理、RabbitMQ、Kafka 等消息中间件",
+        icon: "share",
+        theme: "pink",
+        parentID: 0,
+        sortOrder: 60,
+        isActive: 1,
+      },
+      {
+        name: "算法与数据结构",
+        description: "算法分析、数据结构实现、复杂度分析等计算机科学基础",
+        icon: "grid",
+        theme: "lime",
+        parentID: 0,
+        sortOrder: 70,
+        isActive: 1,
+      },
+      {
+        name: "容器",
+        description: "容器技术、Docker、Kubernetes、容器编排等容器化相关技术",
+        icon: "container",
+        theme: "sky",
+        parentID: 0,
+        sortOrder: 80,
+        isActive: 1,
+      },
+      {
+        name: "阅读",
+        description: "技术书籍阅读、文档学习、技术文章分享等学习资源",
+        icon: "book",
+        theme: "stone",
+        parentID: 0,
+        sortOrder: 90,
+        isActive: 1,
+      },
+      {
+        name: "开发工具",
+        description:
+          "开发环境配置、编辑器使用、版本控制、构建工具等开发效率工具",
+        icon: "wrench",
+        theme: "zinc",
+        parentID: 0,
+        sortOrder: 100,
+        isActive: 1,
+      },
+      {
+        name: "项目经验",
+        description: "项目开发经验、架构设计、技术选型等实战项目分享",
+        icon: "target",
+        theme: "yellow",
+        parentID: 0,
+        sortOrder: 110,
+        isActive: 1,
+      },
+      {
+        name: "面试",
+        description: "技术面试、面试题解析、求职经验、职业发展等面试相关内容",
+        icon: "users",
+        theme: "fuchsia",
+        parentID: 0,
+        sortOrder: 120,
+        isActive: 1,
+      },
+      {
+        name: "安全",
+        description: "Web 安全、网络安全、安全防护、漏洞分析等信息安全技术",
+        icon: "shield",
+        theme: "neutral",
+        parentID: 0,
+        sortOrder: 130,
+        isActive: 1,
+      },
+      {
+        name: "DevOps",
+        description: "DevOps 实践、CI/CD、自动化部署、持续集成等运维开发技术",
+        icon: "settings",
+        theme: "gray",
+        parentID: 0,
+        sortOrder: 140,
+        isActive: 1,
+      },
+      {
+        name: "计算机系统",
+        description: "操作系统、计算机原理、系统编程等计算机系统相关技术",
+        icon: "cpu",
+        theme: "blue",
+        parentID: 0,
+        sortOrder: 150,
+        isActive: 1,
+      },
+      {
+        name: "网络",
+        description: "网络协议、网络编程、网络安全等网络技术相关内容",
+        icon: "globe",
+        theme: "purple",
+        parentID: 0,
+        sortOrder: 160,
+        isActive: 1,
+      },
+      {
+        name: "架构设计",
+        description: "系统架构、软件设计、设计模式等架构设计相关技术",
+        icon: "layers",
+        theme: "green",
+        parentID: 0,
+        sortOrder: 170,
+        isActive: 1,
+      },
+      {
+        name: "性能优化",
+        description: "系统性能优化、代码优化、性能分析等性能提升技术",
+        icon: "trending",
+        theme: "amber",
+        parentID: 0,
+        sortOrder: 180,
+        isActive: 1,
+      },
+      {
+        name: "测试",
+        description: "软件测试、单元测试、集成测试、测试框架等测试相关技术",
+        icon: "monitor",
+        theme: "rose",
+        parentID: 0,
+        sortOrder: 190,
+        isActive: 1,
+      },
+      {
+        name: "运维",
+        description: "系统运维、服务器管理、监控告警等运维相关技术",
+        icon: "harddrive",
+        theme: "indigo",
+        parentID: 0,
+        sortOrder: 200,
+        isActive: 1,
+      },
+      {
+        name: "人工智能",
+        description: "机器学习、深度学习、AI 算法等人工智能相关技术",
+        icon: "lightbulb",
+        theme: "teal",
+        parentID: 0,
+        sortOrder: 210,
+        isActive: 1,
+      },
+      {
+        name: "微服务",
+        description: "微服务架构、服务治理、分布式系统等微服务相关技术",
+        icon: "git",
+        theme: "slate",
+        parentID: 0,
+        sortOrder: 220,
+        isActive: 1,
+      },
+      {
+        name: "其他",
+        description: "其他技术相关内容，不属于以上分类的技术文章",
+        icon: "folder",
+        theme: "neutral",
+        parentID: 0,
+        sortOrder: 230,
+        isActive: 1,
+      },
 
-            // 二级分类
-            { name: 'HTML/CSS', description: 'HTML 标记语言和 CSS 样式技术，包括语义化、响应式设计、动画效果等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 11, isActive: 1 },
-            { name: 'JavaScript', description: 'JavaScript 语言基础、ES6+特性、异步编程、DOM 操作等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 12, isActive: 1 },
-            { name: 'TypeScript', description: 'TypeScript 类型系统、高级特性、项目实践等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 13, isActive: 1 },
-            { name: 'Vue.js', description: 'Vue.js 框架及其生态系统，包括组件开发、状态管理、路由等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 14, isActive: 1 },
-            { name: 'Nuxt.js', description: 'Nuxt.js Vue.js 全栈框架，包括服务端渲染、静态生成、模块系统等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 15, isActive: 1 },
-            { name: 'React', description: 'React 框架及其生态系统，包括 Hooks、状态管理、组件设计等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 16, isActive: 1 },
-            { name: 'Next.js', description: 'Next.js 全栈 React 框架，包括 SSR、SSG、路由、API 路由等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 17, isActive: 1 },
-            { name: 'Svelte', description: 'Svelte 框架开发，包括组件开发、状态管理、编译优化等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 18, isActive: 1 },
-            { name: '构建工具', description: 'Webpack、Vite、Rollup 等前端构建和打包工具', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 19, isActive: 1 },
-            { name: '前端工程化', description: '前端项目构建、代码质量、性能优化、最佳实践等', icon: 'code', theme: 'cyan', parentID: 1, sortOrder: 20, isActive: 1 },
+      // 二级分类
+      {
+        name: "HTML/CSS",
+        description:
+          "HTML 标记语言和 CSS 样式技术，包括语义化、响应式设计、动画效果等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 11,
+        isActive: 1,
+      },
+      {
+        name: "JavaScript",
+        description: "JavaScript 语言基础、ES6+特性、异步编程、DOM 操作等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 12,
+        isActive: 1,
+      },
+      {
+        name: "TypeScript",
+        description: "TypeScript 类型系统、高级特性、项目实践等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 13,
+        isActive: 1,
+      },
+      {
+        name: "Vue.js",
+        description:
+          "Vue.js 框架及其生态系统，包括组件开发、状态管理、路由等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 14,
+        isActive: 1,
+      },
+      {
+        name: "Nuxt.js",
+        description:
+          "Nuxt.js Vue.js 全栈框架，包括服务端渲染、静态生成、模块系统等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 15,
+        isActive: 1,
+      },
+      {
+        name: "React",
+        description:
+          "React 框架及其生态系统，包括 Hooks、状态管理、组件设计等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 16,
+        isActive: 1,
+      },
+      {
+        name: "Next.js",
+        description:
+          "Next.js 全栈 React 框架，包括 SSR、SSG、路由、API 路由等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 17,
+        isActive: 1,
+      },
+      {
+        name: "Svelte",
+        description: "Svelte 框架开发，包括组件开发、状态管理、编译优化等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 18,
+        isActive: 1,
+      },
+      {
+        name: "构建工具",
+        description: "Webpack、Vite、Rollup 等前端构建和打包工具",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 19,
+        isActive: 1,
+      },
+      {
+        name: "前端工程化",
+        description: "前端项目构建、代码质量、性能优化、最佳实践等",
+        icon: "code",
+        theme: "cyan",
+        parentID: 1,
+        sortOrder: 20,
+        isActive: 1,
+      },
 
-            { name: 'Node.js', description: 'Node.js 运行时环境、Express、Koa 等后端框架', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 21, isActive: 1 },
-            { name: 'Go语言', description: 'Go 语言基础、进阶技巧、并发编程等', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 22, isActive: false },
-            { name: 'Gin', description: 'Gin Web 框架开发，轻量级高性能的 Go HTTP 框架', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 23, isActive: 1 },
-            { name: 'go-zero', description: 'go-zero 微服务框架，集成了各种工程实践的 Web 和 RPC 框架', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 24, isActive: 1 },
-            { name: 'GoFrame', description: 'GoFrame 模块化、高性能、企业级的 Go 基础开发框架', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 25, isActive: 1 },
-            { name: 'Kratos', description: 'Kratos 微服务框架，B站开源的轻量级 Go 微服务框架', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 26, isActive: 1 },
-            { name: 'Python', description: 'Python 语言开发、Django、Flask 等 Web 框架', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 27, isActive: false },
-            { name: 'Rust', description: 'Rust 语言开发、Actix-web、Rocket 等 Web 框架', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 28, isActive: 1 },
-            { name: 'API设计', description: 'RESTful API、GraphQL、接口设计规范等', icon: 'code', theme: 'emerald', parentID: 2, sortOrder: 29, isActive: 1 },
+      {
+        name: "Node.js",
+        description: "Node.js 运行时环境、Express、Koa 等后端框架",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 21,
+        isActive: 1,
+      },
+      {
+        name: "Go语言",
+        description: "Go 语言基础、进阶技巧、并发编程等",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 22,
+        isActive: 1,
+      },
+      {
+        name: "Gin",
+        description: "Gin Web 框架开发，轻量级高性能的 Go HTTP 框架",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 23,
+        isActive: 1,
+      },
+      {
+        name: "go-zero",
+        description:
+          "go-zero 微服务框架，集成了各种工程实践的 Web 和 RPC 框架",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 24,
+        isActive: 1,
+      },
+      {
+        name: "GoFrame",
+        description: "GoFrame 模块化、高性能、企业级的 Go 基础开发框架",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 25,
+        isActive: 1,
+      },
+      {
+        name: "Kratos",
+        description: "Kratos 微服务框架，B站开源的轻量级 Go 微服务框架",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 26,
+        isActive: 1,
+      },
+      {
+        name: "Python",
+        description: "Python 语言开发、Django、Flask 等 Web 框架",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 27,
+        isActive: 1,
+      },
+      {
+        name: "Rust",
+        description: "Rust 语言开发、Actix-web、Rocket 等 Web 框架",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 28,
+        isActive: 1,
+      },
+      {
+        name: "API设计",
+        description: "RESTful API、GraphQL、接口设计规范等",
+        icon: "code",
+        theme: "emerald",
+        parentID: 2,
+        sortOrder: 29,
+        isActive: 1,
+      },
 
-            { name: 'React Native', description: 'React Native 移动端开发技术', icon: 'code', theme: 'violet', parentID: 3, sortOrder: 31, isActive: 1 },
-            { name: 'Flutter', description: 'Flutter 跨平台开发框架', icon: 'code', theme: 'violet', parentID: 3, sortOrder: 32, isActive: 1 },
-            { name: '小程序', description: '微信小程序、支付宝小程序等小程序开发', icon: 'code', theme: 'violet', parentID: 3, sortOrder: 33, isActive: 1 },
-            { name: 'Electron', description: 'Electron 桌面应用开发', icon: 'code', theme: 'violet', parentID: 3, sortOrder: 34, isActive: 1 },
-            { name: 'Uni-app', description: 'Uni-app 多端统一开发框架', icon: 'code', theme: 'violet', parentID: 3, sortOrder: 35, isActive: 1 },
-            { name: 'Taro', description: 'Taro 多端统一开发解决方案', icon: 'code', theme: 'violet', parentID: 3, sortOrder: 36, isActive: 1 },
+      {
+        name: "React Native",
+        description: "React Native 移动端开发技术",
+        icon: "code",
+        theme: "violet",
+        parentID: 3,
+        sortOrder: 31,
+        isActive: 1,
+      },
+      {
+        name: "Flutter",
+        description: "Flutter 跨平台开发框架",
+        icon: "code",
+        theme: "violet",
+        parentID: 3,
+        sortOrder: 32,
+        isActive: 1,
+      },
+      {
+        name: "小程序",
+        description: "微信小程序、支付宝小程序等小程序开发",
+        icon: "code",
+        theme: "violet",
+        parentID: 3,
+        sortOrder: 33,
+        isActive: 1,
+      },
+      {
+        name: "Electron",
+        description: "Electron 桌面应用开发",
+        icon: "code",
+        theme: "violet",
+        parentID: 3,
+        sortOrder: 34,
+        isActive: 1,
+      },
+      {
+        name: "Uni-app",
+        description: "Uni-app 多端统一开发框架",
+        icon: "code",
+        theme: "violet",
+        parentID: 3,
+        sortOrder: 35,
+        isActive: 1,
+      },
+      {
+        name: "Taro",
+        description: "Taro 多端统一开发解决方案",
+        icon: "code",
+        theme: "violet",
+        parentID: 3,
+        sortOrder: 36,
+        isActive: 1,
+      },
 
-            { name: 'MySQL', description: 'MySQL 数据库设计、优化、管理等', icon: 'code', theme: 'orange', parentID: 4, sortOrder: 41, isActive: 1 },
-            { name: 'PostgreSQL', description: 'PostgreSQL 数据库技术和最佳实践', icon: 'code', theme: 'orange', parentID: 4, sortOrder: 42, isActive: 1 },
-            { name: 'MongoDB', description: 'MongoDB 文档数据库设计和操作', icon: 'code', theme: 'orange', parentID: 4, sortOrder: 43, isActive: 1 },
-            { name: 'SQLite', description: 'SQLite 轻量级数据库应用', icon: 'code', theme: 'orange', parentID: 4, sortOrder: 44, isActive: 1 },
-            { name: '数据库设计', description: '数据库建模、范式设计、索引优化等', icon: 'code', theme: 'orange', parentID: 4, sortOrder: 45, isActive: 1 },
-            { name: 'SQL优化', description: 'SQL 查询优化、性能调优等', icon: 'code', theme: 'orange', parentID: 4, sortOrder: 46, isActive: 1 },
+      {
+        name: "MySQL",
+        description: "MySQL 数据库设计、优化、管理等",
+        icon: "code",
+        theme: "orange",
+        parentID: 4,
+        sortOrder: 41,
+        isActive: 1,
+      },
+      {
+        name: "PostgreSQL",
+        description: "PostgreSQL 数据库技术和最佳实践",
+        icon: "code",
+        theme: "orange",
+        parentID: 4,
+        sortOrder: 42,
+        isActive: 1,
+      },
+      {
+        name: "MongoDB",
+        description: "MongoDB 文档数据库设计和操作",
+        icon: "code",
+        theme: "orange",
+        parentID: 4,
+        sortOrder: 43,
+        isActive: 1,
+      },
+      {
+        name: "SQLite",
+        description: "SQLite 轻量级数据库应用",
+        icon: "code",
+        theme: "orange",
+        parentID: 4,
+        sortOrder: 44,
+        isActive: 1,
+      },
+      {
+        name: "数据库设计",
+        description: "数据库建模、范式设计、索引优化等",
+        icon: "code",
+        theme: "orange",
+        parentID: 4,
+        sortOrder: 45,
+        isActive: 1,
+      },
+      {
+        name: "SQL优化",
+        description: "SQL 查询优化、性能调优等",
+        icon: "code",
+        theme: "orange",
+        parentID: 4,
+        sortOrder: 46,
+        isActive: 1,
+      },
 
-            { name: 'Redis', description: 'Redis 缓存数据库技术和应用', icon: 'code', theme: 'red', parentID: 5, sortOrder: 51, isActive: 1 },
-            { name: 'Memcached', description: 'Memcached 内存缓存系统', icon: 'code', theme: 'red', parentID: 5, sortOrder: 52, isActive: 1 },
-            { name: '缓存策略', description: '缓存设计模式、缓存穿透、缓存雪崩等', icon: 'code', theme: 'red', parentID: 5, sortOrder: 53, isActive: 1 },
-            { name: '分布式缓存', description: '分布式缓存架构和实现', icon: 'code', theme: 'red', parentID: 5, sortOrder: 54, isActive: 1 },
-            { name: '本地缓存', description: '应用内缓存、内存缓存等', icon: 'code', theme: 'red', parentID: 5, sortOrder: 55, isActive: 1 },
+      {
+        name: "Redis",
+        description: "Redis 缓存数据库技术和应用",
+        icon: "code",
+        theme: "red",
+        parentID: 5,
+        sortOrder: 51,
+        isActive: 1,
+      },
+      {
+        name: "Memcached",
+        description: "Memcached 内存缓存系统",
+        icon: "code",
+        theme: "red",
+        parentID: 5,
+        sortOrder: 52,
+        isActive: 1,
+      },
+      {
+        name: "缓存策略",
+        description: "缓存设计模式、缓存穿透、缓存雪崩等",
+        icon: "code",
+        theme: "red",
+        parentID: 5,
+        sortOrder: 53,
+        isActive: 1,
+      },
+      {
+        name: "分布式缓存",
+        description: "分布式缓存架构和实现",
+        icon: "code",
+        theme: "red",
+        parentID: 5,
+        sortOrder: 54,
+        isActive: 1,
+      },
+      {
+        name: "本地缓存",
+        description: "应用内缓存、内存缓存等",
+        icon: "code",
+        theme: "red",
+        parentID: 5,
+        sortOrder: 55,
+        isActive: 1,
+      },
 
-            { name: 'RabbitMQ', description: 'RabbitMQ 消息队列技术', icon: 'code', theme: 'pink', parentID: 6, sortOrder: 61, isActive: 1 },
-            { name: 'Apache Kafka', description: 'Kafka 分布式流处理平台', icon: 'code', theme: 'pink', parentID: 6, sortOrder: 62, isActive: 1 },
-            { name: 'RocketMQ', description: 'RocketMQ 分布式消息中间件', icon: 'code', theme: 'pink', parentID: 6, sortOrder: 63, isActive: 1 },
-            { name: 'ActiveMQ', description: 'ActiveMQ 消息中间件', icon: 'code', theme: 'pink', parentID: 6, sortOrder: 64, isActive: 1 },
-            { name: '消息模式', description: '发布订阅、点对点等消息传递模式', icon: 'code', theme: 'pink', parentID: 6, sortOrder: 65, isActive: 1 },
-            { name: '异步处理', description: '异步消息处理、事件驱动架构等', icon: 'code', theme: 'pink', parentID: 6, sortOrder: 66, isActive: 1 },
+      {
+        name: "RabbitMQ",
+        description: "RabbitMQ 消息队列技术",
+        icon: "code",
+        theme: "pink",
+        parentID: 6,
+        sortOrder: 61,
+        isActive: 1,
+      },
+      {
+        name: "Apache Kafka",
+        description: "Kafka 分布式流处理平台",
+        icon: "code",
+        theme: "pink",
+        parentID: 6,
+        sortOrder: 62,
+        isActive: 1,
+      },
+      {
+        name: "RocketMQ",
+        description: "RocketMQ 分布式消息中间件",
+        icon: "code",
+        theme: "pink",
+        parentID: 6,
+        sortOrder: 63,
+        isActive: 1,
+      },
+      {
+        name: "ActiveMQ",
+        description: "ActiveMQ 消息中间件",
+        icon: "code",
+        theme: "pink",
+        parentID: 6,
+        sortOrder: 64,
+        isActive: 1,
+      },
+      {
+        name: "消息模式",
+        description: "发布订阅、点对点等消息传递模式",
+        icon: "code",
+        theme: "pink",
+        parentID: 6,
+        sortOrder: 65,
+        isActive: 1,
+      },
+      {
+        name: "异步处理",
+        description: "异步消息处理、事件驱动架构等",
+        icon: "code",
+        theme: "pink",
+        parentID: 6,
+        sortOrder: 66,
+        isActive: 1,
+      },
 
-            { name: '基础数据结构', description: '数组、链表、栈、队列等基本数据结构', icon: 'code', theme: 'lime', parentID: 7, sortOrder: 71, isActive: 1 },
-            { name: '高级数据结构', description: '树、图、堆、哈希表等复杂数据结构', icon: 'code', theme: 'lime', parentID: 7, sortOrder: 72, isActive: 1 },
-            { name: '排序算法', description: '冒泡排序、快速排序、归并排序等排序算法', icon: 'code', theme: 'lime', parentID: 7, sortOrder: 73, isActive: 1 },
-            { name: '搜索算法', description: '二分搜索、深度优先搜索、广度优先搜索等', icon: 'code', theme: 'lime', parentID: 7, sortOrder: 74, isActive: 1 },
-            { name: '动态规划', description: '动态规划算法设计和应用', icon: 'code', theme: 'lime', parentID: 7, sortOrder: 75, isActive: 1 },
-            { name: '贪心算法', description: '贪心算法原理和实现', icon: 'code', theme: 'lime', parentID: 7, sortOrder: 76, isActive: 1 },
-            { name: '图算法', description: '最短路径、最小生成树等图算法', icon: 'code', theme: 'lime', parentID: 7, sortOrder: 77, isActive: 1 },
+      {
+        name: "基础数据结构",
+        description: "数组、链表、栈、队列等基本数据结构",
+        icon: "code",
+        theme: "lime",
+        parentID: 7,
+        sortOrder: 71,
+        isActive: 1,
+      },
+      {
+        name: "高级数据结构",
+        description: "树、图、堆、哈希表等复杂数据结构",
+        icon: "code",
+        theme: "lime",
+        parentID: 7,
+        sortOrder: 72,
+        isActive: 1,
+      },
+      {
+        name: "排序算法",
+        description: "冒泡排序、快速排序、归并排序等排序算法",
+        icon: "code",
+        theme: "lime",
+        parentID: 7,
+        sortOrder: 73,
+        isActive: 1,
+      },
+      {
+        name: "搜索算法",
+        description: "二分搜索、深度优先搜索、广度优先搜索等",
+        icon: "code",
+        theme: "lime",
+        parentID: 7,
+        sortOrder: 74,
+        isActive: 1,
+      },
+      {
+        name: "动态规划",
+        description: "动态规划算法设计和应用",
+        icon: "code",
+        theme: "lime",
+        parentID: 7,
+        sortOrder: 75,
+        isActive: 1,
+      },
+      {
+        name: "贪心算法",
+        description: "贪心算法原理和实现",
+        icon: "code",
+        theme: "lime",
+        parentID: 7,
+        sortOrder: 76,
+        isActive: 1,
+      },
+      {
+        name: "图算法",
+        description: "最短路径、最小生成树等图算法",
+        icon: "code",
+        theme: "lime",
+        parentID: 7,
+        sortOrder: 77,
+        isActive: 1,
+      },
 
-            { name: 'Docker', description: 'Docker 容器技术、镜像构建、容器管理等', icon: 'code', theme: 'sky', parentID: 8, sortOrder: 81, isActive: 1 },
-            { name: 'Kubernetes', description: 'Kubernetes 容器编排平台', icon: 'code', theme: 'sky', parentID: 8, sortOrder: 82, isActive: 1 },
-            { name: '容器编排', description: '容器集群管理、服务发现、负载均衡等', icon: 'code', theme: 'sky', parentID: 8, sortOrder: 83, isActive: 1 },
-            { name: '镜像优化', description: 'Docker 镜像优化、多阶段构建等', icon: 'code', theme: 'sky', parentID: 8, sortOrder: 84, isActive: 1 },
-            { name: '容器网络', description: '容器网络配置、网络模式等', icon: 'code', theme: 'sky', parentID: 8, sortOrder: 85, isActive: 1 },
-            { name: '容器存储', description: '容器数据持久化、存储卷管理等', icon: 'code', theme: 'sky', parentID: 8, sortOrder: 86, isActive: 1 },
+      {
+        name: "Docker",
+        description: "Docker 容器技术、镜像构建、容器管理等",
+        icon: "code",
+        theme: "sky",
+        parentID: 8,
+        sortOrder: 81,
+        isActive: 1,
+      },
+      {
+        name: "Kubernetes",
+        description: "Kubernetes 容器编排平台",
+        icon: "code",
+        theme: "sky",
+        parentID: 8,
+        sortOrder: 82,
+        isActive: 1,
+      },
+      {
+        name: "容器编排",
+        description: "容器集群管理、服务发现、负载均衡等",
+        icon: "code",
+        theme: "sky",
+        parentID: 8,
+        sortOrder: 83,
+        isActive: 1,
+      },
+      {
+        name: "镜像优化",
+        description: "Docker 镜像优化、多阶段构建等",
+        icon: "code",
+        theme: "sky",
+        parentID: 8,
+        sortOrder: 84,
+        isActive: 1,
+      },
+      {
+        name: "容器网络",
+        description: "容器网络配置、网络模式等",
+        icon: "code",
+        theme: "sky",
+        parentID: 8,
+        sortOrder: 85,
+        isActive: 1,
+      },
+      {
+        name: "容器存储",
+        description: "容器数据持久化、存储卷管理等",
+        icon: "code",
+        theme: "sky",
+        parentID: 8,
+        sortOrder: 86,
+        isActive: 1,
+      },
 
-            { name: '技术书籍', description: '技术书籍阅读笔记和总结', icon: 'code', theme: 'stone', parentID: 9, sortOrder: 91, isActive: 1 },
-            { name: '技术文档', description: '官方文档、API 文档学习', icon: 'code', theme: 'stone', parentID: 9, sortOrder: 92, isActive: 1 },
-            { name: '技术博客', description: '优秀技术博客文章分享', icon: 'code', theme: 'stone', parentID: 9, sortOrder: 93, isActive: 1 },
-            { name: '论文研究', description: '计算机科学论文阅读和研究', icon: 'code', theme: 'stone', parentID: 9, sortOrder: 94, isActive: false },
-            { name: '开源项目', description: '开源项目源码阅读和分析', icon: 'code', theme: 'stone', parentID: 9, sortOrder: 95, isActive: 1 },
+      {
+        name: "技术书籍",
+        description: "技术书籍阅读笔记和总结",
+        icon: "code",
+        theme: "stone",
+        parentID: 9,
+        sortOrder: 91,
+        isActive: 1,
+      },
+      {
+        name: "技术文档",
+        description: "官方文档、API 文档学习",
+        icon: "code",
+        theme: "stone",
+        parentID: 9,
+        sortOrder: 92,
+        isActive: 1,
+      },
+      {
+        name: "技术博客",
+        description: "优秀技术博客文章分享",
+        icon: "code",
+        theme: "stone",
+        parentID: 9,
+        sortOrder: 93,
+        isActive: 1,
+      },
+      {
+        name: "论文研究",
+        description: "计算机科学论文阅读和研究",
+        icon: "code",
+        theme: "stone",
+        parentID: 9,
+        sortOrder: 94,
+        isActive: 1,
+      },
+      {
+        name: "开源项目",
+        description: "开源项目源码阅读和分析",
+        icon: "code",
+        theme: "stone",
+        parentID: 9,
+        sortOrder: 95,
+        isActive: 1,
+      },
 
-            { name: '编辑器', description: 'VS Code、Vim、IntelliJ IDEA 等编辑器配置', icon: 'code', theme: 'zinc', parentID: 10, sortOrder: 101, isActive: 1 },
-            { name: '版本控制', description: 'Git 使用技巧、工作流程、团队协作等', icon: 'code', theme: 'zinc', parentID: 10, sortOrder: 102, isActive: 1 },
-            { name: '调试工具', description: '代码调试、性能分析、错误追踪等工具', icon: 'code', theme: 'zinc', parentID: 10, sortOrder: 103, isActive: 1 },
-            { name: '自动化工具', description: '代码生成、自动化测试、构建脚本等', icon: 'code', theme: 'zinc', parentID: 10, sortOrder: 104, isActive: 1 },
-            { name: '包管理', description: 'npm、yarn、pip 等包管理工具', icon: 'code', theme: 'zinc', parentID: 10, sortOrder: 105, isActive: 1 },
-            { name: '开发环境', description: '开发环境搭建、虚拟化、容器化等', icon: 'code', theme: 'zinc', parentID: 10, sortOrder: 106, isActive: 1 },
+      {
+        name: "编辑器",
+        description: "VS Code、Vim、IntelliJ IDEA 等编辑器配置",
+        icon: "code",
+        theme: "zinc",
+        parentID: 10,
+        sortOrder: 101,
+        isActive: 1,
+      },
+      {
+        name: "版本控制",
+        description: "Git 使用技巧、工作流程、团队协作等",
+        icon: "code",
+        theme: "zinc",
+        parentID: 10,
+        sortOrder: 102,
+        isActive: 1,
+      },
+      {
+        name: "调试工具",
+        description: "代码调试、性能分析、错误追踪等工具",
+        icon: "code",
+        theme: "zinc",
+        parentID: 10,
+        sortOrder: 103,
+        isActive: 1,
+      },
+      {
+        name: "自动化工具",
+        description: "代码生成、自动化测试、构建脚本等",
+        icon: "code",
+        theme: "zinc",
+        parentID: 10,
+        sortOrder: 104,
+        isActive: 1,
+      },
+      {
+        name: "包管理",
+        description: "npm、yarn、pip 等包管理工具",
+        icon: "code",
+        theme: "zinc",
+        parentID: 10,
+        sortOrder: 105,
+        isActive: 1,
+      },
+      {
+        name: "开发环境",
+        description: "开发环境搭建、虚拟化、容器化等",
+        icon: "code",
+        theme: "zinc",
+        parentID: 10,
+        sortOrder: 106,
+        isActive: 1,
+      },
 
-            { name: '全栈项目', description: '前后端完整项目开发经验', icon: 'code', theme: 'yellow', parentID: 11, sortOrder: 111, isActive: 1 },
-            { name: '企业项目', description: '企业级项目开发和管理经验', icon: 'code', theme: 'yellow', parentID: 11, sortOrder: 112, isActive: 1 },
-            { name: '开源贡献', description: '开源项目贡献、维护经验', icon: 'code', theme: 'yellow', parentID: 11, sortOrder: 113, isActive: 1 },
-            { name: '技术选型', description: '项目技术栈选择和架构设计', icon: 'code', theme: 'yellow', parentID: 11, sortOrder: 114, isActive: 1 },
-            { name: '项目管理', description: '项目进度管理、团队协作等', icon: 'code', theme: 'yellow', parentID: 11, sortOrder: 115, isActive: 1 },
-            { name: '问题解决', description: '项目开发中遇到的问题及解决方案', icon: 'code', theme: 'yellow', parentID: 11, sortOrder: 116, isActive: 1 },
+      {
+        name: "全栈项目",
+        description: "前后端完整项目开发经验",
+        icon: "code",
+        theme: "yellow",
+        parentID: 11,
+        sortOrder: 111,
+        isActive: 1,
+      },
+      {
+        name: "企业项目",
+        description: "企业级项目开发和管理经验",
+        icon: "code",
+        theme: "yellow",
+        parentID: 11,
+        sortOrder: 112,
+        isActive: 1,
+      },
+      {
+        name: "开源贡献",
+        description: "开源项目贡献、维护经验",
+        icon: "code",
+        theme: "yellow",
+        parentID: 11,
+        sortOrder: 113,
+        isActive: 1,
+      },
+      {
+        name: "技术选型",
+        description: "项目技术栈选择和架构设计",
+        icon: "code",
+        theme: "yellow",
+        parentID: 11,
+        sortOrder: 114,
+        isActive: 1,
+      },
+      {
+        name: "项目管理",
+        description: "项目进度管理、团队协作等",
+        icon: "code",
+        theme: "yellow",
+        parentID: 11,
+        sortOrder: 115,
+        isActive: 1,
+      },
+      {
+        name: "问题解决",
+        description: "项目开发中遇到的问题及解决方案",
+        icon: "code",
+        theme: "yellow",
+        parentID: 11,
+        sortOrder: 116,
+        isActive: 1,
+      },
 
-            { name: '前端面试', description: '前端技术面试题目、考察重点等', icon: 'code', theme: 'fuchsia', parentID: 12, sortOrder: 121, isActive: 1 },
-            { name: '后端面试', description: '后端技术面试、系统设计等', icon: 'code', theme: 'fuchsia', parentID: 12, sortOrder: 122, isActive: 1 },
-            { name: '算法面试', description: '算法题解析、刷题心得等', icon: 'code', theme: 'fuchsia', parentID: 12, sortOrder: 123, isActive: 1 },
-            { name: '系统设计', description: '系统设计面试、架构设计等', icon: 'code', theme: 'fuchsia', parentID: 12, sortOrder: 124, isActive: 1 },
-            { name: '求职经验', description: '求职流程、简历优化、职业规划等', icon: 'code', theme: 'fuchsia', parentID: 12, sortOrder: 125, isActive: 1 },
+      {
+        name: "前端面试",
+        description: "前端技术面试题目、考察重点等",
+        icon: "code",
+        theme: "fuchsia",
+        parentID: 12,
+        sortOrder: 121,
+        isActive: 1,
+      },
+      {
+        name: "后端面试",
+        description: "后端技术面试、系统设计等",
+        icon: "code",
+        theme: "fuchsia",
+        parentID: 12,
+        sortOrder: 122,
+        isActive: 1,
+      },
+      {
+        name: "算法面试",
+        description: "算法题解析、刷题心得等",
+        icon: "code",
+        theme: "fuchsia",
+        parentID: 12,
+        sortOrder: 123,
+        isActive: 1,
+      },
+      {
+        name: "系统设计",
+        description: "系统设计面试、架构设计等",
+        icon: "code",
+        theme: "fuchsia",
+        parentID: 12,
+        sortOrder: 124,
+        isActive: 1,
+      },
+      {
+        name: "求职经验",
+        description: "求职流程、简历优化、职业规划等",
+        icon: "code",
+        theme: "fuchsia",
+        parentID: 12,
+        sortOrder: 125,
+        isActive: 1,
+      },
 
-            { name: 'Web安全', description: 'Web 应用安全、漏洞防护等', icon: 'code', theme: 'neutral', parentID: 13, sortOrder: 131, isActive: 1 },
-            { name: '网络安全', description: '网络协议安全、防火墙配置等', icon: 'code', theme: 'neutral', parentID: 13, sortOrder: 132, isActive: 1 },
-            { name: '加密技术', description: '对称加密、非对称加密、数字签名等', icon: 'code', theme: 'neutral', parentID: 13, sortOrder: 133, isActive: 1 },
-            { name: '身份认证', description: 'OAuth、JWT、单点登录等认证技术', icon: 'code', theme: 'neutral', parentID: 13, sortOrder: 134, isActive: 1 },
-            { name: '安全测试', description: '渗透测试、安全扫描、漏洞评估等', icon: 'code', theme: 'neutral', parentID: 13, sortOrder: 135, isActive: 1 },
-            { name: '安全编码', description: '安全编码规范、代码审计等', icon: 'code', theme: 'neutral', parentID: 13, sortOrder: 136, isActive: 1 },
+      {
+        name: "Web安全",
+        description: "Web 应用安全、漏洞防护等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 13,
+        sortOrder: 131,
+        isActive: 1,
+      },
+      {
+        name: "网络安全",
+        description: "网络协议安全、防火墙配置等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 13,
+        sortOrder: 132,
+        isActive: 1,
+      },
+      {
+        name: "加密技术",
+        description: "对称加密、非对称加密、数字签名等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 13,
+        sortOrder: 133,
+        isActive: 1,
+      },
+      {
+        name: "身份认证",
+        description: "OAuth、JWT、单点登录等认证技术",
+        icon: "code",
+        theme: "neutral",
+        parentID: 13,
+        sortOrder: 134,
+        isActive: 1,
+      },
+      {
+        name: "安全测试",
+        description: "渗透测试、安全扫描、漏洞评估等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 13,
+        sortOrder: 135,
+        isActive: 1,
+      },
+      {
+        name: "安全编码",
+        description: "安全编码规范、代码审计等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 13,
+        sortOrder: 136,
+        isActive: 1,
+      },
 
-            { name: 'CI/CD', description: '持续集成、持续部署流程和工具', icon: 'code', theme: 'gray', parentID: 14, sortOrder: 141, isActive: 1 },
-            { name: '自动化部署', description: '自动化部署策略和实现', icon: 'code', theme: 'gray', parentID: 14, sortOrder: 142, isActive: 1 },
-            { name: '监控告警', description: '系统监控、日志分析、告警机制等', icon: 'code', theme: 'gray', parentID: 14, sortOrder: 143, isActive: 1 },
-            { name: '基础设施', description: '基础设施即代码、云平台管理等', icon: 'code', theme: 'gray', parentID: 14, sortOrder: 144, isActive: 1 },
-            { name: '配置管理', description: '配置文件管理、环境配置等', icon: 'code', theme: 'gray', parentID: 14, sortOrder: 145, isActive: 1 },
-            { name: '发布策略', description: '蓝绿部署、灰度发布、回滚策略等', icon: 'code', theme: 'gray', parentID: 14, sortOrder: 146, isActive: 1 },
+      {
+        name: "CI/CD",
+        description: "持续集成、持续部署流程和工具",
+        icon: "code",
+        theme: "gray",
+        parentID: 14,
+        sortOrder: 141,
+        isActive: 1,
+      },
+      {
+        name: "自动化部署",
+        description: "自动化部署策略和实现",
+        icon: "code",
+        theme: "gray",
+        parentID: 14,
+        sortOrder: 142,
+        isActive: 1,
+      },
+      {
+        name: "监控告警",
+        description: "系统监控、日志分析、告警机制等",
+        icon: "code",
+        theme: "gray",
+        parentID: 14,
+        sortOrder: 143,
+        isActive: 1,
+      },
+      {
+        name: "基础设施",
+        description: "基础设施即代码、云平台管理等",
+        icon: "code",
+        theme: "gray",
+        parentID: 14,
+        sortOrder: 144,
+        isActive: 1,
+      },
+      {
+        name: "配置管理",
+        description: "配置文件管理、环境配置等",
+        icon: "code",
+        theme: "gray",
+        parentID: 14,
+        sortOrder: 145,
+        isActive: 1,
+      },
+      {
+        name: "发布策略",
+        description: "蓝绿部署、灰度发布、回滚策略等",
+        icon: "code",
+        theme: "gray",
+        parentID: 14,
+        sortOrder: 146,
+        isActive: 1,
+      },
 
-            { name: '操作系统', description: 'Linux、Windows 等操作系统原理', icon: 'code', theme: 'blue', parentID: 15, sortOrder: 151, isActive: 1 },
-            { name: '计算机网络', description: '网络协议、TCP/IP、HTTP 等网络技术', icon: 'code', theme: 'blue', parentID: 15, sortOrder: 152, isActive: 1 },
-            { name: '系统编程', description: '系统调用、进程管理、内存管理等', icon: 'code', theme: 'blue', parentID: 15, sortOrder: 153, isActive: 1 },
-            { name: '并发编程', description: '多线程、多进程、协程等并发技术', icon: 'code', theme: 'blue', parentID: 15, sortOrder: 154, isActive: 1 },
-            { name: '编译原理', description: '编译器设计、词法分析、语法分析等', icon: 'code', theme: 'blue', parentID: 15, sortOrder: 155, isActive: 1 },
-            { name: '计算机组成', description: 'CPU、内存、存储等硬件原理', icon: 'code', theme: 'blue', parentID: 15, sortOrder: 156, isActive: 1 },
+      {
+        name: "操作系统",
+        description: "Linux、Windows 等操作系统原理",
+        icon: "code",
+        theme: "blue",
+        parentID: 15,
+        sortOrder: 151,
+        isActive: 1,
+      },
+      {
+        name: "计算机网络",
+        description: "网络协议、TCP/IP、HTTP 等网络技术",
+        icon: "code",
+        theme: "blue",
+        parentID: 15,
+        sortOrder: 152,
+        isActive: 1,
+      },
+      {
+        name: "系统编程",
+        description: "系统调用、进程管理、内存管理等",
+        icon: "code",
+        theme: "blue",
+        parentID: 15,
+        sortOrder: 153,
+        isActive: 1,
+      },
+      {
+        name: "并发编程",
+        description: "多线程、多进程、协程等并发技术",
+        icon: "code",
+        theme: "blue",
+        parentID: 15,
+        sortOrder: 154,
+        isActive: 1,
+      },
+      {
+        name: "编译原理",
+        description: "编译器设计、词法分析、语法分析等",
+        icon: "code",
+        theme: "blue",
+        parentID: 15,
+        sortOrder: 155,
+        isActive: 1,
+      },
+      {
+        name: "计算机组成",
+        description: "CPU、内存、存储等硬件原理",
+        icon: "code",
+        theme: "blue",
+        parentID: 15,
+        sortOrder: 156,
+        isActive: 1,
+      },
 
-            { name: 'HTTP协议', description: 'HTTP/HTTPS 协议原理和应用', icon: 'code', theme: 'purple', parentID: 16, sortOrder: 161, isActive: 1 },
-            { name: 'TCP/IP', description: 'TCP/IP 协议栈、网络编程等', icon: 'code', theme: 'purple', parentID: 16, sortOrder: 162, isActive: 1 },
-            { name: 'WebSocket', description: 'WebSocket 实时通信技术', icon: 'code', theme: 'purple', parentID: 16, sortOrder: 163, isActive: 1 },
-            { name: '网络编程', description: 'Socket 编程、网络 API 等', icon: 'code', theme: 'purple', parentID: 16, sortOrder: 164, isActive: 1 },
-            { name: '网络优化', description: '网络性能优化、CDN 等', icon: 'code', theme: 'purple', parentID: 16, sortOrder: 165, isActive: 1 },
-            { name: '网络协议', description: 'DNS、DHCP 等网络协议', icon: 'code', theme: 'purple', parentID: 16, sortOrder: 166, isActive: 1 },
+      {
+        name: "HTTP协议",
+        description: "HTTP/HTTPS 协议原理和应用",
+        icon: "code",
+        theme: "purple",
+        parentID: 16,
+        sortOrder: 161,
+        isActive: 1,
+      },
+      {
+        name: "TCP/IP",
+        description: "TCP/IP 协议栈、网络编程等",
+        icon: "code",
+        theme: "purple",
+        parentID: 16,
+        sortOrder: 162,
+        isActive: 1,
+      },
+      {
+        name: "WebSocket",
+        description: "WebSocket 实时通信技术",
+        icon: "code",
+        theme: "purple",
+        parentID: 16,
+        sortOrder: 163,
+        isActive: 1,
+      },
+      {
+        name: "网络编程",
+        description: "Socket 编程、网络 API 等",
+        icon: "code",
+        theme: "purple",
+        parentID: 16,
+        sortOrder: 164,
+        isActive: 1,
+      },
+      {
+        name: "网络优化",
+        description: "网络性能优化、CDN 等",
+        icon: "code",
+        theme: "purple",
+        parentID: 16,
+        sortOrder: 165,
+        isActive: 1,
+      },
+      {
+        name: "网络协议",
+        description: "DNS、DHCP 等网络协议",
+        icon: "code",
+        theme: "purple",
+        parentID: 16,
+        sortOrder: 166,
+        isActive: 1,
+      },
 
-            { name: '系统架构', description: '系统整体架构设计和规划', icon: 'code', theme: 'green', parentID: 17, sortOrder: 171, isActive: 1 },
-            { name: '设计模式', description: '常用设计模式的理论和实践', icon: 'code', theme: 'green', parentID: 17, sortOrder: 172, isActive: 1 },
-            { name: '分布式架构', description: '分布式系统设计和实现', icon: 'code', theme: 'green', parentID: 17, sortOrder: 173, isActive: 1 },
-            { name: '高可用设计', description: '系统高可用性、容错设计等', icon: 'code', theme: 'green', parentID: 17, sortOrder: 174, isActive: 1 },
-            { name: '可扩展性', description: '系统扩展性设计、负载均衡等', icon: 'code', theme: 'green', parentID: 17, sortOrder: 175, isActive: 1 },
-            { name: '领域驱动', description: '领域驱动设计（DDD）理论和实践', icon: 'code', theme: 'green', parentID: 17, sortOrder: 176, isActive: 1 },
+      {
+        name: "系统架构",
+        description: "系统整体架构设计和规划",
+        icon: "code",
+        theme: "green",
+        parentID: 17,
+        sortOrder: 171,
+        isActive: 1,
+      },
+      {
+        name: "设计模式",
+        description: "常用设计模式的理论和实践",
+        icon: "code",
+        theme: "green",
+        parentID: 17,
+        sortOrder: 172,
+        isActive: 1,
+      },
+      {
+        name: "分布式架构",
+        description: "分布式系统设计和实现",
+        icon: "code",
+        theme: "green",
+        parentID: 17,
+        sortOrder: 173,
+        isActive: 1,
+      },
+      {
+        name: "高可用设计",
+        description: "系统高可用性、容错设计等",
+        icon: "code",
+        theme: "green",
+        parentID: 17,
+        sortOrder: 174,
+        isActive: 1,
+      },
+      {
+        name: "可扩展性",
+        description: "系统扩展性设计、负载均衡等",
+        icon: "code",
+        theme: "green",
+        parentID: 17,
+        sortOrder: 175,
+        isActive: 1,
+      },
+      {
+        name: "领域驱动",
+        description: "领域驱动设计（DDD）理论和实践",
+        icon: "code",
+        theme: "green",
+        parentID: 17,
+        sortOrder: 176,
+        isActive: 1,
+      },
 
-            { name: '前端优化', description: '前端性能优化、资源优化等', icon: 'code', theme: 'amber', parentID: 18, sortOrder: 181, isActive: 1 },
-            { name: '后端优化', description: '后端性能优化、数据库优化等', icon: 'code', theme: 'amber', parentID: 18, sortOrder: 182, isActive: 1 },
-            { name: '数据库优化', description: 'SQL 优化、索引优化、查询优化等', icon: 'code', theme: 'amber', parentID: 18, sortOrder: 183, isActive: 1 },
-            { name: '缓存优化', description: '缓存策略、缓存穿透、缓存更新等', icon: 'code', theme: 'amber', parentID: 18, sortOrder: 184, isActive: 1 },
-            { name: '网络优化', description: '网络传输优化、压缩、CDN 等', icon: 'code', theme: 'amber', parentID: 18, sortOrder: 185, isActive: 1 },
-            { name: '代码优化', description: '代码性能优化、算法优化等', icon: 'code', theme: 'amber', parentID: 18, sortOrder: 186, isActive: 1 },
+      {
+        name: "前端优化",
+        description: "前端性能优化、资源优化等",
+        icon: "code",
+        theme: "amber",
+        parentID: 18,
+        sortOrder: 181,
+        isActive: 1,
+      },
+      {
+        name: "后端优化",
+        description: "后端性能优化、数据库优化等",
+        icon: "code",
+        theme: "amber",
+        parentID: 18,
+        sortOrder: 182,
+        isActive: 1,
+      },
+      {
+        name: "数据库优化",
+        description: "SQL 优化、索引优化、查询优化等",
+        icon: "code",
+        theme: "amber",
+        parentID: 18,
+        sortOrder: 183,
+        isActive: 1,
+      },
+      {
+        name: "缓存优化",
+        description: "缓存策略、缓存穿透、缓存更新等",
+        icon: "code",
+        theme: "amber",
+        parentID: 18,
+        sortOrder: 184,
+        isActive: 1,
+      },
+      {
+        name: "网络优化",
+        description: "网络传输优化、压缩、CDN 等",
+        icon: "code",
+        theme: "amber",
+        parentID: 18,
+        sortOrder: 185,
+        isActive: 1,
+      },
+      {
+        name: "代码优化",
+        description: "代码性能优化、算法优化等",
+        icon: "code",
+        theme: "amber",
+        parentID: 18,
+        sortOrder: 186,
+        isActive: 1,
+      },
 
-            { name: '单元测试', description: '单元测试框架、测试用例设计等', icon: 'code', theme: 'rose', parentID: 19, sortOrder: 191, isActive: 1 },
-            { name: '集成测试', description: '集成测试策略和实现', icon: 'code', theme: 'rose', parentID: 19, sortOrder: 192, isActive: 1 },
-            { name: '端到端测试', description: 'E2E 测试、自动化测试等', icon: 'code', theme: 'rose', parentID: 19, sortOrder: 193, isActive: 1 },
-            { name: '性能测试', description: '负载测试、压力测试、性能分析等', icon: 'code', theme: 'rose', parentID: 19, sortOrder: 194, isActive: 1 },
-            { name: '测试框架', description: 'Jest、Cypress、Selenium 等测试框架', icon: 'code', theme: 'rose', parentID: 19, sortOrder: 195, isActive: 1 },
-            { name: '测试策略', description: '测试计划、测试覆盖率、测试自动化等', icon: 'code', theme: 'rose', parentID: 19, sortOrder: 196, isActive: 1 },
+      {
+        name: "单元测试",
+        description: "单元测试框架、测试用例设计等",
+        icon: "code",
+        theme: "rose",
+        parentID: 19,
+        sortOrder: 191,
+        isActive: 1,
+      },
+      {
+        name: "集成测试",
+        description: "集成测试策略和实现",
+        icon: "code",
+        theme: "rose",
+        parentID: 19,
+        sortOrder: 192,
+        isActive: 1,
+      },
+      {
+        name: "端到端测试",
+        description: "E2E 测试、自动化测试等",
+        icon: "code",
+        theme: "rose",
+        parentID: 19,
+        sortOrder: 193,
+        isActive: 1,
+      },
+      {
+        name: "性能测试",
+        description: "负载测试、压力测试、性能分析等",
+        icon: "code",
+        theme: "rose",
+        parentID: 19,
+        sortOrder: 194,
+        isActive: 1,
+      },
+      {
+        name: "测试框架",
+        description: "Jest、Cypress、Selenium 等测试框架",
+        icon: "code",
+        theme: "rose",
+        parentID: 19,
+        sortOrder: 195,
+        isActive: 1,
+      },
+      {
+        name: "测试策略",
+        description: "测试计划、测试覆盖率、测试自动化等",
+        icon: "code",
+        theme: "rose",
+        parentID: 19,
+        sortOrder: 196,
+        isActive: 1,
+      },
 
-            { name: '服务器管理', description: 'Linux 服务器配置、管理、维护等', icon: 'code', theme: 'indigo', parentID: 20, sortOrder: 201, isActive: 1 },
-            { name: '云平台', description: 'AWS、阿里云、腾讯云等云平台使用', icon: 'code', theme: 'indigo', parentID: 20, sortOrder: 202, isActive: 1 },
-            { name: '监控运维', description: '系统监控、日志管理、故障排查等', icon: 'code', theme: 'indigo', parentID: 20, sortOrder: 203, isActive: 1 },
-            { name: '备份恢复', description: '数据备份、灾难恢复、高可用等', icon: 'code', theme: 'indigo', parentID: 20, sortOrder: 204, isActive: 1 },
-            { name: '网络运维', description: '网络配置、防火墙、负载均衡等', icon: 'code', theme: 'indigo', parentID: 20, sortOrder: 205, isActive: 1 },
-            { name: '自动化运维', description: '运维自动化、脚本编写、工具使用等', icon: 'code', theme: 'indigo', parentID: 20, sortOrder: 206, isActive: 1 },
+      {
+        name: "服务器管理",
+        description: "Linux 服务器配置、管理、维护等",
+        icon: "code",
+        theme: "indigo",
+        parentID: 20,
+        sortOrder: 201,
+        isActive: 1,
+      },
+      {
+        name: "云平台",
+        description: "AWS、阿里云、腾讯云等云平台使用",
+        icon: "code",
+        theme: "indigo",
+        parentID: 20,
+        sortOrder: 202,
+        isActive: 1,
+      },
+      {
+        name: "监控运维",
+        description: "系统监控、日志管理、故障排查等",
+        icon: "code",
+        theme: "indigo",
+        parentID: 20,
+        sortOrder: 203,
+        isActive: 1,
+      },
+      {
+        name: "备份恢复",
+        description: "数据备份、灾难恢复、高可用等",
+        icon: "code",
+        theme: "indigo",
+        parentID: 20,
+        sortOrder: 204,
+        isActive: 1,
+      },
+      {
+        name: "网络运维",
+        description: "网络配置、防火墙、负载均衡等",
+        icon: "code",
+        theme: "indigo",
+        parentID: 20,
+        sortOrder: 205,
+        isActive: 1,
+      },
+      {
+        name: "自动化运维",
+        description: "运维自动化、脚本编写、工具使用等",
+        icon: "code",
+        theme: "indigo",
+        parentID: 20,
+        sortOrder: 206,
+        isActive: 1,
+      },
 
-            { name: '机器学习', description: '机器学习算法、模型训练等', icon: 'code', theme: 'teal', parentID: 21, sortOrder: 211, isActive: 1 },
-            { name: '深度学习', description: '神经网络、深度学习框架等', icon: 'code', theme: 'teal', parentID: 21, sortOrder: 212, isActive: 1 },
-            { name: '自然语言处理', description: 'NLP 技术、文本分析、语言模型等', icon: 'code', theme: 'teal', parentID: 21, sortOrder: 213, isActive: 1 },
-            { name: '计算机视觉', description: '图像处理、目标检测、图像识别等', icon: 'code', theme: 'teal', parentID: 21, sortOrder: 214, isActive: 1 },
-            { name: 'AI框架', description: 'TensorFlow、PyTorch 等 AI 开发框架', icon: 'code', theme: 'teal', parentID: 21, sortOrder: 215, isActive: 1 },
-            { name: '数据科学', description: '数据分析、数据挖掘、统计学习等', icon: 'code', theme: 'teal', parentID: 21, sortOrder: 216, isActive: 1 },
+      {
+        name: "机器学习",
+        description: "机器学习算法、模型训练等",
+        icon: "code",
+        theme: "teal",
+        parentID: 21,
+        sortOrder: 211,
+        isActive: 1,
+      },
+      {
+        name: "深度学习",
+        description: "神经网络、深度学习框架等",
+        icon: "code",
+        theme: "teal",
+        parentID: 21,
+        sortOrder: 212,
+        isActive: 1,
+      },
+      {
+        name: "自然语言处理",
+        description: "NLP 技术、文本分析、语言模型等",
+        icon: "code",
+        theme: "teal",
+        parentID: 21,
+        sortOrder: 213,
+        isActive: 1,
+      },
+      {
+        name: "计算机视觉",
+        description: "图像处理、目标检测、图像识别等",
+        icon: "code",
+        theme: "teal",
+        parentID: 21,
+        sortOrder: 214,
+        isActive: 1,
+      },
+      {
+        name: "AI框架",
+        description: "TensorFlow、PyTorch 等 AI 开发框架",
+        icon: "code",
+        theme: "teal",
+        parentID: 21,
+        sortOrder: 215,
+        isActive: 1,
+      },
+      {
+        name: "数据科学",
+        description: "数据分析、数据挖掘、统计学习等",
+        icon: "code",
+        theme: "teal",
+        parentID: 21,
+        sortOrder: 216,
+        isActive: 1,
+      },
 
-            { name: '服务拆分', description: '微服务拆分策略、领域划分等', icon: 'code', theme: 'slate', parentID: 22, sortOrder: 221, isActive: 1 },
-            { name: '服务治理', description: '服务注册、服务发现、配置管理等', icon: 'code', theme: 'slate', parentID: 22, sortOrder: 222, isActive: 1 },
-            { name: 'API网关', description: 'API 网关设计、路由、限流等', icon: 'code', theme: 'slate', parentID: 22, sortOrder: 223, isActive: 1 },
-            { name: '分布式事务', description: '分布式事务处理、一致性保证等', icon: 'code', theme: 'slate', parentID: 22, sortOrder: 224, isActive: 1 },
-            { name: '服务通信', description: 'gRPC、REST、消息队列等通信方式', icon: 'code', theme: 'slate', parentID: 22, sortOrder: 225, isActive: 1 },
-            { name: '服务监控', description: '微服务监控、链路追踪、日志聚合等', icon: 'code', theme: 'slate', parentID: 22, sortOrder: 226, isActive: 1 },
+      {
+        name: "服务拆分",
+        description: "微服务拆分策略、领域划分等",
+        icon: "code",
+        theme: "slate",
+        parentID: 22,
+        sortOrder: 221,
+        isActive: 1,
+      },
+      {
+        name: "服务治理",
+        description: "服务注册、服务发现、配置管理等",
+        icon: "code",
+        theme: "slate",
+        parentID: 22,
+        sortOrder: 222,
+        isActive: 1,
+      },
+      {
+        name: "API网关",
+        description: "API 网关设计、路由、限流等",
+        icon: "code",
+        theme: "slate",
+        parentID: 22,
+        sortOrder: 223,
+        isActive: 1,
+      },
+      {
+        name: "分布式事务",
+        description: "分布式事务处理、一致性保证等",
+        icon: "code",
+        theme: "slate",
+        parentID: 22,
+        sortOrder: 224,
+        isActive: 1,
+      },
+      {
+        name: "服务通信",
+        description: "gRPC、REST、消息队列等通信方式",
+        icon: "code",
+        theme: "slate",
+        parentID: 22,
+        sortOrder: 225,
+        isActive: 1,
+      },
+      {
+        name: "服务监控",
+        description: "微服务监控、链路追踪、日志聚合等",
+        icon: "code",
+        theme: "slate",
+        parentID: 22,
+        sortOrder: 226,
+        isActive: 1,
+      },
 
-            { name: '技术趋势', description: '新技术探索、行业趋势分析等', icon: 'code', theme: 'neutral', parentID: 23, sortOrder: 231, isActive: 1 },
-            { name: '职业发展', description: '技术职业规划、技能提升等', icon: 'code', theme: 'neutral', parentID: 23, sortOrder: 232, isActive: 1 },
-            { name: '团队协作', description: '团队管理、代码规范、协作工具等', icon: 'code', theme: 'neutral', parentID: 23, sortOrder: 233, isActive: 1 },
-            { name: '技术分享', description: '技术演讲、知识分享、社区参与等', icon: 'code', theme: 'neutral', parentID: 23, sortOrder: 234, isActive: 1 },
-            { name: '工具推荐', description: '开发工具、效率工具、软件推荐等', icon: 'code', theme: 'neutral', parentID: 23, sortOrder: 235, isActive: 1 },
-            { name: '学习方法', description: '技术学习方法、学习资源推荐等', icon: 'code', theme: 'neutral', parentID: 23, sortOrder: 236, isActive: 1 }
-        ];
+      {
+        name: "技术趋势",
+        description: "新技术探索、行业趋势分析等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 23,
+        sortOrder: 231,
+        isActive: 1,
+      },
+      {
+        name: "职业发展",
+        description: "技术职业规划、技能提升等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 23,
+        sortOrder: 232,
+        isActive: 1,
+      },
+      {
+        name: "团队协作",
+        description: "团队管理、代码规范、协作工具等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 23,
+        sortOrder: 233,
+        isActive: 1,
+      },
+      {
+        name: "技术分享",
+        description: "技术演讲、知识分享、社区参与等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 23,
+        sortOrder: 234,
+        isActive: 1,
+      },
+      {
+        name: "工具推荐",
+        description: "开发工具、效率工具、软件推荐等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 23,
+        sortOrder: 235,
+        isActive: 1,
+      },
+      {
+        name: "学习方法",
+        description: "技术学习方法、学习资源推荐等",
+        icon: "code",
+        theme: "neutral",
+        parentID: 23,
+        sortOrder: 236,
+        isActive: 1,
+      },
+    ];
 
-        // 存储创建的分类ID映射
-        const categoryIdMap = new Map();
+    // 存储创建的分类ID映射
+    const categoryIdMap = new Map();
 
-        function log (message, type = 'info') {
-            const logs = document.getElementById('logs');
-            const timestamp = new Date().toLocaleTimeString();
-            const colorClass = {
-                'info': 'text-blue-600',
-                'success': 'text-green-600',
-                'error': 'text-red-600',
-                'warning': 'text-yellow-600'
-            }[type] || 'text-gray-600';
+    function log(message, type = "info") {
+      const logs = document.getElementById("logs");
+      const timestamp = new Date().toLocaleTimeString();
+      const colorClass =
+        {
+          info: "text-blue-600",
+          success: "text-green-600",
+          error: "text-red-600",
+          warning: "text-yellow-600",
+        }[type] || "text-gray-600";
 
-            logs.innerHTML += `<div class="${colorClass} mb-1">[${timestamp}] ${message}</div>`;
-            logs.scrollTop = logs.scrollHeight;
+      logs.innerHTML += `<div class="${colorClass} mb-1">[${timestamp}] ${message}</div>`;
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function clearLogs() {
+      document.getElementById("logs").innerHTML =
+        '<div class="text-gray-500">日志已清空...</div>';
+    }
+
+    function updateProgress(current, total) {
+      const progress = document.getElementById("progress");
+      const progressBar = document.getElementById("progressBar");
+      const percentage = total > 0 ? (current / total) * 100 : 0;
+
+      progress.textContent = `${current}/${total}`;
+      progressBar.style.width = `${percentage}%`;
+    }
+
+    async function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const statusDiv = document.getElementById("loginStatus");
+
+      if (!username || !password) {
+        statusDiv.innerHTML =
+          '<div class="text-red-600 text-sm">请输入用户名和密码</div>';
+        return;
+      }
+
+      try {
+        log("正在登录...", "info");
+        const response = await axios.post(
+          `${API_BASE}/v1/system/auth/login`,
+          {
+            username: username,
+            password: password,
+          }
+        );
+
+        if (response.data && response.data.token) {
+          authToken = response.data.token;
+          statusDiv.innerHTML =
+            '<div class="text-green-600 text-sm">登录成功</div>';
+          document.getElementById("operationSection").style.display = "block";
+          log("登录成功，获取到认证令牌", "success");
+        } else {
+          throw new Error("登录响应格式错误");
         }
+      } catch (error) {
+        const errorMsg =
+          error.response?.data?.message || error.message || "登录失败";
+        statusDiv.innerHTML = `<div class="text-red-600 text-sm">${errorMsg}</div>`;
+        log(`登录失败: ${errorMsg}`, "error");
+      }
+    }
 
-        function clearLogs () {
-            document.getElementById('logs').innerHTML = '<div class="text-gray-500">日志已清空...</div>';
+    async function createCategory(categoryData) {
+      try {
+        const response = await axios.post(
+          `${API_BASE}/v1/system/categories`,
+          categoryData,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.data && response.data.categoryID) {
+          categoryIdMap.set(categoryData.name, response.data.categoryID);
+          log(
+            `✓ 创建分类成功: ${categoryData.name} (ID: ${response.data.categoryID})`,
+            "success"
+          );
+          return response.data.categoryID;
+        } else {
+          throw new Error("创建响应格式错误");
         }
+      } catch (error) {
+        const errorMsg =
+          error.response?.data?.message || error.message || "创建失败";
+        log(`✗ 创建分类失败: ${categoryData.name} - ${errorMsg}`, "error");
+        throw error;
+      }
+    }
 
-        function updateProgress (current, total) {
-            const progress = document.getElementById('progress');
-            const progressBar = document.getElementById('progressBar');
-            const percentage = total > 0 ? (current / total) * 100 : 0;
+    async function createPrimaryCategories() {
+      if (!authToken) {
+        log("请先登录", "error");
+        return;
+      }
 
-            progress.textContent = `${current}/${total}`;
-            progressBar.style.width = `${percentage}%`;
+      log("开始创建一级分类...", "info");
+      updateProgress(0, categories.length);
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < categories.length; i++) {
+        const category = categories[i];
+        try {
+          await createCategory(category);
+          successCount++;
+        } catch (error) {
+          failCount++;
         }
+        updateProgress(i + 1, categories.length);
+      }
 
-        async function login () {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const statusDiv = document.getElementById('loginStatus');
+      log(
+        `一级分类创建完成: 成功 ${successCount} 个，失败 ${failCount} 个`,
+        successCount === categories.length ? "success" : "warning"
+      );
+    }
 
-            if (!username || !password) {
-                statusDiv.innerHTML = '<div class="text-red-600 text-sm">请输入用户名和密码</div>';
-                return;
-            }
+    async function createAllCategories() {
+      if (!authToken) {
+        log("请先登录", "error");
+        return;
+      }
 
-            try {
-                log('正在登录...', 'info');
-                const response = await axios.post(`${API_BASE}/v1/system/auth/login`, {
-                    username: username,
-                    password: password
-                });
+      log("开始批量创建所有分类...", "info");
 
-                if (response.data && response.data.token) {
-                    authToken = response.data.token;
-                    statusDiv.innerHTML = '<div class="text-green-600 text-sm">登录成功</div>';
-                    document.getElementById('operationSection').style.display = 'block';
-                    log('登录成功，获取到认证令牌', 'success');
-                } else {
-                    throw new Error('登录响应格式错误');
-                }
-            } catch (error) {
-                const errorMsg = error.response?.data?.message || error.message || '登录失败';
-                statusDiv.innerHTML = `<div class="text-red-600 text-sm">${errorMsg}</div>`;
-                log(`登录失败: ${errorMsg}`, 'error');
-            }
-        }
+      // 先创建一级分类
+      await createPrimaryCategories();
 
-        async function createCategory (categoryData) {
-            try {
-                const response = await axios.post(`${API_BASE}/v1/system/categories`, categoryData, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+      log("所有分类创建完成！", "success");
+    }
 
-                if (response.data && response.data.id) {
-                    categoryIdMap.set(categoryData.name, response.data.id);
-                    log(`✓ 创建分类成功: ${categoryData.name} (ID: ${response.data.id})`, 'success');
-                    return response.data.id;
-                } else {
-                    throw new Error('创建响应格式错误');
-                }
-            } catch (error) {
-                const errorMsg = error.response?.data?.message || error.message || '创建失败';
-                log(`✗ 创建分类失败: ${categoryData.name} - ${errorMsg}`, 'error');
-                throw error;
-            }
-        }
-
-        async function createPrimaryCategories () {
-            if (!authToken) {
-                log('请先登录', 'error');
-                return;
-            }
-
-            log('开始创建一级分类...', 'info');
-            updateProgress(0, categories.length);
-
-            let successCount = 0;
-            let failCount = 0;
-
-            for (let i = 0; i < categories.length; i++) {
-                const category = categories[i];
-                try {
-                    await createCategory(category);
-                    successCount++;
-                } catch (error) {
-                    failCount++;
-                }
-                updateProgress(i + 1, categories.length);
-            }
-
-            log(`一级分类创建完成: 成功 ${successCount} 个，失败 ${failCount} 个`, successCount === categories.length ? 'success' : 'warning');
-        }
-
-        async function createAllCategories () {
-            if (!authToken) {
-                log('请先登录', 'error');
-                return;
-            }
-
-            log('开始批量创建所有分类...', 'info');
-
-            // 先创建一级分类
-            await createPrimaryCategories();
-
-            log('所有分类创建完成！', 'success');
-        }
-
-        // 页面加载完成后的初始化
-        document.addEventListener('DOMContentLoaded', function () {
-            log('页面加载完成，请先登录后再进行操作', 'info');
-        });
-    </script>
+    // 页面加载完成后的初始化
+    document.addEventListener("DOMContentLoaded", function () {
+      log("页面加载完成，请先登录后再进行操作", "info");
+    });
+  </script>
 </body>
 
 </html>
