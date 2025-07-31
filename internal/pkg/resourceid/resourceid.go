@@ -16,6 +16,10 @@ const (
 	UserID ResourceID = "user"
 	// PostID 定义博文资源标识符.
 	PostID ResourceID = "post"
+	// CategoryID 定义分类资源标识符.
+	CategoryID ResourceID = "category"
+	// TagID 定义标签资源标识符.
+	TagID ResourceID = "tag"
 )
 
 // String 将资源标识符转换为字符串.

@@ -20,6 +20,7 @@ const TableNameTagM = "tag"
 // TagM 标签表
 type TagM struct {
 	ID        int32          `gorm:"column:id;primaryKey;autoIncrement:true;comment:标签ID" json:"id"`             // 标签ID
+	TagID     string         `gorm:"column:tag_id;not null;comment:标签ID" json:"tag_id"`                          // 标签ID
 	Name      string         `gorm:"column:name;not null;uniqueIndex:uk_tag_name;comment:标签名称" json:"name"`      // 标签名称
 	Color     *string        `gorm:"column:color;default:#007bff;comment:标签颜色(hex 格式)" json:"color"`             // 标签颜色(hex 格式)
 	CreatedAt *time.Time     `gorm:"column:created_at;default:current_timestamp;comment:创建时间" json:"created_at"` // 创建时间

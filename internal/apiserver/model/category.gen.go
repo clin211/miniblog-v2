@@ -20,11 +20,14 @@ const TableNameCategoryM = "category"
 // CategoryM 分类表
 type CategoryM struct {
 	ID          int32          `gorm:"column:id;primaryKey;autoIncrement:true;comment:分类ID" json:"id"`              // 分类ID
+	CategoryID  string         `gorm:"column:category_id;not null;comment:分类ID" json:"category_id"`                 // 分类ID
 	Name        string         `gorm:"column:name;not null;comment:分类名称" json:"name"`                               // 分类名称
 	Description *string        `gorm:"column:description;comment:分类描述" json:"description"`                          // 分类描述
-	ParentID    *int32         `gorm:"column:parent_id;index:idx_parent_id;comment:父分类ID，0表示顶级分类" json:"parent_id"` // 父分类ID，0表示顶级分类
+	Icon        string         `gorm:"column:icon;not null;comment:分类图标" json:"icon"`                               // 分类图标
+	Theme       string         `gorm:"column:theme;not null;comment:分类主题" json:"theme"`                             // 分类主题
+	ParentID    *int32         `gorm:"column:parent_id;index:idx_parent_id;comment:父分类ID,0表示顶级分类" json:"parent_id"` // 父分类ID,0表示顶级分类
 	SortOrder   *int32         `gorm:"column:sort_order;index:idx_sort_order;comment:排序值" json:"sort_order"`        // 排序值
-	IsActive    *int32         `gorm:"column:is_active;default:1;comment:是否激活；1-激活,0-禁用" json:"is_active"`          // 是否激活；1-激活,0-禁用
+	IsActive    *int32         `gorm:"column:is_active;default:1;comment:是否激活;1-激活,0-禁用" json:"is_active"`          // 是否激活;1-激活,0-禁用
 	CreatedAt   *time.Time     `gorm:"column:created_at;default:current_timestamp;comment:创建时间" json:"created_at"`  // 创建时间
 	UpdatedAt   *time.Time     `gorm:"column:updated_at;default:current_timestamp;comment:更新时间" json:"updated_at"`  // 更新时间
 	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at;comment:删除时间" json:"deleted_at"`                            // 删除时间

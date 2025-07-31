@@ -10,24 +10,38 @@ package v1;
 
 option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 
+// IsActive 表示激活状态枚举
+enum IsActive {
+    // 禁用状态
+    IS_ACTIVE_DISABLED = 0;
+    // 激活状态（默认值）
+    IS_ACTIVE_ACTIVE = 1;
+}
+
 // Category 表示文章分类
 message Category {
     // id 表示分类 ID
     int32 id = 1;
+    // categoryID 表示分类 ID
+    string categoryID = 2;
     // name 表示分类名称
-    string name = 2;
+    string name = 3;
     // description 表示分类描述
-    optional string description = 3;
+    optional string description = 4;
+    // icon 表示分类图标
+    string icon = 5;
+    // theme 表示分类主题
+    string theme = 6;
     // parentID 表示父分类ID，0表示顶级分类
-    int32 parentID = 4;
+    int32 parentID = 7;
     // sortOrder 表示排序值
-    int32 sortOrder = 5;
+    int32 sortOrder = 8;
     // isActive 表示是否激活
-    int32 isActive = 6;
+    IsActive isActive = 9;
     // createdAt 表示创建时间（Unix 时间戳）
-    int64 createdAt = 7;
+    int64 createdAt = 10;
     // updatedAt 表示最后更新时间（Unix 时间戳）
-    int64 updatedAt = 8;
+    int64 updatedAt = 11;
 }
 
 // CreateCategoryRequest 表示创建分类请求
@@ -36,34 +50,43 @@ message CreateCategoryRequest {
     string name = 1;
     // description 表示分类描述
     optional string description = 2;
+    // icon 表示分类图标
+    string icon = 3;
+    // theme 表示分类主题
+    string theme = 4;
     // parentID 表示父分类ID
-    optional int32 parentID = 3;
+    optional int32 parentID = 5;
     // sortOrder 表示排序值
-    optional int32 sortOrder = 4;
+    optional int32 sortOrder = 6;
     // isActive 表示是否激活
-    optional bool isActive = 5;
+    optional IsActive isActive = 7;
 }
 
 // CreateCategoryResponse 表示创建分类响应
 message CreateCategoryResponse {
-    // id 表示创建的分类 ID
-    int32 id = 1;
+    // categoryID 表示创建的分类 ID
+    string categoryID = 1;
 }
 
 // UpdateCategoryRequest 表示更新分类请求
 message UpdateCategoryRequest {
-    // id 表示要更新的分类 ID
-    int32 id = 1;
+    // categoryID 表示要更新的分类 ID
+    // @gotags: uri:"categoryID"
+    string categoryID = 1;
     // name 表示可选的分类名称
     optional string name = 2;
     // description 表示可选的分类描述
     optional string description = 3;
+    // icon 表示可选的分类图标
+    optional string icon = 4;
+    // theme 表示可选的分类主题
+    optional string theme = 5;
     // parentID 表示可选的父分类ID
-    optional int32 parentID = 4;
+    optional int32 parentID = 6;
     // sortOrder 表示可选的排序值
-    optional int32 sortOrder = 5;
+    optional int32 sortOrder = 7;
     // isActive 表示可选的激活状态
-    optional int32 isActive = 6;
+    optional IsActive isActive = 8;
 }
 
 // UpdateCategoryResponse 表示更新分类响应
@@ -72,8 +95,9 @@ message UpdateCategoryResponse {
 
 // DeleteCategoryRequest 表示删除分类请求
 message DeleteCategoryRequest {
-    // id 表示要删除的分类 ID
-    int32 id = 1;
+    // categoryID 表示要删除的分类 ID
+    // @gotags: uri:"categoryID"
+    string categoryID = 1;
 }
 
 // DeleteCategoryResponse 表示删除分类响应
@@ -82,8 +106,9 @@ message DeleteCategoryResponse {
 
 // GetCategoryRequest 表示获取分类请求
 message GetCategoryRequest {
-    // id 表示要获取的分类 ID
-    int32 id = 1;
+    // categoryID 表示要获取的分类 ID
+    // @gotags: uri:"categoryID"
+    string categoryID = 1;
 }
 
 // GetCategoryResponse 表示获取分类响应
@@ -107,21 +132,27 @@ message ListCategoryResponse {
     message Categories {
         // id 表示分类 ID
         int32 id = 1;
+        // categoryID 表示分类 ID
+        string categoryID = 2;
         // name 表示分类名称
-        string name = 2;
+        string name = 3;
         // description 表示分类描述
-        optional string description = 3;
+        optional string description = 4;
+        // icon 表示分类图标
+        string icon = 5;
+        // theme 表示分类主题
+        string theme = 6;
         // parentID 表示父分类ID，0表示顶级分类
-        int32 parentID = 4;
+        int32 parentID = 7;
         // sortOrder 表示排序值
-        int32 sortOrder = 5;
+        int32 sortOrder = 8;
         // isActive 表示是否激活
-        int32 isActive = 6;
+        IsActive isActive = 9;
         // createdAt 表示创建时间（Unix 时间戳）
-        int64 createdAt = 7;
+        int64 createdAt = 10;
         // updatedAt 表示最后更新时间（Unix 时间戳）
-        int64 updatedAt = 8;
+        int64 updatedAt = 11;
         // children 表示子分类
-        repeated Category children = 9;
+        repeated Category children = 12;
     }
 }

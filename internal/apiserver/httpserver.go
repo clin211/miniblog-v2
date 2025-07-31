@@ -92,23 +92,23 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 		}
 
 		// 标签相关路由
-		tag := sysv1.Group("/post-tags", authMiddlewares...)
+		tag := sysv1.Group("/tags", authMiddlewares...)
 		{
-			tag.POST("", sys.CreateTag)      // 创建标签
-			tag.PUT(":id", sys.UpdateTag)    // 更新标签
-			tag.DELETE(":id", sys.DeleteTag) // 删除标签
-			tag.GET(":id", sys.GetTag)       // 查询标签详情
-			tag.GET("", sys.ListTag)         // 查询标签列表
+			tag.POST("", sys.CreateTag)         // 创建标签
+			tag.PUT(":tagID", sys.UpdateTag)    // 更新标签
+			tag.DELETE(":tagID", sys.DeleteTag) // 删除标签
+			tag.GET(":tagID", sys.GetTag)       // 查询标签详情
+			tag.GET("", sys.ListTag)            // 查询标签列表
 		}
 
 		// 分类相关路由
 		category := sysv1.Group("/categories", authMiddlewares...)
 		{
-			category.POST("", sys.CreateCategory)      // 创建分类
-			category.PUT(":id", sys.UpdateCategory)    // 更新分类
-			category.DELETE(":id", sys.DeleteCategory) // 删除分类
-			category.GET(":id", sys.GetCategory)       // 查询分类详情
-			category.GET("", sys.ListCategory)         // 查询分类列表
+			category.POST("", sys.CreateCategory)              // 创建分类
+			category.PUT(":categoryID", sys.UpdateCategory)    // 更新分类
+			category.DELETE(":categoryID", sys.DeleteCategory) // 删除分类
+			category.GET(":categoryID", sys.GetCategory)       // 查询分类详情
+			category.GET("", sys.ListCategory)                 // 查询分类列表
 		}
 
 		// 设备相关路由

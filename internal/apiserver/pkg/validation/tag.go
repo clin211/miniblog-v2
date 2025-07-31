@@ -30,8 +30,8 @@ func (v *Validator) ValidateTagRules() genericvalidation.Rules {
 			if len(strings.TrimSpace(name)) == 0 {
 				return errno.ErrInvalidArgument.WithMessage("name cannot be whitespace only")
 			}
-			if len(name) > 20 {
-				return errno.ErrInvalidArgument.WithMessage("name cannot exceed 20 characters")
+			if len(name) > 50 {
+				return errno.ErrInvalidArgument.WithMessage("name cannot exceed 50 characters")
 			}
 			return nil
 		},
@@ -48,6 +48,19 @@ func (v *Validator) ValidateTagRules() genericvalidation.Rules {
 
 			return nil
 		},
+		// 分页参数校验
+		"Limit": func(value any) error {
+			if value.(int64) < 0 {
+				return errno.ErrInvalidArgument.WithMessage("limit cannot be negative")
+			}
+			return nil
+		},
+		"Offset": func(value any) error {
+			if value.(int64) < 0 {
+				return errno.ErrInvalidArgument.WithMessage("offset cannot be negative")
+			}
+			return nil
+		},
 	}
 }
 
@@ -58,39 +71,27 @@ func (v *Validator) ValidateCreateTagRequest(ctx context.Context, rq *v1.CreateT
 
 // ValidateUpdateTagRequest 校验 UpdateTagRequest 结构体的有效性.
 func (v *Validator) ValidateUpdateTagRequest(ctx context.Context, rq *v1.UpdateTagRequest) error {
-	// 先校验 ID 字段
-	if rq.GetId() <= 0 {
-		return errno.ErrInvalidArgument.WithMessage("tag ID must be positive")
-	}
 	return genericvalidation.ValidateAllFields(rq, v.ValidateTagRules())
 }
 
 // ValidateDeleteTagRequest 校验 DeleteTagRequest 结构体的有效性.
 func (v *Validator) ValidateDeleteTagRequest(ctx context.Context, rq *v1.DeleteTagRequest) error {
-	if rq.GetId() <= 0 {
-		return errno.ErrInvalidArgument.WithMessage("tag ID must be positive")
-	}
-	return nil
+	return genericvalidation.ValidateAllFields(rq, v.ValidateTagRules())
 }
 
 // ValidateGetTagRequest 校验 GetTagRequest 结构体的有效性.
 func (v *Validator) ValidateGetTagRequest(ctx context.Context, rq *v1.GetTagRequest) error {
-	if rq.GetId() <= 0 {
-		return errno.ErrInvalidArgument.WithMessage("tag ID must be positive")
-	}
-	return nil
+	return genericvalidation.ValidateAllFields(rq, v.ValidateTagRules())
 }
 
 // ValidateListTagRequest 校验 ListTagRequest 结构体的有效性.
 func (v *Validator) ValidateListTagRequest(ctx context.Context, rq *v1.ListTagRequest) error {
-	// 校验可选的名称过滤参数
-	if name := rq.GetName(); name != "" {
-		if len(strings.TrimSpace(name)) == 0 {
-			return errno.ErrInvalidArgument.WithMessage("name filter cannot be whitespace only")
-		}
-		if len(name) > 20 {
-			return errno.ErrInvalidArgument.WithMessage("name filter cannot exceed 20 characters")
-		}
+	rules := v.ValidateTagRules()
+	if err := rules["Offset"](rq.GetOffset()); err != nil {
+		return err
+	}
+	if err := rules["Limit"](rq.GetLimit()); err != nil {
+		return err
 	}
 	return nil
 }

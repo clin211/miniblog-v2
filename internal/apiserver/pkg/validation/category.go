@@ -17,6 +17,16 @@ import (
 
 // ValidateCategoryRules 定义分类相关的校验规则
 func (v *Validator) ValidateCategoryRules() genericvalidation.Rules {
+	// 分类ID校验函数
+	validateCategoryID := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			if value.(string) == "" {
+				return errno.ErrInvalidArgument.WithMessage("category ID cannot be empty")
+			}
+			return nil
+		}
+	}
+
 	// 分类名称校验函数
 	validateName := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
@@ -71,6 +81,91 @@ func (v *Validator) ValidateCategoryRules() genericvalidation.Rules {
 
 			if hasDesc && len(descStr) > 200 {
 				return errno.ErrInvalidArgument.WithMessage("category description is too long")
+			}
+			return nil
+		}
+	}
+
+	// 分类图标校验函数
+	validateIcon := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			// 处理两种可能的类型：string 和 *string
+			var iconStr string
+			var hasIcon bool
+
+			switch v := value.(type) {
+			case string:
+				iconStr = v
+				hasIcon = v != ""
+			case *string:
+				if v != nil {
+					iconStr = *v
+					hasIcon = *v != ""
+				}
+			default:
+				return errno.ErrInvalidArgument.WithMessage("icon field type error")
+			}
+
+			if hasIcon {
+				if len(strings.TrimSpace(iconStr)) == 0 {
+					return errno.ErrInvalidArgument.WithMessage("category icon cannot be empty or whitespace only")
+				}
+				if len(iconStr) > 255 {
+					return errno.ErrInvalidArgument.WithMessage("category icon is too long")
+				}
+				// 可以添加更多图标格式验证，比如只允许特定的图标名称
+				// 这里简单验证不包含特殊字符
+				if strings.ContainsAny(iconStr, "<>\"'&") {
+					return errno.ErrInvalidArgument.WithMessage("category icon contains invalid characters")
+				}
+			}
+			return nil
+		}
+	}
+
+	// 分类主题校验函数
+	validateTheme := func() genericvalidation.ValidatorFunc {
+		return func(value any) error {
+			// 处理两种可能的类型：string 和 *string
+			var themeStr string
+			var hasTheme bool
+
+			switch v := value.(type) {
+			case string:
+				themeStr = v
+				hasTheme = v != ""
+			case *string:
+				if v != nil {
+					themeStr = *v
+					hasTheme = *v != ""
+				}
+			default:
+				return errno.ErrInvalidArgument.WithMessage("theme field type error")
+			}
+
+			if hasTheme {
+				if len(strings.TrimSpace(themeStr)) == 0 {
+					return errno.ErrInvalidArgument.WithMessage("category theme cannot be empty or whitespace only")
+				}
+				if len(themeStr) > 50 {
+					return errno.ErrInvalidArgument.WithMessage("category theme is too long")
+				}
+				// 验证主题名称格式（只允许字母、数字、连字符）
+				validThemes := []string{
+					"cyan", "emerald", "violet", "orange", "red", "pink", "lime", "sky",
+					"stone", "zinc", "yellow", "fuchsia", "neutral", "gray", "blue",
+					"purple", "green", "amber", "rose", "indigo", "teal", "slate",
+				}
+				validTheme := false
+				for _, valid := range validThemes {
+					if themeStr == valid {
+						validTheme = true
+						break
+					}
+				}
+				if !validTheme {
+					return errno.ErrInvalidArgument.WithMessage("invalid category theme")
+				}
 			}
 			return nil
 		}
@@ -133,12 +228,24 @@ func (v *Validator) ValidateCategoryRules() genericvalidation.Rules {
 	// 激活状态校验函数
 	validateIsActive := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
-			// 处理两种可能的类型：bool 和 *bool
-			switch value.(type) {
-			case bool, *bool:
+			// 处理两种可能的类型：v1.IsActive 和 *v1.IsActive
+			switch val := value.(type) {
+			case v1.IsActive:
+				// 验证 enum 值是否有效
+				if val != v1.IsActive_IS_ACTIVE_ACTIVE && val != v1.IsActive_IS_ACTIVE_DISABLED {
+					return errno.ErrInvalidArgument.WithMessage("invalid IsActive enum value")
+				}
+				return nil
+			case *v1.IsActive:
+				if val != nil {
+					// 验证 enum 值是否有效
+					if *val != v1.IsActive_IS_ACTIVE_ACTIVE && *val != v1.IsActive_IS_ACTIVE_DISABLED {
+						return errno.ErrInvalidArgument.WithMessage("invalid IsActive enum value")
+					}
+				}
 				return nil
 			default:
-				return errno.ErrInvalidArgument.WithMessage("is active field type error")
+				return errno.ErrInvalidArgument.WithMessage("IsActive field must be of 0 or 1")
 			}
 		}
 	}
@@ -146,15 +253,11 @@ func (v *Validator) ValidateCategoryRules() genericvalidation.Rules {
 	// 定义各字段的校验逻辑
 	return genericvalidation.Rules{
 		// 基本字段校验
-		"ID": func(value any) error {
-			id := value.(int32)
-			if id <= 0 {
-				return errno.ErrInvalidArgument.WithMessage("category ID must be positive")
-			}
-			return nil
-		},
+		"CategoryID":  validateCategoryID(),
 		"Name":        validateName(),
 		"Description": validateDescription(),
+		"Icon":        validateIcon(),
+		"Theme":       validateTheme(),
 		"ParentID":    validateParentID(),
 		"SortOrder":   validateSortOrder(),
 		"IsActive":    validateIsActive(),
@@ -163,81 +266,7 @@ func (v *Validator) ValidateCategoryRules() genericvalidation.Rules {
 
 // ValidateCreateCategoryRequest 校验 CreateCategoryRequest 结构体的有效性
 func (v *Validator) ValidateCreateCategoryRequest(ctx context.Context, rq *v1.CreateCategoryRequest) error {
-
-	rules := v.ValidateCategoryRules()
-	if rq.Name != "" {
-		if err := rules["Name"](rq.Name); err != nil {
-			return err
-		}
-	}
-	if rq.Description != nil {
-		if err := rules["Description"](rq.Description); err != nil {
-			return err
-		}
-	}
-	if rq.ParentID != nil {
-		if err := rules["ParentID"](rq.ParentID); err != nil {
-			return err
-		}
-	}
-	if rq.SortOrder != nil {
-		if err := rules["SortOrder"](rq.SortOrder); err != nil {
-			return err
-		}
-	}
-	if rq.IsActive != nil {
-		if err := rules["IsActive"](rq.IsActive); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// ValidateUpdateCategoryRequest 校验 UpdateCategoryRequest 结构体的有效性
-func (v *Validator) ValidateUpdateCategoryRequest(ctx context.Context, rq *v1.UpdateCategoryRequest) error {
-	// 校验必填的分类ID
-	if rq.GetId() <= 0 {
-		return errno.ErrInvalidArgument.WithMessage("category ID must be positive")
-	}
-
-	// 校验可选字段
-	rules := v.ValidateCategoryRules()
-	if rq.Name != nil {
-		if err := rules["Name"](*rq.Name); err != nil {
-			return err
-		}
-	}
-	if rq.Description != nil {
-		if err := rules["Description"](rq.Description); err != nil {
-			return err
-		}
-	}
-	if rq.ParentID != nil {
-		if err := rules["ParentID"](rq.ParentID); err != nil {
-			return err
-		}
-	}
-	if rq.SortOrder != nil {
-		if err := rules["SortOrder"](rq.SortOrder); err != nil {
-			return err
-		}
-	}
-	if rq.IsActive != nil {
-		if err := rules["IsActive"](rq.IsActive); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// ValidateDeleteCategoryRequest 校验 DeleteCategoryRequest 结构体的有效性
-func (v *Validator) ValidateDeleteCategoryRequest(ctx context.Context, rq *v1.DeleteCategoryRequest) error {
-	if rq.GetId() <= 0 {
-		return errno.ErrInvalidArgument.WithMessage("category ID must be positive")
-	}
-	return nil
+	return genericvalidation.ValidateAllFields(rq, v.ValidateCategoryRules())
 }
 
 // ValidateGetCategoryRequest 校验 GetCategoryRequest 结构体的有效性
@@ -245,15 +274,17 @@ func (v *Validator) ValidateGetCategoryRequest(ctx context.Context, rq *v1.GetCa
 	return genericvalidation.ValidateAllFields(rq, v.ValidateCategoryRules())
 }
 
+// ValidateDeleteCategoryRequest 校验 DeleteCategoryRequest 结构体的有效性
+func (v *Validator) ValidateDeleteCategoryRequest(ctx context.Context, rq *v1.DeleteCategoryRequest) error {
+	return genericvalidation.ValidateAllFields(rq, v.ValidateCategoryRules())
+}
+
+// ValidateUpdateCategoryRequest 校验 UpdateCategoryRequest 结构体的有效性
+func (v *Validator) ValidateUpdateCategoryRequest(ctx context.Context, rq *v1.UpdateCategoryRequest) error {
+	return genericvalidation.ValidateAllFields(rq, v.ValidateCategoryRules())
+}
+
 // ValidateListCategoryRequest 校验 ListCategoryRequest 结构体的有效性
 func (v *Validator) ValidateListCategoryRequest(ctx context.Context, rq *v1.ListCategoryRequest) error {
-	// 校验可选的父分类ID过滤参数
-	if rq.ParentID != nil {
-		if *rq.ParentID < 0 {
-			return errno.ErrInvalidArgument.WithMessage("parent ID filter cannot be negative")
-		}
-	}
-
-	// 校验可选的激活状态过滤参数（bool类型无需特殊校验）
-	return nil
+	return genericvalidation.ValidateAllFields(rq, v.ValidateCategoryRules())
 }

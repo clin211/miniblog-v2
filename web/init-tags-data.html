@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<!--
+ Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+ Use of this source code is governed by a MIT style
+ license that can be found in the LICENSE file. The original repo for
+ this file is https://github.com/clin211/miniblog-v2.git.
+-->
+
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniBlog 标签数据初始化</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">MiniBlog 标签数据初始化</h1>
+
+            <!-- 登录区域 -->
+            <div id="loginSection" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">用户登录</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+                        <input type="text" id="username" value="uploadfile"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                        <input type="password" id="password" value="kKOcmxVf99l9OFz"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <button onclick="login()"
+                    class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                    登录
+                </button>
+                <div id="loginStatus" class="mt-2"></div>
+            </div>
+
+            <!-- 操作区域 -->
+            <div id="operationSection" class="bg-white rounded-lg shadow-md p-6 mb-6" style="display: none;">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">批量创建标签</h2>
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <button onclick="createAllTags()"
+                        class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                        创建所有标签
+                    </button>
+                    <button onclick="clearLogs()"
+                        class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                        清空日志
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <div class="text-sm text-gray-600 mb-2">进度: <span id="progress">0/0</span></div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 日志区域 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">操作日志</h2>
+                <div id="logs" class="bg-gray-50 rounded-md p-4 h-96 overflow-y-auto text-sm font-mono">
+                    <div class="text-gray-500">等待操作...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = '';
+        const API_BASE = 'http://localhost:5555';
+        const tags = [
+            // 前端框架标签 (蓝色系)
+            { name: 'Next.js', color: '#0070f3' },
+            { name: 'React', color: '#61dafb' },
+            { name: 'Vue', color: '#4fc08d' },
+            { name: 'Angular', color: '#dd0031' },
+
+            // 前端基础技术标签 (绿色系)
+            { name: 'JavaScript', color: '#f7df1e' },
+            { name: 'TypeScript', color: '#3178c6' },
+            { name: 'HTML', color: '#e34f26' },
+            { name: 'CSS', color: '#1572b6' },
+            { name: 'Sass', color: '#cc6699' },
+            { name: 'Less', color: '#1d365d' },
+
+            // 前端工具和库标签 (紫色系)
+            { name: 'Webpack', color: '#8dd6f9' },
+            { name: 'Vite', color: '#646cff' },
+            { name: 'Rollup', color: '#ec4a3f' },
+            { name: 'ESLint', color: '#4b32c3' },
+            { name: 'Prettier', color: '#f7b93e' },
+            { name: 'Babel', color: '#f9dc3e' },
+
+            // 状态管理标签 (橙色系)
+            { name: 'Zustand', color: '#ff6b35' },
+            { name: 'Redux', color: '#764abc' },
+            { name: 'MobX', color: '#ff9955' },
+            { name: 'TanStack Query', color: '#ff4154' },
+            { name: 'SWR', color: '#000000' },
+
+            // 后端技术标签 (红色系)
+            { name: 'Go', color: '#00add8' },
+            { name: 'Gin', color: '#00add8' },
+            { name: 'go-zero', color: '#00add8' },
+            { name: 'GoFrame', color: '#00add8' },
+            { name: 'gRPC', color: '#244c5a' },
+            { name: 'Protobuf', color: '#4285f4' },
+
+            // 数据库标签 (青色系)
+            { name: 'MySQL', color: '#4479a1' },
+            { name: 'PostgreSQL', color: '#336791' },
+            { name: 'MongoDB', color: '#47a248' },
+            { name: 'Redis', color: '#dc382d' },
+            { name: 'SQLite', color: '#003b57' },
+
+            // 云原生和运维标签 (灰色系)
+            { name: 'Docker', color: '#2496ed' },
+            { name: 'Kubernetes', color: '#326ce5' },
+            { name: 'CI/CD', color: '#6c757d' },
+            { name: 'DevOps', color: '#495057' },
+            { name: 'Nginx', color: '#009639' },
+
+            // 算法和数据结构标签 (黄色系)
+            { name: '算法', color: '#ffc107' },
+            { name: '数据结构', color: '#fd7e14' },
+            { name: '复杂度分析', color: '#e83e8c' },
+            { name: '排序算法', color: '#6f42c1' },
+            { name: '搜索算法', color: '#20c997' },
+
+            // 设计模式标签 (粉色系)
+            { name: '设计模式', color: '#e91e63' },
+            { name: '策略模式', color: '#f06292' },
+            { name: '观察者模式', color: '#ba68c8' },
+            { name: '工厂模式', color: '#9575cd' },
+            { name: '单例模式', color: '#7986cb' },
+
+            // 开发工具标签 (棕色系)
+            { name: 'VS Code', color: '#007acc' },
+            { name: 'Vim', color: '#019733' },
+            { name: 'Git', color: '#f05032' },
+            { name: 'Shell', color: '#89e051' },
+            { name: 'Linux', color: '#fcc624' },
+
+            // 性能优化标签 (深蓝色系)
+            { name: '性能优化', color: '#0d47a1' },
+            { name: '缓存', color: '#1565c0' },
+            { name: 'SEO', color: '#1976d2' },
+            { name: '图像优化', color: '#1e88e5' },
+            { name: '代码分割', color: '#2196f3' },
+
+            // 安全相关标签 (深红色系)
+            { name: 'Web安全', color: '#b71c1c' },
+            { name: 'XSS', color: '#c62828' },
+            { name: 'CSRF', color: '#d32f2f' },
+            { name: 'SQL注入', color: '#f44336' },
+
+            // 架构设计标签 (深绿色系)
+            { name: '微服务', color: '#2e7d32' },
+            { name: 'RESTful API', color: '#388e3c' },
+            { name: 'GraphQL', color: '#43a047' },
+            { name: '系统架构', color: '#4caf50' },
+            { name: '分布式', color: '#66bb6a' },
+
+            // 测试相关标签 (深紫色系)
+            { name: '单元测试', color: '#4a148c' },
+            { name: '集成测试', color: '#6a1b9a' },
+            { name: 'E2E测试', color: '#7b1fa2' },
+            { name: 'Jest', color: '#8e24aa' },
+            { name: 'Cypress', color: '#9c27b0' },
+
+            // 移动开发标签 (青绿色系)
+            { name: 'React Native', color: '#02569b' },
+            { name: 'Flutter', color: '#61dafb' },
+            { name: '小程序', color: '#07c160' },
+            { name: 'PWA', color: '#5a0fc8' },
+
+            // Node.js 核心技术标签 (绿色系)
+            { name: 'Node.js', color: '#339933' },
+            { name: 'npm', color: '#cb3837' },
+            { name: 'yarn', color: '#2c8ebb' },
+            { name: 'pnpm', color: '#f69220' },
+
+            // Node.js 后端框架标签 (深绿色系)
+            { name: 'Express', color: '#000000' },
+            { name: 'Koa', color: '#33333d' },
+            { name: 'Nest.js', color: '#e0234e' },
+            { name: 'Fastify', color: '#000000' },
+
+            // Node.js 工具和库标签 (蓝绿色系)
+            { name: 'Nodemon', color: '#76d04b' },
+            { name: 'PM2', color: '#2b037a' },
+            { name: 'Socket.io', color: '#010101' },
+            { name: 'Passport', color: '#34e27a' },
+            { name: 'Multer', color: '#ff6600' },
+
+            // Node.js 数据库相关标签 (青色系)
+            { name: 'Mongoose', color: '#880000' },
+            { name: 'Sequelize', color: '#52b0e7' },
+            { name: 'Prisma', color: '#2d3748' },
+            { name: 'TypeORM', color: '#fe0803' },
+
+            // Node.js 构建和部署标签 (橙色系)
+            { name: 'esbuild', color: '#ffcf00' },
+            { name: 'Serverless', color: '#fd5750' },
+
+            // Node.js 实时通信标签 (红色系)
+            { name: 'WebSocket', color: '#010101' },
+            { name: 'Server-Sent Events', color: '#ff4444' },
+
+            // Node.js 微服务标签 (深蓝色系)
+            { name: 'Microservices', color: '#0066cc' },
+            { name: 'API Gateway', color: '#ff9900' },
+            { name: 'Service Mesh', color: '#326ce5' },
+
+            // 学习和分享标签 (暖色系)
+            { name: '学习笔记', color: '#ff5722' },
+            { name: '最佳实践', color: '#ff7043' },
+            { name: '经验分享', color: '#ff8a65' },
+            { name: '问题解决', color: '#ffab91' },
+            { name: '技术趋势', color: '#ffcc02' },
+
+            // 项目类型标签 (中性色系)
+            { name: '全栈项目', color: '#607d8b' },
+            { name: '开源项目', color: '#78909c' },
+            { name: '个人项目', color: '#90a4ae' },
+            { name: '企业项目', color: '#b0bec5' },
+
+            // 渲染模式标签 (特殊色系)
+            { name: 'SSR', color: '#00bcd4' },
+            { name: 'SSG', color: '#009688' },
+            { name: 'CSR', color: '#4db6ac' },
+            { name: 'ISR', color: '#26a69a' },
+
+            // 国际化和本地化标签
+            { name: '国际化', color: '#795548' },
+            { name: 'i18n', color: '#8d6e63' },
+            { name: '本地化', color: '#a1887f' },
+
+            // 内容管理标签
+            { name: 'Markdown', color: '#000000' },
+            { name: 'CMS', color: '#6c757d' },
+            { name: '内容管理', color: '#495057' },
+
+            // 面试相关标签
+            { name: '面试题', color: '#dc3545' },
+            { name: '技术面试', color: '#c82333' },
+            { name: '求职', color: '#bd2130' }
+        ];
+
+        // 登录功能
+        async function login () {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginStatus = document.getElementById('loginStatus');
+
+            if (!username || !password) {
+                loginStatus.innerHTML = '<div class="text-red-500 text-sm mt-2">请输入用户名和密码</div>';
+                return;
+            }
+
+            try {
+                loginStatus.innerHTML = '<div class="text-blue-500 text-sm mt-2">登录中...</div>';
+
+                const response = await axios.post(`${API_BASE}/v1/system/auth/login`, {
+                    username: username,
+                    password: password
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.data && response.data.token) {
+                    authToken = response.data.token;
+                    loginStatus.innerHTML = '<div class="text-green-500 text-sm mt-2">登录成功！</div>';
+                    document.getElementById('operationSection').style.display = 'block';
+                    addLog('登录成功，可以开始创建标签', 'success');
+                } else {
+                    throw new Error('登录响应格式错误');
+                }
+            } catch (error) {
+                console.error('登录失败:', error);
+                const errorMsg = error.response?.data?.message || error.message || '登录失败';
+                loginStatus.innerHTML = `<div class="text-red-500 text-sm mt-2">登录失败: ${errorMsg}</div>`;
+                addLog(`登录失败: ${errorMsg}`, 'error');
+            }
+        }
+
+        // 创建单个标签
+        async function createTag (tag) {
+            try {
+                const response = await axios.post(`${API_BASE}/v1/system/tags`, tag, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                addLog(`✅ 标签 "${tag.name}" 创建成功`, 'success');
+                return { success: true, tag: tag };
+            } catch (error) {
+                const errorMsg = error.response?.data?.message || error.message || '未知错误';
+                addLog(`❌ 标签 "${tag.name}" 创建失败: ${errorMsg}`, 'error');
+                return { success: false, tag: tag, error: errorMsg };
+            }
+        }
+
+        // 创建所有标签
+        async function createAllTags () {
+            if (!authToken) {
+                addLog('请先登录', 'error');
+                return;
+            }
+
+            const totalTags = tags.length;
+            let successCount = 0;
+            let failCount = 0;
+
+            addLog(`开始创建 ${totalTags} 个标签...`, 'info');
+            updateProgress(0, totalTags);
+
+            for (let i = 0; i < tags.length; i++) {
+                const tag = tags[i];
+                const result = await createTag(tag);
+
+                if (result.success) {
+                    successCount++;
+                } else {
+                    failCount++;
+                }
+
+                updateProgress(i + 1, totalTags);
+
+                // 添加小延迟避免请求过快
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            addLog(`\n=== 创建完成 ===`, 'info');
+            addLog(`总计: ${totalTags} 个标签`, 'info');
+            addLog(`成功: ${successCount} 个`, 'success');
+            addLog(`失败: ${failCount} 个`, failCount > 0 ? 'error' : 'info');
+        }
+
+        // 更新进度
+        function updateProgress (current, total) {
+            const percentage = total > 0 ? (current / total) * 100 : 0;
+            document.getElementById('progress').textContent = `${current}/${total}`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+        }
+
+        // 添加日志
+        function addLog (message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            let colorClass = 'text-gray-600';
+
+            switch (type) {
+                case 'success':
+                    colorClass = 'text-green-600';
+                    break;
+                case 'error':
+                    colorClass = 'text-red-600';
+                    break;
+                case 'warning':
+                    colorClass = 'text-yellow-600';
+                    break;
+                case 'info':
+                    colorClass = 'text-blue-600';
+                    break;
+            }
+
+            const logEntry = document.createElement('div');
+            logEntry.className = `${colorClass} mb-1`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        // 清空日志
+        function clearLogs () {
+            const logs = document.getElementById('logs');
+            logs.innerHTML = '<div class="text-gray-500">日志已清空...</div>';
+            updateProgress(0, 0);
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            addLog('页面加载完成，请先登录', 'info');
+            addLog(`准备创建 ${tags.length} 个标签`, 'info');
+        });
+    </script>
+</body>
+
+</html>

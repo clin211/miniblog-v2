@@ -59,12 +59,12 @@ func (b *tagBiz) Create(ctx context.Context, rq *v1.CreateTagRequest) (*v1.Creat
 		return nil, err
 	}
 
-	return &v1.CreateTagResponse{Id: tagM.ID}, nil
+	return &v1.CreateTagResponse{TagID: tagM.TagID}, nil
 }
 
 // Update 实现 TagBiz 接口中的 Update 方法.
 func (b *tagBiz) Update(ctx context.Context, rq *v1.UpdateTagRequest) (*v1.UpdateTagResponse, error) {
-	whr := where.F("id", rq.GetId())
+	whr := where.F("tag_id", rq.GetTagID())
 	tagM, err := b.store.Tag().Get(ctx, whr)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (b *tagBiz) Update(ctx context.Context, rq *v1.UpdateTagRequest) (*v1.Updat
 
 // Delete 实现 TagBiz 接口中的 Delete 方法.
 func (b *tagBiz) Delete(ctx context.Context, rq *v1.DeleteTagRequest) (*v1.DeleteTagResponse, error) {
-	whr := where.F("id", rq.GetId())
+	whr := where.F("tag_id", rq.GetTagID())
 	if err := b.store.Tag().Delete(ctx, whr); err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (b *tagBiz) Delete(ctx context.Context, rq *v1.DeleteTagRequest) (*v1.Delet
 
 // Get 实现 TagBiz 接口中的 Get 方法.
 func (b *tagBiz) Get(ctx context.Context, rq *v1.GetTagRequest) (*v1.GetTagResponse, error) {
-	whr := where.F("id", rq.GetId())
+	whr := where.F("tag_id", rq.GetTagID())
 	tagM, err := b.store.Tag().Get(ctx, whr)
 	if err != nil {
 		return nil, err
@@ -115,9 +115,9 @@ func (b *tagBiz) Get(ctx context.Context, rq *v1.GetTagRequest) (*v1.GetTagRespo
 func (b *tagBiz) List(ctx context.Context, rq *v1.ListTagRequest) (*v1.ListTagResponse, error) {
 	whr := where.NewWhere()
 
-	// 如果有名称过滤参数，添加到查询条件中
-	if name := rq.GetName(); name != "" {
-		whr = whr.F("name", name)
+	// 如果有过滤参数，添加到查询条件中
+	if int(rq.GetOffset()) > 0 && int(rq.GetLimit()) > 0 {
+		whr = whr.P(int(rq.GetLimit()), int(rq.GetOffset()))
 	}
 
 	_, tagList, err := b.store.Tag().List(ctx, whr)
@@ -131,5 +131,5 @@ func (b *tagBiz) List(ctx context.Context, rq *v1.ListTagRequest) (*v1.ListTagRe
 		tags = append(tags, converted)
 	}
 
-	return &v1.ListTagResponse{Tags: tags}, nil
+	return &v1.ListTagResponse{Total: int32(len(tagList)), Tags: tags}, nil
 }

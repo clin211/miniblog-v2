@@ -280,7 +280,7 @@ service MiniBlog {
     // UpdateCategory 更新分类
     rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse) {
         option (google.api.http) = {
-            put: "/v1/system/categories/{id}",
+            put: "/v1/system/categories/{categoryID}",
             body: "*",
         };
 
@@ -294,7 +294,7 @@ service MiniBlog {
     // DeleteCategory 删除分类
     rpc DeleteCategory(DeleteCategoryRequest) returns (DeleteCategoryResponse) {
         option (google.api.http) = {
-            delete: "/v1/system/categories/{id}",
+            delete: "/v1/system/categories/{categoryID}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -307,7 +307,7 @@ service MiniBlog {
     // GetCategory 获取分类信息
     rpc GetCategory(GetCategoryRequest) returns (GetCategoryResponse) {
         option (google.api.http) = {
-            get: "/v1/system/categories/{id}",
+            get: "/v1/system/categories/{categoryID}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -347,7 +347,7 @@ service MiniBlog {
     // UpdateTag 更新标签
     rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse) {
         option (google.api.http) = {
-            put: "/v1/system/tags/{id}",
+            put: "/v1/system/tags/{tagID}",
             body: "*",
         };
 
@@ -361,7 +361,7 @@ service MiniBlog {
     // DeleteTag 删除标签
     rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse) {
         option (google.api.http) = {
-            delete: "/v1/system/tags/{id}",
+            delete: "/v1/system/tags/{tagID}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -374,7 +374,7 @@ service MiniBlog {
     // GetTag 获取标签信息
     rpc GetTag(GetTagRequest) returns (GetTagResponse) {
         option (google.api.http) = {
-            get: "/v1/system/tags/{id}",
+            get: "/v1/system/tags/{tagID}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -496,7 +496,7 @@ service MiniBlog {
     // GetCategory 获取分类信息
     rpc AppGetCategory(GetCategoryRequest) returns (GetCategoryResponse) {
         option (google.api.http) = {
-            get: "/v1/app/categories/{id}",
+            get: "/v1/app/categories/{categoryID}",
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

@@ -14,14 +14,16 @@ option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 message Tag {
     // id 表示标签 ID
     int32 id = 1;
+    // tagID 表示标签 ID
+    string tagID = 2;
     // name 表示标签名称
-    string name = 2;
+    string name = 3;
     // color 表示标签颜色(hex 格式)
-    string color = 3;
+    string color = 4;
     // createdAt 表示创建时间（Unix 时间戳）
-    int64 createdAt = 4;
+    int64 createdAt = 5;
     // updatedAt 表示最后更新时间（Unix 时间戳）
-    int64 updatedAt = 5;
+    int64 updatedAt = 6;
 }
 
 // CreateTagRequest 表示创建标签请求
@@ -34,15 +36,15 @@ message CreateTagRequest {
 
 // CreateTagResponse 表示创建标签响应
 message CreateTagResponse {
-    // id 表示创建的标签 ID
-    int32 id = 1;
+    // tagID 表示要获取的标签 tagID
+    string tagID = 1;
 }
 
 // UpdateTagRequest 表示更新标签请求
 message UpdateTagRequest {
-    // id 表示要更新的标签 ID
-    // @gotags: uri:"id"
-    int32 id = 1;
+    // tagID 表示要获取的标签 tagID
+    // @gotags: uri:"tagID"
+    string tagID = 1;
     // name 表示可选的标签名称
     optional string name = 2;
     // color 表示可选的标签颜色
@@ -55,9 +57,9 @@ message UpdateTagResponse {
 
 // DeleteTagRequest 表示删除标签请求
 message DeleteTagRequest {
-    // id 表示要删除的标签 ID
-    // @gotags: uri:"id"
-    int32 id = 1;
+    // tagID 表示要获取的标签 tagID
+    // @gotags: uri:"tagID"
+    string tagID = 1;
 }
 
 // DeleteTagResponse 表示删除标签响应
@@ -66,9 +68,9 @@ message DeleteTagResponse {
 
 // GetTagRequest 表示获取标签请求
 message GetTagRequest {
-    // id 表示要获取的标签 ID
-    // @gotags: uri:"id"
-    int32 id = 1;
+    // tagID 表示要获取的标签 tagID
+    // @gotags: uri:"tagID"
+    string tagID = 1;
 }
 
 // GetTagResponse 表示获取标签响应
@@ -79,12 +81,18 @@ message GetTagResponse {
 
 // ListTagRequest 表示获取标签列表请求
 message ListTagRequest {
-    // name 表示可选的标签名称过滤
-    optional string name = 1;
+    // offset 表示偏移量
+    // @gotags: form:"offset"
+    int64 offset = 1;
+    // limit 表示每页数量
+    // @gotags: form:"limit"
+    int64 limit = 2;
 }
 
 // ListTagResponse 表示获取标签列表响应
 message ListTagResponse {
     // tags 表示标签列表
     repeated Tag tags = 1;
+    // total 表示总数量
+    int32 total = 2;
 }

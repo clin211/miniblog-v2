@@ -35,3 +35,13 @@ func (m *UserM) BeforeCreate(tx *gorm.DB) error {
 
 	return nil
 }
+
+func (m *CategoryM) AfterCreate(tx *gorm.DB) error {
+	m.CategoryID = rid.CategoryID.New(uint64(m.ID))
+	return tx.Save(m).Error
+}
+
+func (m *TagM) AfterCreate(tx *gorm.DB) error {
+	m.TagID = rid.TagID.New(uint64(m.ID))
+	return tx.Save(m).Error
+}

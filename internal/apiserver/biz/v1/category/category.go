@@ -51,12 +51,12 @@ func (b *categoryBiz) Create(ctx context.Context, rq *v1.CreateCategoryRequest) 
 	if err := b.store.Category().Create(ctx, &categoryM); err != nil {
 		return nil, err
 	}
-	return &v1.CreateCategoryResponse{Id: categoryM.ID}, nil
+	return &v1.CreateCategoryResponse{CategoryID: categoryM.CategoryID}, nil
 }
 
 // Update 实现 CategoryBiz 接口中的 Update 方法.
 func (b *categoryBiz) Update(ctx context.Context, rq *v1.UpdateCategoryRequest) (*v1.UpdateCategoryResponse, error) {
-	whr := where.F("id", rq.GetId())
+	whr := where.F("category_id", rq.GetCategoryID())
 	categoryM, err := b.store.Category().Get(ctx, whr)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (b *categoryBiz) Update(ctx context.Context, rq *v1.UpdateCategoryRequest) 
 
 // Delete 实现 CategoryBiz 接口中的 Delete 方法.
 func (b *categoryBiz) Delete(ctx context.Context, rq *v1.DeleteCategoryRequest) (*v1.DeleteCategoryResponse, error) {
-	whr := where.F("id", rq.GetId())
+	whr := where.F("category_id", rq.GetCategoryID())
 	if err := b.store.Category().Delete(ctx, whr); err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (b *categoryBiz) Delete(ctx context.Context, rq *v1.DeleteCategoryRequest) 
 
 // Get 实现 CategoryBiz 接口中的 Get 方法.
 func (b *categoryBiz) Get(ctx context.Context, rq *v1.GetCategoryRequest) (*v1.GetCategoryResponse, error) {
-	whr := where.F("id", rq.GetId())
+	whr := where.F("category_id", rq.GetCategoryID())
 	categoryM, err := b.store.Category().Get(ctx, whr)
 	if err != nil {
 		return nil, err
@@ -165,7 +165,10 @@ func buildHierarchicalCategories(categoryList []*model.CategoryM) []*v1.ListCate
 		// 使用结构体字面量初始化，减少零值赋值
 		categoryWithChildren := &v1.ListCategoryResponse_Categories{
 			Id:          rootCategory.ID,
+			CategoryID:  rootCategory.CategoryID,
 			Name:        rootCategory.Name,
+			Icon:        rootCategory.Icon,
+			Theme:       rootCategory.Theme,
 			Description: rootCategory.Description,
 			Children:    childrenV1,
 		}
@@ -178,7 +181,11 @@ func buildHierarchicalCategories(categoryList []*model.CategoryM) []*v1.ListCate
 			categoryWithChildren.SortOrder = *rootCategory.SortOrder
 		}
 		if rootCategory.IsActive != nil {
-			categoryWithChildren.IsActive = *rootCategory.IsActive
+			if *rootCategory.IsActive == 1 {
+				categoryWithChildren.IsActive = v1.IsActive_IS_ACTIVE_ACTIVE
+			} else {
+				categoryWithChildren.IsActive = v1.IsActive_IS_ACTIVE_DISABLED
+			}
 		}
 		if rootCategory.CreatedAt != nil {
 			categoryWithChildren.CreatedAt = rootCategory.CreatedAt.Unix()
