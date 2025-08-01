@@ -233,26 +233,10 @@ func (v *Validator) ValidatePostRules() genericvalidation.Rules {
 	// 分类ID校验函数
 	validateCategoryID := func() genericvalidation.ValidatorFunc {
 		return func(value any) error {
-			// 处理两种可能的类型：int32 和 *int32
-			var categoryID int32
-			var hasCategoryID bool
-
-			switch v := value.(type) {
-			case int32:
-				categoryID = v
-				hasCategoryID = true
-			case *int32:
-				if v != nil {
-					categoryID = *v
-					hasCategoryID = true
-				}
-			default:
-				return errno.ErrInvalidArgument.WithMessage("category ID field type error")
+			if value.(string) == "" {
+				return errno.ErrInvalidArgument.WithMessage("category ID cannot be empty")
 			}
 
-			if hasCategoryID && categoryID <= 0 {
-				return errno.ErrInvalidArgument.WithMessage("category ID cannot be negative")
-			}
 			return nil
 		}
 	}
@@ -438,19 +422,5 @@ func (v *Validator) ValidateGetPostRequest(ctx context.Context, rq *v1.GetPostRe
 
 // ValidateListPostRequest 校验 ListPostRequest 结构体的有效性
 func (v *Validator) ValidateListPostRequest(ctx context.Context, rq *v1.ListPostRequest) error {
-	// 校验分页参数
-	rules := v.ValidatePostRules()
-	if err := rules["Offset"](rq.GetOffset()); err != nil {
-		return err
-	}
-	if err := rules["Limit"](rq.GetLimit()); err != nil {
-		return err
-	}
-
-	// 校验可选的 categoryID 过滤参数
-	if rq.CategoryID != nil && *rq.CategoryID <= 0 {
-		return errno.ErrInvalidArgument.WithMessage("category ID cannot be negative")
-
-	}
-	return nil
+	return genericvalidation.ValidateAllFields(rq, v.ValidatePostRules())
 }

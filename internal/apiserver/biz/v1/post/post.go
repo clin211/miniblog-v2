@@ -238,7 +238,7 @@ func (b *postBiz) List(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPos
 func (b *postBiz) AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error) {
 	var whr *where.Options
 	// 检查 categoryID 是否提供
-	if rq.CategoryID != nil && *rq.CategoryID > 0 {
+	if rq.GetCategoryID() != "" {
 		whr = where.F("category_id", *rq.CategoryID).P(int(rq.GetOffset()), int(rq.GetLimit()))
 	} else {
 		whr = where.P(int(rq.GetOffset()), int(rq.GetLimit()))

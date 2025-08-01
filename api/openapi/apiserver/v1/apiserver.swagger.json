@@ -157,8 +157,7 @@
             "description": "categoryID 表示可选的标题过滤\n@gotags: form:\"categoryID\"",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "string"
           }
         ],
         "tags": [
@@ -635,8 +634,7 @@
             "description": "categoryID 表示可选的标题过滤\n@gotags: form:\"categoryID\"",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "string"
           }
         ],
         "tags": [
