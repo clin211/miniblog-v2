@@ -132,8 +132,8 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 
 		category := appv1.Group("/categories")
 		{
-			category.GET("", app.ListCategories) // 查询所有分类
-			category.GET(":id", app.GetCategory) // 查询单条分类
+			category.GET("", app.ListCategories)         // 查询所有分类
+			category.GET(":categoryID", app.GetCategory) // 查询单条分类
 		}
 	}
 }
