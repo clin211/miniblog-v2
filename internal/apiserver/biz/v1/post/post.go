@@ -34,6 +34,7 @@ type PostBiz interface {
 // PostExpansion 定义额外的帖子操作方法.
 type PostExpansion interface {
 	AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error)
+	AppGet(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostResponse, error)
 }
 
 // postBiz 是 PostBiz 接口的实现.
@@ -256,4 +257,14 @@ func (b *postBiz) AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.List
 	}
 
 	return &v1.ListPostResponse{TotalCount: count, Posts: posts}, nil
+}
+
+func (b *postBiz) AppGet(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostResponse, error) {
+	whr := where.F("post_id", rq.GetPostID())
+	postM, err := b.store.Post().Get(ctx, whr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.GetPostResponse{Post: conversion.PostModelToPostV1(postM)}, nil
 }
