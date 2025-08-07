@@ -24,6 +24,7 @@ type CategoryBiz interface {
 	Delete(ctx context.Context, rq *v1.DeleteCategoryRequest) (*v1.DeleteCategoryResponse, error)
 	Get(ctx context.Context, rq *v1.GetCategoryRequest) (*v1.GetCategoryResponse, error)
 	List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error)
+	AppList(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error)
 }
 
 type categoryBiz struct {
@@ -97,6 +98,22 @@ func (b *categoryBiz) Get(ctx context.Context, rq *v1.GetCategoryRequest) (*v1.G
 // List 实现 CategoryBiz 接口中的 List 方法.
 func (b *categoryBiz) List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error) {
 	whr := where.NewWhere()
+
+	// 获取所有分类数据
+	_, categoryList, err := b.store.Category().List(ctx, whr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ListCategoryResponse{
+		Total:      int32(len(categoryList)),
+		Categories: buildHierarchicalCategories(categoryList),
+	}, nil
+}
+
+// List 实现 CategoryBiz 接口中的 List 方法.
+func (b *categoryBiz) AppList(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error) {
+	whr := where.F("is_active", 1)
 
 	// 获取所有分类数据
 	_, categoryList, err := b.store.Category().List(ctx, whr)

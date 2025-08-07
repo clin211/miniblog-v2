@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handler) ListCategories(c *gin.Context) {
-	core.HandleQueryRequest(c, h.biz.CategoryV1().List, h.val.ValidateListCategoryRequest)
+	core.HandleQueryRequest(c, h.biz.CategoryV1().AppList, h.val.ValidateListCategoryRequest)
 }
 
 func (h *Handler) GetCategory(c *gin.Context) {
