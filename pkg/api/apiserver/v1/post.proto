@@ -8,6 +8,9 @@ syntax = "proto3";
 
 package v1;
 
+import "apiserver/v1/tag.proto";
+import "apiserver/v1/category.proto";
+
 option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
 
 // PostType 表示文章类型
@@ -64,6 +67,10 @@ message Post {
     int64 createdAt = 17;
     // updatedAt 表示博客最后更新时间（Unix 时间戳）
     int64 updatedAt = 18;
+    // category 表示文章分类信息
+    optional Category category = 19;
+    // tags 表示文章标签列表
+    repeated Tag tags = 20;
 }
 
 // CreatePostRequest 表示创建文章请求

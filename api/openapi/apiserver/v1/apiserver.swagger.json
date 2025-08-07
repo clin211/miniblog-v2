@@ -2056,6 +2056,18 @@
           "type": "string",
           "format": "int64",
           "title": "updatedAt 表示博客最后更新时间（Unix 时间戳）"
+        },
+        "category": {
+          "$ref": "#/definitions/v1Category",
+          "title": "category 表示文章分类信息"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Tag"
+          },
+          "title": "tags 表示文章标签列表"
         }
       },
       "title": "Post 表示博客文章"

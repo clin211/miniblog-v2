@@ -25,3 +25,31 @@ func PostV1ToPostModel(protoPost *v1.Post) *model.PostM {
 	_ = copier.CopyWithConverters(&postModel, protoPost)
 	return &postModel
 }
+
+// PostModelToPostV1WithRelations 将文章模型和关联数据转换为 Protobuf 层的 Post 对象
+func PostModelToPostV1WithRelations(postModel *model.PostM, category *model.CategoryM, tags []*model.TagM) *v1.Post {
+	if postModel == nil {
+		return nil
+	}
+
+	// 首先转换基础的文章信息
+	var protoPost v1.Post
+	_ = copier.CopyWithConverters(&protoPost, postModel)
+
+	// 转换分类信息
+	if category != nil {
+		protoPost.Category = CategoryModelToCategoryV1(category)
+	}
+
+	// 转换标签信息
+	if len(tags) > 0 {
+		protoPost.Tags = make([]*v1.Tag, 0, len(tags))
+		for _, tag := range tags {
+			if tag != nil {
+				protoPost.Tags = append(protoPost.Tags, TagModelToTagV1(tag))
+			}
+		}
+	}
+
+	return &protoPost
+}

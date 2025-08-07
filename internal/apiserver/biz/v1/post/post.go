@@ -12,7 +12,6 @@ import (
 	"github.com/jinzhu/copier"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
-	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/conversion"
 	"github.com/clin211/miniblog-v2/internal/apiserver/store"
 	"github.com/clin211/miniblog-v2/internal/pkg/contextx"
 	"github.com/clin211/miniblog-v2/internal/pkg/log"
@@ -48,6 +47,12 @@ var _ PostBiz = (*postBiz)(nil)
 // New 创建 postBiz 的实例.
 func New(store store.IStore) *postBiz {
 	return &postBiz{store: store}
+}
+
+// loadPostsWithRelations 批量加载文章及其关联的分类和标签信息
+// 使用 helper.go 中的便捷工厂方法，保持接口简洁
+func (b *postBiz) loadPostsWithRelations(ctx context.Context, posts []*model.PostM) ([]*v1.Post, error) {
+	return LoadPostsWithRelations(ctx, b.store, posts)
 }
 
 // Create 实现 PostBiz 接口中的 Create 方法.
@@ -216,7 +221,17 @@ func (b *postBiz) Get(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostRe
 		return nil, err
 	}
 
-	return &v1.GetPostResponse{Post: conversion.PostModelToPostV1(postM)}, nil
+	// 使用批量加载方法处理单个文章
+	posts, err := b.loadPostsWithRelations(ctx, []*model.PostM{postM})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(posts) == 0 {
+		return nil, err
+	}
+
+	return &v1.GetPostResponse{Post: posts[0]}, nil
 }
 
 // List 实现 PostBiz 接口中的 List 方法.
@@ -227,10 +242,10 @@ func (b *postBiz) List(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPos
 		return nil, err
 	}
 
-	posts := make([]*v1.Post, 0, len(postList))
-	for _, post := range postList {
-		converted := conversion.PostModelToPostV1(post)
-		posts = append(posts, converted)
+	// 使用批量加载方法处理文章列表
+	posts, err := b.loadPostsWithRelations(ctx, postList)
+	if err != nil {
+		return nil, err
 	}
 
 	return &v1.ListPostResponse{TotalCount: count, Posts: posts}, nil
@@ -250,10 +265,10 @@ func (b *postBiz) AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.List
 		return nil, err
 	}
 
-	posts := make([]*v1.Post, 0, len(postList))
-	for _, post := range postList {
-		converted := conversion.PostModelToPostV1(post)
-		posts = append(posts, converted)
+	// 使用批量加载方法处理文章列表
+	posts, err := b.loadPostsWithRelations(ctx, postList)
+	if err != nil {
+		return nil, err
 	}
 
 	return &v1.ListPostResponse{TotalCount: count, Posts: posts}, nil
@@ -266,5 +281,15 @@ func (b *postBiz) AppGet(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPos
 		return nil, err
 	}
 
-	return &v1.GetPostResponse{Post: conversion.PostModelToPostV1(postM)}, nil
+	// 使用批量加载方法处理单个文章
+	posts, err := b.loadPostsWithRelations(ctx, []*model.PostM{postM})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(posts) == 0 {
+		return nil, err
+	}
+
+	return &v1.GetPostResponse{Post: posts[0]}, nil
 }

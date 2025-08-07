@@ -13,12 +13,7 @@ import (
 // PostStore 定义了 post 模块在 store 层所实现的方法
 type PostStore interface {
 	genericstore.IStore[model.PostM]
-
-	PostExpansion
 }
-
-// PostExpansion 定义了帖子操作的附加方法
-type PostExpansion interface{}
 
 // postStore 是 PostStore 接口的实现
 type postStore struct {
