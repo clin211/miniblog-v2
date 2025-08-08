@@ -17,3 +17,7 @@ func (h *Handler) ListPost(c *gin.Context) {
 func (h *Handler) GetPost(c *gin.Context) {
 	core.HandleUriRequest(c, h.biz.PostV1().AppGet, h.val.ValidateGetPostRequest)
 }
+
+func (h *Handler) BatchGetPosts(c *gin.Context) {
+	core.HandleQueryRequest(c, h.biz.PostV1().AppBatchGet, h.val.ValidateBatchGetPostsRequest)
+}

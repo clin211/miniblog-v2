@@ -56,6 +56,7 @@ const (
 	MiniBlog_BatchDeletePostTags_FullMethodName = "/v1.MiniBlog/BatchDeletePostTags"
 	MiniBlog_AppPostList_FullMethodName         = "/v1.MiniBlog/AppPostList"
 	MiniBlog_AppGetPost_FullMethodName          = "/v1.MiniBlog/AppGetPost"
+	MiniBlog_BatchAppGetPosts_FullMethodName    = "/v1.MiniBlog/BatchAppGetPosts"
 	MiniBlog_AppGetCategory_FullMethodName      = "/v1.MiniBlog/AppGetCategory"
 	MiniBlog_AppListCategory_FullMethodName     = "/v1.MiniBlog/AppListCategory"
 )
@@ -128,6 +129,8 @@ type MiniBlogClient interface {
 	AppPostList(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (*ListPostResponse, error)
 	// GetPost 获取文章信息
 	AppGetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error)
+	// BatchAppGetPosts 批量获取文章信息
+	BatchAppGetPosts(ctx context.Context, in *BatchGetPostsRequest, opts ...grpc.CallOption) (*BatchGetPostsResponse, error)
 	// GetCategory 获取分类信息
 	AppGetCategory(ctx context.Context, in *GetCategoryRequest, opts ...grpc.CallOption) (*GetCategoryResponse, error)
 	// ListCategory 列出所有分类
@@ -452,6 +455,16 @@ func (c *miniBlogClient) AppGetPost(ctx context.Context, in *GetPostRequest, opt
 	return out, nil
 }
 
+func (c *miniBlogClient) BatchAppGetPosts(ctx context.Context, in *BatchGetPostsRequest, opts ...grpc.CallOption) (*BatchGetPostsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BatchGetPostsResponse)
+	err := c.cc.Invoke(ctx, MiniBlog_BatchAppGetPosts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *miniBlogClient) AppGetCategory(ctx context.Context, in *GetCategoryRequest, opts ...grpc.CallOption) (*GetCategoryResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetCategoryResponse)
@@ -540,6 +553,8 @@ type MiniBlogServer interface {
 	AppPostList(context.Context, *ListPostRequest) (*ListPostResponse, error)
 	// GetPost 获取文章信息
 	AppGetPost(context.Context, *GetPostRequest) (*GetPostResponse, error)
+	// BatchAppGetPosts 批量获取文章信息
+	BatchAppGetPosts(context.Context, *BatchGetPostsRequest) (*BatchGetPostsResponse, error)
 	// GetCategory 获取分类信息
 	AppGetCategory(context.Context, *GetCategoryRequest) (*GetCategoryResponse, error)
 	// ListCategory 列出所有分类
@@ -646,6 +661,9 @@ func (UnimplementedMiniBlogServer) AppPostList(context.Context, *ListPostRequest
 }
 func (UnimplementedMiniBlogServer) AppGetPost(context.Context, *GetPostRequest) (*GetPostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AppGetPost not implemented")
+}
+func (UnimplementedMiniBlogServer) BatchAppGetPosts(context.Context, *BatchGetPostsRequest) (*BatchGetPostsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BatchAppGetPosts not implemented")
 }
 func (UnimplementedMiniBlogServer) AppGetCategory(context.Context, *GetCategoryRequest) (*GetCategoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AppGetCategory not implemented")
@@ -1232,6 +1250,24 @@ func _MiniBlog_AppGetPost_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MiniBlog_BatchAppGetPosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchGetPostsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiniBlogServer).BatchAppGetPosts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MiniBlog_BatchAppGetPosts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiniBlogServer).BatchAppGetPosts(ctx, req.(*BatchGetPostsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MiniBlog_AppGetCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetCategoryRequest)
 	if err := dec(in); err != nil {
@@ -1398,6 +1434,10 @@ var MiniBlog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AppGetPost",
 			Handler:    _MiniBlog_AppGetPost_Handler,
+		},
+		{
+			MethodName: "BatchAppGetPosts",
+			Handler:    _MiniBlog_BatchAppGetPosts_Handler,
 		},
 		{
 			MethodName: "AppGetCategory",

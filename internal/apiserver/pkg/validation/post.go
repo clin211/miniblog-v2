@@ -424,3 +424,16 @@ func (v *Validator) ValidateGetPostRequest(ctx context.Context, rq *v1.GetPostRe
 func (v *Validator) ValidateListPostRequest(ctx context.Context, rq *v1.ListPostRequest) error {
 	return genericvalidation.ValidateAllFields(rq, v.ValidatePostRules())
 }
+
+// ValidateBatchGetPostsRequest 校验 BatchGetPostsRequest 结构体的有效性
+func (v *Validator) ValidateBatchGetPostsRequest(ctx context.Context, rq *v1.BatchGetPostsRequest) error {
+	if len(rq.GetPostIDs()) == 0 {
+		return errno.ErrInvalidArgument.WithMessage("postIDs cannot be empty")
+	}
+	for _, id := range rq.GetPostIDs() {
+		if id == "" {
+			return errno.ErrInvalidArgument.WithMessage("post ID in the list cannot be empty")
+		}
+	}
+	return nil
+}

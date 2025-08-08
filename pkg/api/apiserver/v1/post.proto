@@ -165,6 +165,19 @@ message GetPostResponse {
     Post post = 1;
 }
 
+// BatchGetPostsRequest 表示批量获取文章请求
+message BatchGetPostsRequest {
+    // postIDs 表示要获取的文章 ID 列表
+    // @gotags: form:"postIDs"
+    repeated string postIDs = 1;
+}
+
+// BatchGetPostsResponse 表示批量获取文章响应
+message BatchGetPostsResponse {
+    // posts 表示返回的文章列表
+    repeated Post posts = 1;
+}
+
 // ListPostRequest 表示获取文章列表请求
 message ListPostRequest {
     // offset 表示偏移量

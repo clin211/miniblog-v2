@@ -493,6 +493,19 @@ service MiniBlog {
         };
     }
 
+    // BatchAppGetPosts 批量获取文章信息
+    rpc BatchAppGetPosts(BatchGetPostsRequest) returns (BatchGetPostsResponse) {
+        option (google.api.http) = {
+            get: "/v1/app/posts/batch",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "批量获取文章信息";
+            operation_id: "BatchAppGetPosts";
+            tags: "app/博客管理";
+        };
+    }
+
     // GetCategory 获取分类信息
     rpc AppGetCategory(GetCategoryRequest) returns (GetCategoryResponse) {
         option (google.api.http) = {

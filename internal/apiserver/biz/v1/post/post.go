@@ -36,6 +36,8 @@ type PostBiz interface {
 type PostExpansion interface {
 	AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error)
 	AppGet(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostResponse, error)
+	// AppBatchGet 批量按 postID 获取文章
+	AppBatchGet(ctx context.Context, rq *v1.BatchGetPostsRequest) (*v1.BatchGetPostsResponse, error)
 }
 
 // postBiz 是 PostBiz 接口的实现.
@@ -309,4 +311,33 @@ func (b *postBiz) AppGet(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPos
 		return nil, err
 	}
 	return &v1.GetPostResponse{Post: postProto}, nil
+}
+
+// AppBatchGet 批量按 postID 获取文章
+func (b *postBiz) AppBatchGet(ctx context.Context, rq *v1.BatchGetPostsRequest) (*v1.BatchGetPostsResponse, error) {
+	ids := rq.GetPostIDs()
+	if len(ids) == 0 {
+		return &v1.BatchGetPostsResponse{Posts: []*v1.Post{}}, nil
+	}
+
+	whr := where.NewWhere().F("post_id", ids)
+	// 选择必要列，避免 longtext IO
+	whr = whr.C(clause.Select{
+		Columns: []clause.Column{
+			{Name: "id"}, {Name: "post_id"}, {Name: "title"}, {Name: "cover"}, {Name: "summary"},
+			{Name: "user_id"}, {Name: "category_id"}, {Name: "post_type"}, {Name: "position"},
+			{Name: "view_count"}, {Name: "like_count"}, {Name: "status"}, {Name: "published_at"},
+			{Name: "created_at"}, {Name: "updated_at"},
+		},
+	})
+
+	_, list, err := b.store.Post().List(ctx, whr)
+	if err != nil {
+		return nil, err
+	}
+	posts, err := b.loadPostsWithRelations(ctx, list)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.BatchGetPostsResponse{Posts: posts}, nil
 }

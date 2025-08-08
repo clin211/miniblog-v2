@@ -165,6 +165,42 @@
         ]
       }
     },
+    "/v1/app/posts/batch": {
+      "get": {
+        "summary": "批量获取文章信息",
+        "operationId": "BatchAppGetPosts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchGetPostsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "postIDs",
+            "description": "postIDs 表示要获取的文章 ID 列表\n@gotags: form:\"postIDs\"",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "app/博客管理"
+        ]
+      }
+    },
     "/v1/app/posts/{postID}": {
       "get": {
         "summary": "获取文章信息",
@@ -1457,6 +1493,20 @@
     "v1BatchDeletePostTagsResponse": {
       "type": "object",
       "title": "BatchDeletePostTagsResponse 表示批量删除文章标签关联响应"
+    },
+    "v1BatchGetPostsResponse": {
+      "type": "object",
+      "properties": {
+        "posts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Post"
+          },
+          "title": "posts 表示返回的文章列表"
+        }
+      },
+      "title": "BatchGetPostsResponse 表示批量获取文章响应"
     },
     "v1Category": {
       "type": "object",
