@@ -277,7 +277,7 @@ func (b *postBiz) AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.List
 		},
 	})
 
-	// 列表与计数下沉至 store 层
+	// 列表与计数
 	postList, err := b.store.Post().ListApp(ctx, whr)
 	if err != nil {
 		return nil, err

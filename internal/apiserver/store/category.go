@@ -14,6 +14,7 @@ import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
 	genericstore "github.com/clin211/miniblog-v2/pkg/store"
 	"github.com/clin211/miniblog-v2/pkg/where"
+	"golang.org/x/sync/singleflight"
 )
 
 // CategoryStore 定义了 category 模块在 store 层所实现的方法
@@ -22,6 +23,11 @@ type CategoryStore interface {
 
 	// BatchGetByIDsWithCache 批量获取分类并带短 TTL 缓存
 	BatchGetByIDsWithCache(ctx context.Context, ids []int32) (map[int32]*model.CategoryM, error)
+
+	// ListAllWithCache 返回全量分类列表并带缓存
+	ListAllWithCache(ctx context.Context) ([]*model.CategoryM, error)
+	// ListActiveWithCache 返回 is_active=1 的分类列表并带缓存
+	ListActiveWithCache(ctx context.Context) ([]*model.CategoryM, error)
 }
 
 // categoryStore 是 CategoryStore 接口的实现
@@ -39,6 +45,53 @@ func newCategoryStore(store *datastore) *categoryStore {
 		Store: genericstore.NewStore[model.CategoryM](store, genericstore.NewLogger()),
 		ds:    store,
 	}
+}
+
+const (
+	cacheKeyCategoryListAll    = "miniblog:category:list:all"
+	cacheKeyCategoryListActive = "miniblog:category:list:active"
+	cacheTTLCategoryList       = 12 * time.Hour
+)
+
+var listGroup singleflight.Group
+
+func (s *categoryStore) invalidateListCache(ctx context.Context) {
+	rdb := s.ds.Redis(ctx)
+	if rdb == nil {
+		return
+	}
+	_ = rdb.Del(ctx, cacheKeyCategoryListAll, cacheKeyCategoryListActive).Err()
+}
+
+// Create 覆盖通用 Create，在成功后失效列表缓存
+func (s *categoryStore) Create(ctx context.Context, data *model.CategoryM) error {
+	if err := s.Store.Create(ctx, data); err != nil {
+		return err
+	}
+	s.invalidateListCache(ctx)
+	return nil
+}
+
+// Update 覆盖通用 Update，在成功后失效列表缓存及单条缓存
+func (s *categoryStore) Update(ctx context.Context, data *model.CategoryM) error {
+	if err := s.Store.Update(ctx, data); err != nil {
+		return err
+	}
+	rdb := s.ds.Redis(ctx)
+	if rdb != nil && data != nil && data.ID != 0 {
+		_ = rdb.Del(ctx, fmt.Sprintf("miniblog:category:%d", data.ID)).Err()
+	}
+	s.invalidateListCache(ctx)
+	return nil
+}
+
+// Delete 覆盖通用 Delete，在成功后失效列表缓存
+func (s *categoryStore) Delete(ctx context.Context, opts *where.Options) error {
+	if err := s.Store.Delete(ctx, opts); err != nil {
+		return err
+	}
+	s.invalidateListCache(ctx)
+	return nil
 }
 
 // BatchGetByIDsWithCache 批量获取分类并带短 TTL 缓存
@@ -107,4 +160,66 @@ func (s *categoryStore) BatchGetByIDsWithCache(ctx context.Context, ids []int32)
 	}
 
 	return result, nil
+}
+
+// ListAllWithCache 返回全量分类列表并带缓存
+func (s *categoryStore) ListAllWithCache(ctx context.Context) ([]*model.CategoryM, error) {
+	rdb := s.ds.Redis(ctx)
+	if rdb != nil {
+		if bs, err := rdb.Get(ctx, cacheKeyCategoryListAll).Bytes(); err == nil && len(bs) > 0 {
+			var list []*model.CategoryM
+			if jsonErr := json.Unmarshal(bs, &list); jsonErr == nil {
+				return list, nil
+			}
+		}
+	}
+
+	v, err, _ := listGroup.Do(cacheKeyCategoryListAll, func() (any, error) {
+		whr := where.NewWhere()
+		_, categoryList, err := s.Store.List(ctx, whr)
+		if err != nil {
+			return nil, err
+		}
+		if rdb != nil {
+			if data, mErr := json.Marshal(categoryList); mErr == nil {
+				_ = rdb.Set(ctx, cacheKeyCategoryListAll, data, cacheTTLCategoryList).Err()
+			}
+		}
+		return categoryList, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return v.([]*model.CategoryM), nil
+}
+
+// ListActiveWithCache 返回 is_active=1 的分类列表并带缓存
+func (s *categoryStore) ListActiveWithCache(ctx context.Context) ([]*model.CategoryM, error) {
+	rdb := s.ds.Redis(ctx)
+	if rdb != nil {
+		if bs, err := rdb.Get(ctx, cacheKeyCategoryListActive).Bytes(); err == nil && len(bs) > 0 {
+			var list []*model.CategoryM
+			if jsonErr := json.Unmarshal(bs, &list); jsonErr == nil {
+				return list, nil
+			}
+		}
+	}
+
+	v, err, _ := listGroup.Do(cacheKeyCategoryListActive, func() (any, error) {
+		whr := where.F("is_active", 1)
+		_, categoryList, err := s.Store.List(ctx, whr)
+		if err != nil {
+			return nil, err
+		}
+		if rdb != nil {
+			if data, mErr := json.Marshal(categoryList); mErr == nil {
+				_ = rdb.Set(ctx, cacheKeyCategoryListActive, data, cacheTTLCategoryList).Err()
+			}
+		}
+		return categoryList, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return v.([]*model.CategoryM), nil
 }

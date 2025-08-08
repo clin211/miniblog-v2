@@ -97,14 +97,11 @@ func (b *categoryBiz) Get(ctx context.Context, rq *v1.GetCategoryRequest) (*v1.G
 
 // List 实现 CategoryBiz 接口中的 List 方法.
 func (b *categoryBiz) List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error) {
-	whr := where.NewWhere()
-
-	// 获取所有分类数据
-	_, categoryList, err := b.store.Category().List(ctx, whr)
+	// 读取全量列表
+	categoryList, err := b.store.Category().ListAllWithCache(ctx)
 	if err != nil {
 		return nil, err
 	}
-
 	return &v1.ListCategoryResponse{
 		Total:      int32(len(categoryList)),
 		Categories: buildHierarchicalCategories(categoryList),
@@ -113,14 +110,11 @@ func (b *categoryBiz) List(ctx context.Context, rq *v1.ListCategoryRequest) (*v1
 
 // List 实现 CategoryBiz 接口中的 List 方法.
 func (b *categoryBiz) AppList(ctx context.Context, rq *v1.ListCategoryRequest) (*v1.ListCategoryResponse, error) {
-	whr := where.F("is_active", 1)
-
-	// 获取所有分类数据
-	_, categoryList, err := b.store.Category().List(ctx, whr)
+	// 读取 active 列表
+	categoryList, err := b.store.Category().ListActiveWithCache(ctx)
 	if err != nil {
 		return nil, err
 	}
-
 	return &v1.ListCategoryResponse{
 		Total:      int32(len(categoryList)),
 		Categories: buildHierarchicalCategories(categoryList),
