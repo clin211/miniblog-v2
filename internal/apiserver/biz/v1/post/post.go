@@ -7,9 +7,11 @@ package post
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/jinzhu/copier"
+	"gorm.io/gorm/clause"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
 	"github.com/clin211/miniblog-v2/internal/apiserver/store"
@@ -53,6 +55,11 @@ func New(store store.IStore) *postBiz {
 // 使用 helper.go 中的便捷工厂方法，保持接口简洁
 func (b *postBiz) loadPostsWithRelations(ctx context.Context, posts []*model.PostM) ([]*v1.Post, error) {
 	return LoadPostsWithRelations(ctx, b.store, posts)
+}
+
+// loadSinglePostWithRelations 为单篇文章提供轻量级的关联装载路径。
+func (b *postBiz) loadSinglePostWithRelations(ctx context.Context, post *model.PostM) (*v1.Post, error) {
+	return LoadSinglePostWithRelations(ctx, b.store, post)
 }
 
 // Create 实现 PostBiz 接口中的 Create 方法.
@@ -221,17 +228,12 @@ func (b *postBiz) Get(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostRe
 		return nil, err
 	}
 
-	// 使用批量加载方法处理单个文章
-	posts, err := b.loadPostsWithRelations(ctx, []*model.PostM{postM})
+	// 单篇文章走轻量路径，减少不必要并发与对象池开销
+	postProto, err := b.loadSinglePostWithRelations(ctx, postM)
 	if err != nil {
 		return nil, err
 	}
-
-	if len(posts) == 0 {
-		return nil, err
-	}
-
-	return &v1.GetPostResponse{Post: posts[0]}, nil
+	return &v1.GetPostResponse{Post: postProto}, nil
 }
 
 // List 实现 PostBiz 接口中的 List 方法.
@@ -252,15 +254,35 @@ func (b *postBiz) List(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPos
 }
 
 func (b *postBiz) AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.ListPostResponse, error) {
-	var whr *where.Options
-	// 检查 categoryID 是否提供
+	// 使用偏移量/限制，避免将 offset 当成页码
+	whr := where.O(int(rq.GetOffset())).L(int(rq.GetLimit()))
+
+	// 仅展示已发布文章，减少扫描数据量
+	whr.F("status", int32(v1.PostStatus_POST_STATUS_PUBLISHED))
+
+	// 可选的分类过滤：安全解析为整型，避免隐式类型转换影响索引
 	if rq.GetCategoryID() != "" {
-		whr = where.F("category_id", *rq.CategoryID).P(int(rq.GetOffset()), int(rq.GetLimit()))
-	} else {
-		whr = where.P(int(rq.GetOffset()), int(rq.GetLimit()))
+		if cid64, err := strconv.ParseInt(rq.GetCategoryID(), 10, 32); err == nil {
+			whr.F("category_id", int32(cid64))
+		}
 	}
 
-	count, postList, err := b.store.Post().List(ctx, whr)
+	// 列表不需要 content（LONGTEXT），选择必要列，显著减少 IO
+	whr.C(clause.Select{
+		Columns: []clause.Column{
+			{Name: "id"}, {Name: "post_id"}, {Name: "title"}, {Name: "cover"}, {Name: "summary"},
+			{Name: "user_id"}, {Name: "category_id"}, {Name: "post_type"}, {Name: "position"},
+			{Name: "view_count"}, {Name: "like_count"}, {Name: "status"}, {Name: "published_at"},
+			{Name: "created_at"}, {Name: "updated_at"},
+		},
+	})
+
+	// 列表与计数下沉至 store 层
+	postList, err := b.store.Post().ListApp(ctx, whr)
+	if err != nil {
+		return nil, err
+	}
+	totalCount, err := b.store.Post().CountApp(ctx, whr)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +293,7 @@ func (b *postBiz) AppList(ctx context.Context, rq *v1.ListPostRequest) (*v1.List
 		return nil, err
 	}
 
-	return &v1.ListPostResponse{TotalCount: count, Posts: posts}, nil
+	return &v1.ListPostResponse{TotalCount: totalCount, Posts: posts}, nil
 }
 
 func (b *postBiz) AppGet(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPostResponse, error) {
@@ -281,15 +303,10 @@ func (b *postBiz) AppGet(ctx context.Context, rq *v1.GetPostRequest) (*v1.GetPos
 		return nil, err
 	}
 
-	// 使用批量加载方法处理单个文章
-	posts, err := b.loadPostsWithRelations(ctx, []*model.PostM{postM})
+	// 单篇文章走轻量路径
+	postProto, err := b.loadSinglePostWithRelations(ctx, postM)
 	if err != nil {
 		return nil, err
 	}
-
-	if len(posts) == 0 {
-		return nil, err
-	}
-
-	return &v1.GetPostResponse{Post: posts[0]}, nil
+	return &v1.GetPostResponse{Post: postProto}, nil
 }

@@ -7,12 +7,8 @@ package post
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"sync"
-	"time"
 
-	"github.com/redis/go-redis/v9"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/clin211/miniblog-v2/internal/apiserver/model"
@@ -57,147 +53,9 @@ var (
 	}
 )
 
-// Redis 缓存管理器
-type RedisCache struct {
-	client *redis.Client
-	ttl    time.Duration
-}
+// 删除 Redis 具体实现，交由 store 层统一缓存
 
-// NewRedisCache 创建 Redis 缓存管理器
-func NewRedisCache(client *redis.Client, ttl time.Duration) *RedisCache {
-	return &RedisCache{
-		client: client,
-		ttl:    ttl,
-	}
-}
-
-// 缓存键前缀
-const (
-	categoryKeyPrefix = "miniblog:category:"
-	tagKeyPrefix      = "miniblog:tag:"
-)
-
-// getBatchCategories 批量获取缓存的分类
-func (rc *RedisCache) getBatchCategories(ctx context.Context, ids []int32) (map[int32]*model.CategoryM, []int32) {
-	if len(ids) == 0 {
-		return make(map[int32]*model.CategoryM), nil
-	}
-
-	keys := make([]string, len(ids))
-	for i, id := range ids {
-		keys[i] = fmt.Sprintf("%s%d", categoryKeyPrefix, id)
-	}
-
-	vals, err := rc.client.MGet(ctx, keys...).Result()
-	if err != nil {
-		log.W(ctx).Errorw("Failed to batch get cached categories", "error", err)
-		return make(map[int32]*model.CategoryM), ids
-	}
-
-	cached := make(map[int32]*model.CategoryM)
-	uncached := make([]int32, 0)
-
-	for i, val := range vals {
-		if val == nil {
-			uncached = append(uncached, ids[i])
-			continue
-		}
-
-		var category model.CategoryM
-		if err := json.Unmarshal([]byte(val.(string)), &category); err != nil {
-			log.W(ctx).Errorw("Failed to unmarshal cached category", "error", err, "categoryID", ids[i])
-			uncached = append(uncached, ids[i])
-			continue
-		}
-
-		cached[ids[i]] = &category
-	}
-
-	return cached, uncached
-}
-
-// setBatchCategories 批量设置缓存的分类
-func (rc *RedisCache) setBatchCategories(ctx context.Context, categories []*model.CategoryM) {
-	if len(categories) == 0 {
-		return
-	}
-
-	pipe := rc.client.Pipeline()
-	for _, category := range categories {
-		key := fmt.Sprintf("%s%d", categoryKeyPrefix, category.ID)
-		data, err := json.Marshal(category)
-		if err != nil {
-			log.W(ctx).Errorw("Failed to marshal category for cache", "error", err, "categoryID", category.ID)
-			continue
-		}
-		pipe.Set(ctx, key, data, rc.ttl)
-	}
-
-	if _, err := pipe.Exec(ctx); err != nil {
-		log.W(ctx).Errorw("Failed to batch set cached categories", "error", err)
-	}
-}
-
-// getBatchTags 批量获取缓存的标签
-func (rc *RedisCache) getBatchTags(ctx context.Context, ids []int32) (map[int32]*model.TagM, []int32) {
-	if len(ids) == 0 {
-		return make(map[int32]*model.TagM), nil
-	}
-
-	keys := make([]string, len(ids))
-	for i, id := range ids {
-		keys[i] = fmt.Sprintf("%s%d", tagKeyPrefix, id)
-	}
-
-	vals, err := rc.client.MGet(ctx, keys...).Result()
-	if err != nil {
-		log.W(ctx).Errorw("Failed to batch get cached tags", "error", err)
-		return make(map[int32]*model.TagM), ids
-	}
-
-	cached := make(map[int32]*model.TagM)
-	uncached := make([]int32, 0)
-
-	for i, val := range vals {
-		if val == nil {
-			uncached = append(uncached, ids[i])
-			continue
-		}
-
-		var tag model.TagM
-		if err := json.Unmarshal([]byte(val.(string)), &tag); err != nil {
-			log.W(ctx).Errorw("Failed to unmarshal cached tag", "error", err, "tagID", ids[i])
-			uncached = append(uncached, ids[i])
-			continue
-		}
-
-		cached[ids[i]] = &tag
-	}
-
-	return cached, uncached
-}
-
-// setBatchTags 批量设置缓存的标签
-func (rc *RedisCache) setBatchTags(ctx context.Context, tags []*model.TagM) {
-	if len(tags) == 0 {
-		return
-	}
-
-	pipe := rc.client.Pipeline()
-	for _, tag := range tags {
-		key := fmt.Sprintf("%s%d", tagKeyPrefix, tag.ID)
-		data, err := json.Marshal(tag)
-		if err != nil {
-			log.W(ctx).Errorw("Failed to marshal tag for cache", "error", err, "tagID", tag.ID)
-			continue
-		}
-		pipe.Set(ctx, key, data, rc.ttl)
-	}
-
-	if _, err := pipe.Exec(ctx); err != nil {
-		log.W(ctx).Errorw("Failed to batch set cached tags", "error", err)
-	}
-}
+// 删除具体缓存读写逻辑
 
 // resetPool 重置切片池对象
 func resetSlice[T any](s []T) []T {
@@ -236,17 +94,11 @@ type HighPerformanceCategoryLoader struct {
 	store         store.IStore
 	categoriesMap map[int32]*model.CategoryM
 	mu            *sync.RWMutex
-	cache         *RedisCache
 }
 
 // NewHighPerformanceCategoryLoaderWithCache 创建带缓存的高性能分类加载器
-func NewHighPerformanceCategoryLoaderWithCache(store store.IStore, categoriesMap map[int32]*model.CategoryM, mu *sync.RWMutex, cache *RedisCache) *HighPerformanceCategoryLoader {
-	return &HighPerformanceCategoryLoader{
-		store:         store,
-		categoriesMap: categoriesMap,
-		mu:            mu,
-		cache:         cache,
-	}
+func NewHighPerformanceCategoryLoader(store store.IStore, categoriesMap map[int32]*model.CategoryM, mu *sync.RWMutex) *HighPerformanceCategoryLoader {
+	return &HighPerformanceCategoryLoader{store: store, categoriesMap: categoriesMap, mu: mu}
 }
 
 // Load 实现 RelationLoader 接口 - 高性能版本（使用 Redis 缓存）
@@ -273,48 +125,16 @@ func (hcl *HighPerformanceCategoryLoader) Load(ctx context.Context, posts []*mod
 	}
 
 	return func() error {
-		var cachedCategories map[int32]*model.CategoryM
-		var uncachedIDs []int32
-
-		// 如果有 Redis 缓存，使用批量缓存查询
-		if hcl.cache != nil {
-			cachedCategories, uncachedIDs = hcl.cache.getBatchCategories(ctx, categoryIDs)
-		} else {
-			// 没有缓存时，直接查询所有ID
-			cachedCategories = make(map[int32]*model.CategoryM)
-			uncachedIDs = categoryIDs
+		// 使用 store 层批量缓存 API
+		cached, err := hcl.store.Category().BatchGetByIDsWithCache(ctx, categoryIDs)
+		if err != nil {
+			return err
 		}
-
-		// 先设置缓存中的数据
-		if len(cachedCategories) > 0 {
-			hcl.mu.Lock()
-			for id, category := range cachedCategories {
-				hcl.categoriesMap[id] = category
-			}
-			hcl.mu.Unlock()
+		hcl.mu.Lock()
+		for id, c := range cached {
+			hcl.categoriesMap[id] = c
 		}
-
-		// 查询未缓存的分类
-		if len(uncachedIDs) > 0 {
-			whr := where.F("id", uncachedIDs)
-			_, categories, err := hcl.store.Category().List(ctx, whr)
-			if err != nil {
-				log.W(ctx).Errorw("Failed to load categories", "error", err, "categoryIDs", uncachedIDs)
-				return err
-			}
-
-			hcl.mu.Lock()
-			for _, category := range categories {
-				hcl.categoriesMap[category.ID] = category
-			}
-			hcl.mu.Unlock()
-
-			// 批量更新 Redis 缓存
-			if hcl.cache != nil {
-				hcl.cache.setBatchCategories(ctx, categories)
-			}
-		}
-
+		hcl.mu.Unlock()
 		return nil
 	}
 }
@@ -328,17 +148,11 @@ type HighPerformanceTagLoader struct {
 	store       store.IStore
 	postTagsMap map[string][]*model.TagM
 	mu          *sync.RWMutex
-	cache       *RedisCache
 }
 
 // NewHighPerformanceTagLoaderWithCache 创建带缓存的高性能标签加载器
-func NewHighPerformanceTagLoaderWithCache(store store.IStore, postTagsMap map[string][]*model.TagM, mu *sync.RWMutex, cache *RedisCache) *HighPerformanceTagLoader {
-	return &HighPerformanceTagLoader{
-		store:       store,
-		postTagsMap: postTagsMap,
-		mu:          mu,
-		cache:       cache,
-	}
+func NewHighPerformanceTagLoader(store store.IStore, postTagsMap map[string][]*model.TagM, mu *sync.RWMutex) *HighPerformanceTagLoader {
+	return &HighPerformanceTagLoader{store: store, postTagsMap: postTagsMap, mu: mu}
 }
 
 // Load 实现 RelationLoader 接口 - 高性能版本
@@ -412,43 +226,15 @@ func (htl *HighPerformanceTagLoader) loadTagRelationsOptimized(ctx context.Conte
 		return nil
 	}
 
-	var cachedTags map[int32]*model.TagM
-	var uncachedTagIDs []int32
-
-	// 如果有 Redis 缓存，使用批量缓存查询
-	if htl.cache != nil {
-		cachedTags, uncachedTagIDs = htl.cache.getBatchTags(ctx, allTagIDs)
-	} else {
-		// 没有缓存时，直接查询所有ID
-		cachedTags = make(map[int32]*model.TagM)
-		uncachedTagIDs = allTagIDs
+	// 由 store 层提供批量缓存 API
+	cachedTags, err := htl.store.Tag().BatchGetByIDsWithCache(ctx, allTagIDs)
+	if err != nil {
+		return err
 	}
-
 	// 建立标签ID到标签对象的映射
-	tagsMap := make(map[int32]*model.TagM, len(cachedTags)+len(uncachedTagIDs))
-
-	// 先添加缓存的标签
+	tagsMap := make(map[int32]*model.TagM, len(cachedTags))
 	for id, tag := range cachedTags {
 		tagsMap[id] = tag
-	}
-
-	// 批量查询未缓存的标签详情
-	if len(uncachedTagIDs) > 0 {
-		tagWhr := where.F("id", uncachedTagIDs)
-		_, allTags, err := htl.store.Tag().List(ctx, tagWhr)
-		if err != nil {
-			log.W(ctx).Errorw("Failed to query tags", "error", err, "tagIDs", uncachedTagIDs)
-			return err
-		}
-
-		for _, tag := range allTags {
-			tagsMap[tag.ID] = tag
-		}
-
-		// 批量更新 Redis 缓存
-		if htl.cache != nil {
-			htl.cache.setBatchTags(ctx, allTags)
-		}
 	}
 
 	// 为每篇文章组装标签列表 - 减少锁的持有时间
@@ -609,16 +395,6 @@ func LoadPostsWithRelations(ctx context.Context, store store.IStore, posts []*mo
 		return []*v1.Post{}, nil
 	}
 
-	// 性能监控
-	start := time.Now()
-	defer func() {
-		duration := time.Since(start)
-		log.W(ctx).Infow("LoadPostsWithRelations performance",
-			"posts_count", len(posts),
-			"duration_ms", duration.Milliseconds(),
-			"avg_ms_per_post", float64(duration.Milliseconds())/float64(len(posts)))
-	}()
-
 	// 从对象池获取 map 对象，减少内存分配
 	categoriesMap := categoryMapPool.Get().(map[int32]*model.CategoryM)
 	postTagsMap := postTagsMapPool.Get().(map[string][]*model.TagM)
@@ -633,12 +409,9 @@ func LoadPostsWithRelations(ctx context.Context, store store.IStore, posts []*mo
 
 	var mu sync.RWMutex
 
-	// 创建 Redis 缓存管理器
-	cache := NewRedisCache(store.Redis(ctx), 12*time.Hour)
-
-	// 创建带 Redis 缓存的高性能关联数据加载器
-	categoryLoader := NewHighPerformanceCategoryLoaderWithCache(store, categoriesMap, &mu, cache)
-	tagLoader := NewHighPerformanceTagLoaderWithCache(store, postTagsMap, &mu, cache)
+	// 创建加载器（缓存由 store 层负责）
+	categoryLoader := NewHighPerformanceCategoryLoader(store, categoriesMap, &mu)
+	tagLoader := NewHighPerformanceTagLoader(store, postTagsMap, &mu)
 
 	// 创建协调器并发加载所有关联数据
 	coordinator := NewRelationLoadCoordinator(categoryLoader, tagLoader)
@@ -654,4 +427,52 @@ func LoadPostsWithRelations(ctx context.Context, store store.IStore, posts []*mo
 		return builder.BuildPostsConcurrently(posts), nil
 	}
 	return builder.BuildPosts(posts), nil
+}
+
+// LoadSinglePostWithRelations 加载单篇文章及其关联数据。
+// 相比批量装载路径，单篇装载会避免不必要的并发与对象池开销，减少额外分配与同步成本。
+func LoadSinglePostWithRelations(ctx context.Context, store store.IStore, post *model.PostM) (*v1.Post, error) {
+	if post == nil {
+		return nil, nil
+	}
+
+	var category *model.CategoryM
+	var tags []*model.TagM
+
+	// 分类：优先使用缓存，其次数据库。
+	if post.CategoryID != nil {
+		categoryID := *post.CategoryID
+		cachedMap, err := store.Category().BatchGetByIDsWithCache(ctx, []int32{categoryID})
+		if err != nil {
+			return nil, err
+		}
+		category = cachedMap[categoryID]
+	}
+
+	// 标签列表：先查 post_tag，再批量获取标签详情（优先缓存）。
+	postTagWhr := where.F("post_id", post.PostID)
+	_, postTags, err := store.PostTag().List(ctx, postTagWhr)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(postTags) > 0 {
+		tagIDs := make([]int32, 0, len(postTags))
+		for _, pt := range postTags {
+			tagIDs = append(tagIDs, pt.TagID)
+		}
+		cachedTags, err := store.Tag().BatchGetByIDsWithCache(ctx, tagIDs)
+		if err != nil {
+			return nil, err
+		}
+		tags = make([]*model.TagM, 0, len(tagIDs))
+		for _, id := range tagIDs {
+			if t, ok := cachedTags[id]; ok {
+				tags = append(tags, t)
+			}
+		}
+	}
+
+	protoPost := conversion.PostModelToPostV1WithRelations(post, category, tags)
+	return protoPost, nil
 }

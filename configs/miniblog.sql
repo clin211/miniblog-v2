@@ -85,6 +85,8 @@ CREATE TABLE post (
     INDEX idx_category_id (`category_id`),
     INDEX idx_post_type (`post_type`),
     INDEX idx_status (`status`),
+    -- 联合索引用于 AppList 过滤 + 排序
+    INDEX idx_status_category_id_id (`status`, `category_id`, `id`),
     INDEX idx_deleted_at (`deleted_at`)
 ) COMMENT='文章表' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
