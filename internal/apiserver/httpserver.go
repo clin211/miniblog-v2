@@ -127,7 +127,7 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 		post := appv1.Group("/posts")
 		{
 			post.GET("", app.ListPost)           // 查询所有文章
-			post.GET("batch", app.BatchGetPosts) // 批量按 postID 查询（静态路径避免与 :postID 冲突）
+			post.GET("batch", app.BatchGetPosts) // 批量按 postID 查询
 			post.GET(":postID", app.GetPost)     // 查询单篇文章
 		}
 

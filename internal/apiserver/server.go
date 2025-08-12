@@ -170,23 +170,6 @@ func (cfg *Config) NewDB() (*gorm.DB, error) {
 
 // NewMongoClient 创建一个 *mongo.Client 实例.
 func (cfg *Config) NewMongoClient() (*mongo.Client, error) {
-	// ctx, cancel := context.WithTimeout(context.Background(), cfg.MongoOptions.Timeout)
-	// defer cancel()
-
-	// // 使用URL创建MongoDB客户端
-	// client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.MongoOptions.URL))
-	// if err != nil {
-	// 	log.Errorw("Failed to connect to MongoDB", "err", err)
-	// 	return nil, err
-	// }
-
-	// // 测试连接
-	// if err := client.Ping(ctx, nil); err != nil {
-	// 	log.Errorw("Failed to ping MongoDB", "err", err)
-	// 	return nil, err
-	// }
-
-	// return client, nil
 	return cfg.MongoOptions.NewClient()
 }
 
