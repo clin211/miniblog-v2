@@ -44,20 +44,23 @@ type ServerOptions struct {
 	MongoOptions *genericoptions.MongoOptions `json:"mongodb" mapstructure:"mongo"`
 	// RedisOptions 包含 Redis 配置选项
 	RedisOptions *genericoptions.RedisOptions `json:"redis" mapstructure:"redis"`
+	// UploadOptions 包含文件上传配置选项
+	UploadOptions *genericoptions.UploadOptions `json:"upload" mapstructure:"upload"`
 }
 
 // NewServerOptions 创建带有默认值的 ServerOptions 实例
 func NewServerOptions() *ServerOptions {
 	opts := &ServerOptions{
-		ServerMode:   apiserver.GRPCGatewayServerMode,
-		JWTKey:       "Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5",
-		Expiration:   2 * time.Hour,
-		TLSOptions:   genericoptions.NewTLSOptions(),
-		HTTPOptions:  genericoptions.NewHTTPOptions(),
-		GRPCOptions:  genericoptions.NewGRPCOptions(),
-		MySQLOptions: genericoptions.NewMySQLOptions(),
-		MongoOptions: genericoptions.NewMongoOptions(),
-		RedisOptions: genericoptions.NewRedisOptions(),
+		ServerMode:    apiserver.GRPCGatewayServerMode,
+		JWTKey:        "Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5",
+		Expiration:    2 * time.Hour,
+		TLSOptions:    genericoptions.NewTLSOptions(),
+		HTTPOptions:   genericoptions.NewHTTPOptions(),
+		GRPCOptions:   genericoptions.NewGRPCOptions(),
+		MySQLOptions:  genericoptions.NewMySQLOptions(),
+		MongoOptions:  genericoptions.NewMongoOptions(),
+		RedisOptions:  genericoptions.NewRedisOptions(),
+		UploadOptions: genericoptions.NewUploadOptions(),
 	}
 	opts.HTTPOptions.Addr = ":5555"
 	opts.GRPCOptions.Addr = ":6666"
@@ -112,14 +115,15 @@ func (o *ServerOptions) Validate() error {
 // Config 基于 ServerOptions 创建新的 apiserver.Config。
 func (o *ServerOptions) Config() (*apiserver.Config, error) {
 	return &apiserver.Config{
-		ServerMode:   o.ServerMode,
-		JWTKey:       o.JWTKey,
-		TLSOptions:   o.TLSOptions,
-		Expiration:   o.Expiration,
-		HTTPOptions:  o.HTTPOptions,
-		GRPCOptions:  o.GRPCOptions,
-		MySQLOptions: o.MySQLOptions,
-		MongoOptions: o.MongoOptions,
-		RedisOptions: o.RedisOptions,
+		ServerMode:    o.ServerMode,
+		JWTKey:        o.JWTKey,
+		TLSOptions:    o.TLSOptions,
+		Expiration:    o.Expiration,
+		HTTPOptions:   o.HTTPOptions,
+		GRPCOptions:   o.GRPCOptions,
+		MySQLOptions:  o.MySQLOptions,
+		MongoOptions:  o.MongoOptions,
+		RedisOptions:  o.RedisOptions,
+		UploadOptions: o.UploadOptions,
 	}, nil
 }

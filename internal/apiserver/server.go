@@ -47,15 +47,16 @@ const (
 // Config 配置结构体，用于存储应用相关的配置.
 // 不用 viper.Get，是因为这种方式能更加清晰的知道应用提供了哪些配置项.
 type Config struct {
-	ServerMode   string
-	JWTKey       string
-	Expiration   time.Duration
-	HTTPOptions  *genericoptions.HTTPOptions
-	GRPCOptions  *genericoptions.GRPCOptions
-	MySQLOptions *genericoptions.MySQLOptions
-	TLSOptions   *genericoptions.TLSOptions
-	MongoOptions *genericoptions.MongoOptions
-	RedisOptions *genericoptions.RedisOptions
+	ServerMode    string
+	JWTKey        string
+	Expiration    time.Duration
+	HTTPOptions   *genericoptions.HTTPOptions
+	GRPCOptions   *genericoptions.GRPCOptions
+	MySQLOptions  *genericoptions.MySQLOptions
+	TLSOptions    *genericoptions.TLSOptions
+	MongoOptions  *genericoptions.MongoOptions
+	RedisOptions  *genericoptions.RedisOptions
+	UploadOptions *genericoptions.UploadOptions
 }
 
 // UnionServer 定义一个联合服务器. 根据 ServerMode 决定要启动的服务器类型.

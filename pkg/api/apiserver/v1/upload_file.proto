@@ -1,0 +1,149 @@
+// Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file. The original repo for
+// this file is https://github.com/clin211/miniblog-v2.git.
+
+syntax = "proto3";
+
+package v1;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/clin211/miniblog-v2/pkg/api/apiserver/v1;v1";
+
+// MultipartMode 表示分片上传的数据路径模式。
+enum MultipartMode {
+    MULTIPART_MODE_UNSPECIFIED = 0;
+    // PROXY: 客户端上传分片到应用服务，再由服务持久化到后端存储
+    PROXY = 1;
+    // DIRECT: 客户端直传到 OSS（通过预签名 URL）
+    DIRECT = 2;
+}
+
+// UploadedObject 为上传成功后的对象信息，单文件上传与分片合并统一返回该结构。
+message UploadedObject {
+    string provider = 1; // local | alioss
+    string key = 2;      // 对象键
+    string url = 3;      // 可访问 URL（或代理/签名 URL）
+    int64 size = 4;      // 字节数
+    string mime = 5;     // MIME 类型
+    string hash = 6;     // 如 sha256:xxxx
+    map<string, string> metadata = 7; // 附加元数据，如 scene
+}
+
+// ----------------------------- 单文件直传 -----------------------------
+
+message UploadFileRequest {
+    string scene = 1;        // 上传场景标签（可选）
+    string filename = 2;     // 建议文件名（可选）
+    string mime = 3;         // MIME（可选）
+    int64 size = 4;          // 文件大小（可选，服务端可校验）
+    bytes file = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            // OpenAPI 展示为二进制文件上传
+            type: STRING,
+            format: "binary"
+        }
+    ];
+}
+
+// ----------------------------- 分片上传：会话 -----------------------------
+
+message InitMultipartRequest {
+    string filename = 1; // 必填
+    int64 size = 2;      // 必填：用于建议分片策略与超限校验
+    string mime = 3;     // 可选
+    string scene = 4;    // 可选
+    string sha256 = 5;   // 可选：用于内容去重与最终校验
+    int64 partSize = 6;  // 可选：客户端期望的分片大小（字节）
+}
+
+message InitMultipartResponse {
+    string uploadID = 1;                 // 会话 ID
+    string key = 2;                      // 建议对象键
+    MultipartMode mode = 3;              // proxy | direct（由服务按配置决定）
+    int64 partSize = 4;                  // 服务端最终确定的分片大小
+    int64 presignExpiresSeconds = 5;     // 直传 URL 过期（秒），仅 direct 有意义
+    bool duplicated = 6;                 // 若命中去重直接复用（则无需再上传）
+}
+
+// ----------------------------- 分片上传：直传预签名 -----------------------------
+
+message PresignPartsRequest {
+    string uploadID = 1;
+    repeated int32 partNumbers = 2; // 需要预签名的分片号列表
+}
+
+message PresignedPart {
+    int32 partNumber = 1;
+    string url = 2;                         // 直传 URL
+    map<string, string> headers = 3;        // 需要附带的头
+    string expiresAt = 4;                   // ISO8601 到期时间
+}
+
+message PresignPartsResponse {
+    repeated PresignedPart items = 1;
+}
+
+// ----------------------------- 分片上传：代理上传单片 -----------------------------
+
+message UploadPartRequest {
+    string uploadID = 1;   // 会话 ID
+    int32 partNumber = 2;  // 分片号（1..maxParts）
+    bytes content = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            type: STRING,
+            format: "binary"
+        }
+    ];
+    string checksum = 4;   // 可选：分片校验（如 sha256:xxxx 或 Content-MD5）
+}
+
+message UploadPartResponse {
+    int32 partNumber = 1;
+    string etag = 2;       // 存储后端返回的分片标识
+    int64 size = 3;        // 实际接收字节数
+    string checksum = 4;   // 服务端计算或回显
+}
+
+// ----------------------------- 分片上传：查询、完成与中止 -----------------------------
+
+message ListPartsRequest {
+    string uploadID = 1;
+}
+
+message UploadedPart {
+    int32 partNumber = 1;
+    string etag = 2;
+    int64 size = 3;
+}
+
+message ListPartsResponse {
+    string uploadID = 1;
+    repeated UploadedPart parts = 2;
+}
+
+message CompletedPart {
+    int32 partNumber = 1;
+    string etag = 2;
+}
+
+message CompleteMultipartRequest {
+    string uploadID = 1;
+    repeated CompletedPart parts = 2; // direct 模式必传 ETag
+}
+
+// 完成分片上传后返回与单文件上传相同的对象信息。
+message CompleteMultipartResponse {
+    UploadedObject object = 1;
+}
+
+message AbortMultipartRequest {
+    string uploadID = 1;
+}
+
+message AbortMultipartResponse {
+    string uploadID = 1;
+}
+
+

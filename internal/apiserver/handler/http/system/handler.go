@@ -7,6 +7,7 @@ package system
 
 import (
 	"github.com/clin211/miniblog-v2/internal/apiserver/biz"
+	uploadsvc "github.com/clin211/miniblog-v2/internal/apiserver/pkg/uploader"
 	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/validation"
 )
 
@@ -14,12 +15,14 @@ import (
 type Handler struct {
 	biz biz.IBiz
 	val *validation.Validator
+	upl uploadsvc.Uploader
 }
 
 // NewHandler 创建新的 Handler 实例.
-func NewHandler(biz biz.IBiz, val *validation.Validator) *Handler {
+func NewHandler(biz biz.IBiz, val *validation.Validator, upl uploadsvc.Uploader) *Handler {
 	return &Handler{
 		biz: biz,
 		val: val,
+		upl: upl,
 	}
 }

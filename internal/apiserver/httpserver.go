@@ -7,12 +7,15 @@ package apiserver
 
 import (
 	"context"
+	"net/http"
+	"net/url"
 
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 
 	appHandler "github.com/clin211/miniblog-v2/internal/apiserver/handler/http/app"
 	systemHandler "github.com/clin211/miniblog-v2/internal/apiserver/handler/http/system"
+	"github.com/clin211/miniblog-v2/internal/apiserver/pkg/uploader"
 	"github.com/clin211/miniblog-v2/internal/pkg/core"
 	"github.com/clin211/miniblog-v2/internal/pkg/errno"
 	mw "github.com/clin211/miniblog-v2/internal/pkg/middleware/gin"
@@ -48,8 +51,26 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 	// 注册业务无关的 API 接口
 	InstallGenericAPI(engine)
 
+	// 本地上传静态目录映射（优先使用 BasePath；兼容 BaseURL 的 path）
+	if c.cfg.UploadOptions != nil && c.cfg.UploadOptions.Provider == "local" && c.cfg.UploadOptions.Local != nil {
+		if c.cfg.UploadOptions.Local.BaseDir != "" {
+			path := c.cfg.UploadOptions.Local.BasePath
+			if path == "" {
+				if c.cfg.UploadOptions.Local.BaseURL != "" {
+					u, _ := url.Parse(c.cfg.UploadOptions.Local.BaseURL)
+					path = u.Path
+				}
+			}
+			if path == "" {
+				path = "/static/uploads"
+			}
+			engine.StaticFS(path, http.Dir(c.cfg.UploadOptions.Local.BaseDir))
+		}
+	}
+
 	// 创建核心业务处理器
-	sys := systemHandler.NewHandler(c.biz, c.val)
+	upl := uploader.NewLocalOrFromConfig(c.cfg.UploadOptions)
+	sys := systemHandler.NewHandler(c.biz, c.val, upl)
 	app := appHandler.NewHandler(c.biz, c.val)
 
 	// 注册健康检查接口
@@ -119,6 +140,18 @@ func (c *ServerConfig) InstallRESTAPI(engine *gin.Engine) {
 			device.DELETE(":id", sys.DeleteDevice) // 删除设备
 			device.GET(":id", sys.GetDevice)       // 获取单个设备
 			device.GET("", sys.ListDevices)        // 查询设备列表
+		}
+
+		// 文件上传相关路由（系统）
+		upload := sysv1.Group("/upload", authMiddlewares...)
+		{
+			upload.POST("/file", sys.UploadFile)
+			upload.POST("/multipart/init", sys.InitMultipart)
+			upload.POST("/multipart/presign", sys.PresignParts)
+			upload.PUT("/multipart/part", sys.UploadPart)
+			upload.GET("/multipart/:uploadId/parts", sys.ListParts)
+			upload.POST("/multipart/complete", sys.CompleteMultipart)
+			upload.DELETE("/multipart/abort", sys.AbortMultipart)
 		}
 	}
 

@@ -982,6 +982,235 @@
         ]
       }
     },
+    "/v1/system/upload/file": {
+      "post": {
+        "summary": "单文件上传",
+        "operationId": "UploadFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UploadedObject"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UploadFileRequest"
+            }
+          }
+        ],
+        "tags": [
+          "system/文件上传"
+        ]
+      }
+    },
+    "/v1/system/upload/multipart/abort": {
+      "delete": {
+        "summary": "中止分片上传",
+        "operationId": "AbortMultipart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AbortMultipartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AbortMultipartRequest"
+            }
+          }
+        ],
+        "tags": [
+          "system/文件上传"
+        ]
+      }
+    },
+    "/v1/system/upload/multipart/complete": {
+      "post": {
+        "summary": "完成分片上传",
+        "operationId": "CompleteMultipart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CompleteMultipartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CompleteMultipartRequest"
+            }
+          }
+        ],
+        "tags": [
+          "system/文件上传"
+        ]
+      }
+    },
+    "/v1/system/upload/multipart/init": {
+      "post": {
+        "summary": "初始化分片上传",
+        "operationId": "InitMultipart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1InitMultipartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1InitMultipartRequest"
+            }
+          }
+        ],
+        "tags": [
+          "system/文件上传"
+        ]
+      }
+    },
+    "/v1/system/upload/multipart/part": {
+      "put": {
+        "summary": "代理上传单个分片",
+        "operationId": "UploadPart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UploadPartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UploadPartRequest"
+            }
+          }
+        ],
+        "tags": [
+          "system/文件上传"
+        ]
+      }
+    },
+    "/v1/system/upload/multipart/presign": {
+      "post": {
+        "summary": "批量获取直传分片预签名 URL",
+        "operationId": "PresignParts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PresignPartsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PresignPartsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "system/文件上传"
+        ]
+      }
+    },
+    "/v1/system/upload/multipart/{uploadID}/parts": {
+      "get": {
+        "summary": "查询已上传分片",
+        "operationId": "ListParts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPartsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uploadID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "system/文件上传"
+        ]
+      }
+    },
     "/v1/system/users": {
       "get": {
         "summary": "列出所有用户",
@@ -1450,6 +1679,22 @@
         }
       }
     },
+    "v1AbortMultipartRequest": {
+      "type": "object",
+      "properties": {
+        "uploadID": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AbortMultipartResponse": {
+      "type": "object",
+      "properties": {
+        "uploadID": {
+          "type": "string"
+        }
+      }
+    },
     "v1BatchCreatePostTagsRequest": {
       "type": "object",
       "properties": {
@@ -1566,6 +1811,43 @@
     "v1ChangePasswordResponse": {
       "type": "object",
       "title": "ChangePasswordResponse 表示修改密码响应"
+    },
+    "v1CompleteMultipartRequest": {
+      "type": "object",
+      "properties": {
+        "uploadID": {
+          "type": "string"
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CompletedPart"
+          },
+          "title": "direct 模式必传 ETag"
+        }
+      }
+    },
+    "v1CompleteMultipartResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1UploadedObject"
+        }
+      },
+      "title": "完成分片上传后返回与单文件上传相同的对象信息。"
+    },
+    "v1CompletedPart": {
+      "type": "object",
+      "properties": {
+        "partNumber": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "etag": {
+          "type": "string"
+        }
+      }
     },
     "v1CreateCategoryRequest": {
       "type": "object",
@@ -1897,6 +2179,68 @@
       },
       "title": "HealthzResponse 表示健康检查的响应结构体"
     },
+    "v1InitMultipartRequest": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "title": "必填"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "必填：用于建议分片策略与超限校验"
+        },
+        "mime": {
+          "type": "string",
+          "title": "可选"
+        },
+        "scene": {
+          "type": "string",
+          "title": "可选"
+        },
+        "sha256": {
+          "type": "string",
+          "title": "可选：用于内容去重与最终校验"
+        },
+        "partSize": {
+          "type": "string",
+          "format": "int64",
+          "title": "可选：客户端期望的分片大小（字节）"
+        }
+      }
+    },
+    "v1InitMultipartResponse": {
+      "type": "object",
+      "properties": {
+        "uploadID": {
+          "type": "string",
+          "title": "会话 ID"
+        },
+        "key": {
+          "type": "string",
+          "title": "建议对象键"
+        },
+        "mode": {
+          "$ref": "#/definitions/v1MultipartMode",
+          "title": "proxy | direct（由服务按配置决定）"
+        },
+        "partSize": {
+          "type": "string",
+          "format": "int64",
+          "title": "服务端最终确定的分片大小"
+        },
+        "presignExpiresSeconds": {
+          "type": "string",
+          "format": "int64",
+          "title": "直传 URL 过期（秒），仅 direct 有意义"
+        },
+        "duplicated": {
+          "type": "boolean",
+          "title": "若命中去重直接复用（则无需再上传）"
+        }
+      }
+    },
     "v1IsActive": {
       "type": "string",
       "enum": [
@@ -1924,6 +2268,21 @@
         }
       },
       "title": "ListCategoryResponse 表示获取分类列表响应"
+    },
+    "v1ListPartsResponse": {
+      "type": "object",
+      "properties": {
+        "uploadID": {
+          "type": "string"
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UploadedPart"
+          }
+        }
+      }
     },
     "v1ListPostResponse": {
       "type": "object",
@@ -2024,6 +2383,17 @@
         }
       },
       "title": "LoginResponse 表示登录响应"
+    },
+    "v1MultipartMode": {
+      "type": "string",
+      "enum": [
+        "MULTIPART_MODE_UNSPECIFIED",
+        "PROXY",
+        "DIRECT"
+      ],
+      "default": "MULTIPART_MODE_UNSPECIFIED",
+      "description": "- PROXY: PROXY: 客户端上传分片到应用服务，再由服务持久化到后端存储\n - DIRECT: DIRECT: 客户端直传到 OSS（通过预签名 URL）",
+      "title": "MultipartMode 表示分片上传的数据路径模式。"
     },
     "v1Post": {
       "type": "object",
@@ -2171,6 +2541,58 @@
       "description": "- POST_TYPE_UNSPECIFIED: 未指定\n - POST_TYPE_ORIGINAL: 原创\n - POST_TYPE_REPOST: 转载\n - POST_TYPE_CONTRIBUTION: 投稿",
       "title": "PostType 表示文章类型"
     },
+    "v1PresignPartsRequest": {
+      "type": "object",
+      "properties": {
+        "uploadID": {
+          "type": "string"
+        },
+        "partNumbers": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "需要预签名的分片号列表"
+        }
+      }
+    },
+    "v1PresignPartsResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PresignedPart"
+          }
+        }
+      }
+    },
+    "v1PresignedPart": {
+      "type": "object",
+      "properties": {
+        "partNumber": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "url": {
+          "type": "string",
+          "title": "直传 URL"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "需要附带的头"
+        },
+        "expiresAt": {
+          "type": "string",
+          "title": "ISO8601 到期时间"
+        }
+      }
+    },
     "v1RefreshTokenRequest": {
       "type": "object",
       "description": "该请求无需额外字段，仅通过现有的认证信息（如旧的 token）进行刷新",
@@ -2264,6 +2686,130 @@
     "v1UpdateUserResponse": {
       "type": "object",
       "title": "UpdateUserResponse 表示更新用户响应"
+    },
+    "v1UploadFileRequest": {
+      "type": "object",
+      "properties": {
+        "scene": {
+          "type": "string",
+          "title": "上传场景标签（可选）"
+        },
+        "filename": {
+          "type": "string",
+          "title": "建议文件名（可选）"
+        },
+        "mime": {
+          "type": "string",
+          "title": "MIME（可选）"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "文件大小（可选，服务端可校验）"
+        },
+        "file": {
+          "type": "string",
+          "format": "binary"
+        }
+      }
+    },
+    "v1UploadPartRequest": {
+      "type": "object",
+      "properties": {
+        "uploadID": {
+          "type": "string",
+          "title": "会话 ID"
+        },
+        "partNumber": {
+          "type": "integer",
+          "format": "int32",
+          "title": "分片号（1..maxParts）"
+        },
+        "content": {
+          "type": "string",
+          "format": "binary"
+        },
+        "checksum": {
+          "type": "string",
+          "title": "可选：分片校验（如 sha256:xxxx 或 Content-MD5）"
+        }
+      }
+    },
+    "v1UploadPartResponse": {
+      "type": "object",
+      "properties": {
+        "partNumber": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "etag": {
+          "type": "string",
+          "title": "存储后端返回的分片标识"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "实际接收字节数"
+        },
+        "checksum": {
+          "type": "string",
+          "title": "服务端计算或回显"
+        }
+      }
+    },
+    "v1UploadedObject": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "title": "local | alioss"
+        },
+        "key": {
+          "type": "string",
+          "title": "对象键"
+        },
+        "url": {
+          "type": "string",
+          "title": "可访问 URL（或代理/签名 URL）"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "字节数"
+        },
+        "mime": {
+          "type": "string",
+          "title": "MIME 类型"
+        },
+        "hash": {
+          "type": "string",
+          "title": "如 sha256:xxxx"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "附加元数据，如 scene"
+        }
+      },
+      "title": "UploadedObject 为上传成功后的对象信息，单文件上传与分片合并统一返回该结构。"
+    },
+    "v1UploadedPart": {
+      "type": "object",
+      "properties": {
+        "partNumber": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "etag": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
     },
     "v1User": {
       "type": "object",

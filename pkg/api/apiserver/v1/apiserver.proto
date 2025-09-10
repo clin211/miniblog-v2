@@ -23,6 +23,8 @@ import "apiserver/v1/category.proto";
 import "apiserver/v1/tag.proto";
 // 定义当前服务所依赖的文章标签关联消息
 import "apiserver/v1/post_tag.proto";
+// 定义当前服务所依赖的上传消息
+import "apiserver/v1/upload_file.proto";
 // 为生成 OpenAPI 文档提供相关注释（如标题、版本、作者、许可证等信息）
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -72,6 +74,104 @@ service MiniBlog {
             operation_id: "Healthz";
             // 将该接口归类为"服务治理"
             tags: "服务治理";
+        };
+    }
+
+    // --------------------------- 文件上传（system） ---------------------------
+    // UploadFile 单文件上传（表单/二进制）。
+    rpc UploadFile(UploadFileRequest) returns (UploadedObject) {
+        option (google.api.http) = {
+            post: "/v1/system/upload/file",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "单文件上传",
+            operation_id: "UploadFile",
+            tags: "system/文件上传",
+        };
+    }
+
+    // InitMultipart 初始化分片上传会话。
+    rpc InitMultipart(InitMultipartRequest) returns (InitMultipartResponse) {
+        option (google.api.http) = {
+            post: "/v1/system/upload/multipart/init",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "初始化分片上传",
+            operation_id: "InitMultipart",
+            tags: "system/文件上传",
+        };
+    }
+
+    // PresignParts 直传模式批量获取分片预签名 URL。
+    rpc PresignParts(PresignPartsRequest) returns (PresignPartsResponse) {
+        option (google.api.http) = {
+            post: "/v1/system/upload/multipart/presign",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "批量获取直传分片预签名 URL",
+            operation_id: "PresignParts",
+            tags: "system/文件上传",
+        };
+    }
+
+    // UploadPart 代理模式上传单个分片。
+    rpc UploadPart(UploadPartRequest) returns (UploadPartResponse) {
+        option (google.api.http) = {
+            put: "/v1/system/upload/multipart/part",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "代理上传单个分片",
+            operation_id: "UploadPart",
+            tags: "system/文件上传",
+        };
+    }
+
+    // ListParts 查询会话已上传分片列表。
+    rpc ListParts(ListPartsRequest) returns (ListPartsResponse) {
+        option (google.api.http) = {
+            get: "/v1/system/upload/multipart/{uploadID}/parts",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "查询已上传分片",
+            operation_id: "ListParts",
+            tags: "system/文件上传",
+        };
+    }
+
+    // CompleteMultipart 提交完成分片上传。
+    rpc CompleteMultipart(CompleteMultipartRequest) returns (CompleteMultipartResponse) {
+        option (google.api.http) = {
+            post: "/v1/system/upload/multipart/complete",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "完成分片上传",
+            operation_id: "CompleteMultipart",
+            tags: "system/文件上传",
+        };
+    }
+
+    // AbortMultipart 放弃分片上传并清理。
+    rpc AbortMultipart(AbortMultipartRequest) returns (AbortMultipartResponse) {
+        option (google.api.http) = {
+            delete: "/v1/system/upload/multipart/abort",
+            body: "*",
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "中止分片上传",
+            operation_id: "AbortMultipart",
+            tags: "system/文件上传",
         };
     }
 

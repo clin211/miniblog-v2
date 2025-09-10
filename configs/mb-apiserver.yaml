@@ -100,6 +100,61 @@ redis:
   # 是否启用链路追踪，默认 false
   enable-trace: false
 
+# 文件上传相关配置
+upload:
+  # 存储提供商：local / alioss（当前仅实现 local）
+  provider: local
+  # 最大上传大小
+  maxSize: "20MB"
+  # 允许的 MIME 类型
+  allowedMIMEs: [ "image/jpeg", "image/png", "image/gif", "image/heic", "image/heif", "application/pdf" ]
+  # 是否去重（按内容哈希）
+  deduplicate: true
+  # 对象键模板：{date:...} {sha256:N} {ext}
+  keyTemplate: "{date:2006/01/02}/{sha256:16}{ext}"
+  # 本地存储配置
+  local:
+    # 本地文件根目录（服务会自动创建）
+    baseDir: "./_output/uploads"
+    # 静态访问前缀路径（环境无关），例如 /static/uploads
+    basePath: "/static/uploads"
+    # 对外可访问完整前缀（含协议/域名/路径），不同环境请分别配置：
+    #   开发示例:   http://localhost:5555/static/uploads
+    #   测试示例:   https://api.test.example.com/static/uploads
+    #   生产示例:   https://cdn.example.com/uploads
+    # 若留空将回退为 basePath，仅返回路径，由同源网关提供访问
+    baseURL: "http://localhost:5555/static/uploads"
+    # 目录权限（十进制 493 = 八进制 0755）
+    mkdirPerm: 493
+  # 阿里云 OSS（占位，后续实现）
+  alioss:
+    endpoint: "oss-cn-hangzhou.aliyuncs.com"
+    bucket: "your-bucket-name"
+    accessKeyID: "your-ak"
+    accessKeySecret: "your-sk"
+    securityToken: ""
+    acl: "private"
+    pathStyleAccess: false
+    uploadTimeout: "30s"
+    callbackURL: ""
+  # 分片上传（预留，当前仅本地实现）
+  multipart:
+    enabled: true
+    minSize: "8MB"
+    maxParts: 10000
+    partSize:
+      min: "5MB"
+      max: "128MB"
+      default: "8MB"
+    concurrencyLimitPerUser: 2
+    uploadIdTTL: "24h"
+    tempDir: "./_output/uploads/.multipart"
+    checksum: "sha256"
+    presign:
+      enabled: true
+      expires: "15m"
+      mode: "direct"
+
 # 日志配置
 log:
   # 是否开启 caller，如果开启会在日志中显示调用日志所在的文件和行号

@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+<!--
+ Copyright 2025 长林啊 <767425412@qq.com>. All rights reserved.
+ Use of this source code is governed by a MIT style
+ license that can be found in the LICENSE file. The original repo for
+ this file is https://github.com/clin211/miniblog-v2.git.
+-->
+
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiniBlog 文件上传演示（Vue + Tailwind + Axios）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/heic2any/dist/heic2any.min.js"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+  <div id="app" class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+      <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">MiniBlog 文件上传演示</h1>
+
+      <!-- 基础配置 -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">服务配置与登录</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="env" class="block text-sm font-medium text-gray-700 mb-2">环境</label>
+            <select id="env" v-model="state.env" @change="actions.onEnvChange"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="test">测试服</option>
+              <option value="local">本地</option>
+              <option value="custom">自定义</option>
+            </select>
+          </div>
+          <div>
+            <label for="apiBase" class="block text-sm font-medium text-gray-700 mb-2">API Base</label>
+            <input id="apiBase" v-model.trim="state.apiBase" type="text" @blur="actions.onApiBaseBlur"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="https://api.clin.pro">
+          </div>
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+            <input id="username" v-model.trim="state.username" type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="uploadfile">
+          </div>
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+            <input id="password" v-model="state.password" type="password"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="******">
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3 mt-4 items-center">
+          <button @click="actions.login" :disabled="state.logining"
+            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium py-2 px-4 rounded-md transition">
+            {{ state.logining ? '登录中...' : '登录' }}
+          </button>
+          <div v-if="state.token" class="text-green-600 text-sm break-all">
+            Token: {{ state.token }}
+          </div>
+          <div v-else class="text-gray-500 text-sm">未登录</div>
+        </div>
+      </div>
+
+      <!-- 上传方式与参数 -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">上传方式与参数</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="uploadMethod" class="block text-sm font-medium text-gray-700 mb-2">上传方式</label>
+            <select id="uploadMethod" v-model="state.defaultUploadMethod"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="single">单文件上传（JSON+base64）</option>
+              <option value="multipart">分片上传（自动选择 PROXY/DIRECT）</option>
+            </select>
+          </div>
+          <div>
+            <label for="parallel" class="block text-sm font-medium text-gray-700 mb-2">并发分片数</label>
+            <input id="parallel" type="number" min="1" max="8" v-model.number="state.multipartParallel"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label for="scene" class="block text-sm font-medium text-gray-700 mb-2">场景标记 scene（可选）</label>
+            <input id="scene" v-model.trim="state.scene"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="avatar / post-image / ...">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div>
+            <label for="maxSizeMB" class="block text-sm font-medium text-gray-700 mb-2">最大文件大小（MB）</label>
+            <input id="maxSizeMB" type="number" min="1" v-model.number="state.maxSizeMB"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div class="md:col-span-2">
+            <label for="allowMimes" class="block text-sm font-medium text-gray-700 mb-2">允许的 MIME（逗号分隔，空=不限制）</label>
+            <input id="allowMimes" v-model.trim="state.allowMimes"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="image/png,image/jpeg,video/mp4">
+          </div>
+        </div>
+      </div>
+
+      <!-- 选择与拖拽区域 -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">选择文件</h2>
+        <div class="flex flex-wrap gap-3 mb-4">
+          <label class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-md cursor-pointer">
+            选择文件
+            <input type="file" multiple class="hidden" @change="e => actions.onPickFiles(e)"
+              accept=".heic,.heif,image/*,video/*,application/pdf">
+          </label>
+          <button @click="actions.clearQueue"
+            class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-md">清空队列</button>
+        </div>
+        <div class="border-2 border-dashed rounded-lg p-8 text-center"
+          :class="state.dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'"
+          @dragover.prevent="state.dragOver = true" @dragleave.prevent="state.dragOver = false"
+          @drop.prevent="e => actions.onDropFiles(e)">
+          <div class="text-gray-600">拖拽文件到此处，或点击上方按钮选择</div>
+        </div>
+      </div>
+
+      <!-- 队列与上传控制 -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6" v-if="state.items.length">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">上传队列</h2>
+        <div class="space-y-4">
+          <div v-for="item in state.items" :key="item.id" class="border rounded-lg p-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="w-16 h-16 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
+                <img v-if="item.previewUrl && isImageRenderable(item.file.type, item.file.name)" :src="item.previewUrl"
+                  class="object-cover w-full h-full" alt="文件预览" />
+                <span v-else class="text-gray-400 text-xs">无预览</span>
+              </div>
+              <div class="flex-1 min-w-[200px]">
+                <div class="font-medium text-gray-800 break-all">{{ item.file.name }}</div>
+                <div class="text-sm text-gray-500">{{ formatSize(item.file.size) }} · {{ item.file.type ||
+                  'application/octet-stream' }}</div>
+                <div class="text-xs text-gray-400" v-if="item.method === 'multipart'">
+                  分片 · 模式: {{ item.mode || '-' }} · partSize: {{ item.partSize ? formatSize(item.partSize) : '-' }}
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <select v-model="item.method" class="px-2 py-1 border rounded text-sm" aria-label="选择上传方式">
+                  <option value="single">单文件</option>
+                  <option value="multipart">分片</option>
+                </select>
+                <button v-if="item.status==='idle' || item.status==='error'" @click="actions.start(item)"
+                  class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-1.5 px-3 rounded">开始</button>
+                <button v-if="item.status==='uploading'" @click="actions.cancel(item)"
+                  class="bg-red-600 hover:bg-red-700 text-white text-sm py-1.5 px-3 rounded">取消</button>
+                <button v-if="item.status==='canceled' || item.status==='error'" @click="actions.retry(item)"
+                  class="bg-amber-600 hover:bg-amber-700 text-white text-sm py-1.5 px-3 rounded">重试</button>
+                <button v-if="item.status==='completed' && item.method==='multipart' && item.uploadID"
+                  @click="actions.listParts(item)"
+                  class="bg-gray-600 hover:bg-gray-700 text-white text-sm py-1.5 px-3 rounded">查看分片</button>
+                <button v-if="item.status==='uploading' && item.method==='multipart' && item.uploadID"
+                  @click="actions.abort(item)"
+                  class="bg-black hover:bg-black/80 text-white text-sm py-1.5 px-3 rounded">中止会话</button>
+                <button @click="actions.remove(item)"
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm py-1.5 px-3 rounded">移除</button>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-green-600 h-2 rounded-full transition-all duration-300"
+                  :style="{ width: item.progress + '%' }"></div>
+              </div>
+              <div class="text-xs text-gray-600 mt-1">
+                状态：<span :class="statusColor(item.status)">{{ item.status }}</span>
+                <span class="ml-2">进度：{{ item.progress.toFixed(2) }}%</span>
+                <span class="ml-2" v-if="item.speed">速度：{{ formatSpeed(item.speed) }}</span>
+              </div>
+            </div>
+            <div v-if="item.error" class="mt-2 text-sm text-red-600 break-all">错误：{{ item.error }}</div>
+            <div v-if="item.result" class="mt-3">
+              <div class="text-sm text-gray-700">上传结果：</div>
+              <div class="bg-gray-50 border rounded p-3 text-sm overflow-auto">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-1">
+                  <div><span class="text-gray-500">provider：</span>{{ item.result.provider }}</div>
+                  <div class="md:col-span-2 break-all"><span class="text-gray-500">key：</span>{{ item.result.key }}
+                  </div>
+                  <div class="md:col-span-3 break-all"><span class="text-gray-500">url：</span>
+                    <a class="text-blue-600 hover:underline" :href="item.result.url" target="_blank">{{ item.result.url
+                      }}</a>
+                  </div>
+                  <div><span class="text-gray-500">size：</span>{{ formatSize(item.result.size) }}</div>
+                  <div><span class="text-gray-500">mime：</span>{{ item.result.mime }}</div>
+                  <div class="md:col-span-3 break-all"><span class="text-gray-500">hash：</span>{{ item.result.hash }}
+                  </div>
+                </div>
+              </div>
+              <div class="mt-2" v-if="isPreviewable(item.result?.mime, item.file?.name)">
+                <img v-if="isImageRenderable(item.result?.mime, item.file?.name)" :src="item.result.url"
+                  class="max-h-64 rounded" alt="上传结果预览" />
+                <video v-else-if="isVideoRenderable(item.result?.mime, item.file?.name)" :src="item.result.url"
+                  class="max-h-64 rounded" controls></video>
+                <div v-else class="text-xs text-gray-500">该类型暂不支持直接预览（如 HEIC）。</div>
+              </div>
+            </div>
+            <div v-if="item.method==='multipart' && item.partsView && item.partsView.length" class="mt-3">
+              <div class="text-sm text-gray-700 mb-1">已上传分片：</div>
+              <div class="bg-gray-50 border rounded p-3 text-xs overflow-auto">
+                <div class="grid grid-cols-6 gap-2">
+                  <div class="font-medium text-gray-500">#</div>
+                  <div class="font-medium text-gray-500 col-span-3">ETag</div>
+                  <div class="font-medium text-gray-500">Size</div>
+                  <div class="font-medium text-gray-500">状态</div>
+                  <template v-for="p in item.partsView">
+                    <div>{{ p.partNumber }}</div>
+                    <div class="col-span-3 break-all">{{ p.etag }}</div>
+                    <div>{{ formatSize(p.size) }}</div>
+                    <div>{{ p.done ? '完成' : '待传' }}</div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 日志 -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">操作日志</h2>
+        <div class="bg-gray-50 rounded-md p-4 h-80 overflow-y-auto text-sm font-mono" ref="logBox">
+          <div v-for="(log, idx) in state.logs" :key="idx" :class="log.class">[{{ log.time }}] {{ log.msg }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, reactive, ref, onMounted } = Vue;
+
+    function bufferToBase64 (arrayBuffer) {
+      let binary = '';
+      const bytes = new Uint8Array(arrayBuffer);
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        const sub = bytes.subarray(i, i + chunk);
+        binary += String.fromCharCode.apply(null, sub);
+      }
+      return btoa(binary);
+    }
+
+    function guessMimeByExt (filename) {
+      const lower = (filename || '').toLowerCase();
+      if (lower.endsWith('.heic')) return 'image/heic';
+      if (lower.endsWith('.heif')) return 'image/heif';
+      if (lower.endsWith('.png')) return 'image/png';
+      if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+      if (lower.endsWith('.gif')) return 'image/gif';
+      if (lower.endsWith('.webp')) return 'image/webp';
+      if (lower.endsWith('.avif')) return 'image/avif';
+      if (lower.endsWith('.svg')) return 'image/svg+xml';
+      if (lower.endsWith('.bmp')) return 'image/bmp';
+      if (lower.endsWith('.mp4')) return 'video/mp4';
+      if (lower.endsWith('.webm')) return 'video/webm';
+      if (lower.endsWith('.ogg')) return 'video/ogg';
+      if (lower.endsWith('.pdf')) return 'application/pdf';
+      return '';
+    }
+
+    function effectiveMime (mime, name) {
+      return mime || guessMimeByExt(name);
+    }
+
+    function isImageRenderable (mime, name) {
+      const m = effectiveMime(mime, name);
+      if (!m) return false;
+      // 浏览器常见可渲染图片类型，排除 heic/heif
+      return [
+        'image/png',
+        'image/jpeg',
+        'image/gif',
+        'image/webp',
+        'image/avif',
+        'image/svg+xml',
+        'image/bmp'
+      ].includes(m);
+    }
+
+    function isVideoRenderable (mime, name) {
+      const m = effectiveMime(mime, name);
+      if (!m) return false;
+      return [
+        'video/mp4',
+        'video/webm',
+        'video/ogg'
+      ].includes(m);
+    }
+
+    async function sha256HexOfFile (file) {
+      const buf = await file.arrayBuffer();
+      const digest = await crypto.subtle.digest('SHA-256', buf);
+      const bytes = new Uint8Array(digest);
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    createApp({
+      setup () {
+        const state = reactive({
+          env: 'test',
+          apiBase: 'https://api.clin.pro',
+          username: 'uploadfile',
+          password: 'kKOcmxVf99l9OFz',
+          token: '',
+          logining: false,
+          defaultUploadMethod: 'single',
+          multipartParallel: 3,
+          scene: '',
+          maxSizeMB: 200,
+          allowMimes: 'image/png,image/jpeg,image/gif,image/heic,image/heif,video/mp4,application/pdf',
+          dragOver: false,
+          items: [],
+          logs: []
+        });
+
+        const logBox = ref(null);
+        const STORAGE_KEY = 'upload_demo_env';
+
+        function addLog (msg, type = 'info') {
+          const colors = { info: 'text-blue-700', success: 'text-green-700', warn: 'text-amber-700', error: 'text-red-700' };
+          state.logs.push({ time: new Date().toLocaleTimeString(), msg, class: colors[type] || colors.info });
+          requestAnimationFrame(() => {
+            if (logBox.value) logBox.value.scrollTop = logBox.value.scrollHeight;
+          });
+        }
+
+        function applyEnvToApiBase () {
+          if (state.env === 'test') {
+            state.apiBase = 'https://api.clin.pro';
+          } else if (state.env === 'local') {
+            state.apiBase = 'http://localhost:5555';
+          } // custom 保持用户自填
+        }
+
+        function persistEnv () {
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ env: state.env, apiBase: state.apiBase })); } catch { }
+        }
+
+        function restoreEnv () {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            const saved = JSON.parse(raw);
+            if (saved.env) state.env = saved.env;
+            if (saved.apiBase) state.apiBase = saved.apiBase;
+          } catch { }
+        }
+
+        function statusColor (status) {
+          switch (status) {
+            case 'idle': return 'text-gray-600';
+            case 'uploading': return 'text-blue-700';
+            case 'canceled': return 'text-amber-700';
+            case 'error': return 'text-red-700';
+            case 'completed': return 'text-green-700';
+            default: return 'text-gray-600';
+          }
+        }
+
+        function isPreviewable (mime, name) {
+          const m = effectiveMime(mime, name);
+          if (!m) return false;
+          // heic/heif 不可直接预览
+          if (m === 'image/heic' || m === 'image/heif') return false;
+          return m.startsWith('image/') || m.startsWith('video/');
+        }
+
+        function formatSize (bytes) {
+          if (!Number.isFinite(bytes)) return '-';
+          const units = ['B', 'KB', 'MB', 'GB'];
+          let i = 0, n = bytes;
+          while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+          return `${n.toFixed(2)} ${units[i]}`;
+        }
+
+        function formatSpeed (bps) {
+          if (!bps) return '-';
+          const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+          let i = 0, n = bps;
+          while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+          return `${n.toFixed(2)} ${units[i]}`;
+        }
+
+        function validateFile (file) {
+          if (!file) return '空文件';
+          const max = state.maxSizeMB * 1024 * 1024;
+          if (file.size > max) return `文件过大（>${state.maxSizeMB}MB）`;
+          if (state.allowMimes.trim()) {
+            const allowed = state.allowMimes.split(',').map(s => s.trim()).filter(Boolean);
+            const effectiveMime = file.type || guessMimeByExt(file.name) || '';
+            if (allowed.length && !allowed.includes(effectiveMime)) return `MIME 不允许：${effectiveMime || '(空)'}`;
+          }
+          return '';
+        }
+
+        async function makeItem (file) {
+          const err = validateFile(file);
+          const url = URL.createObjectURL(file);
+          const renderable = isImageRenderable(file.type, file.name) || isVideoRenderable(file.type, file.name);
+          const item = {
+            id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            file,
+            method: state.defaultUploadMethod,
+            status: err ? 'error' : 'idle',
+            error: err || '',
+            progress: 0,
+            speed: 0,
+            startAt: 0,
+            uploadedBytes: 0,
+            canceler: null,
+            controller: null,
+            previewUrl: url,
+            isImage: isImageRenderable(file.type, file.name),
+            previewOk: renderable,
+            // 单/分片结果数据：
+            result: null,
+            // 分片参数：
+            uploadID: '',
+            mode: '',
+            partSize: 0,
+            partsView: [], // { partNumber, etag, size, done }
+            etags: {}, // partNumber -> etag
+          };
+
+          // 对 HEIC/HEIF 尝试浏览器端转换为 JPEG 以支持预览
+          const m = effectiveMime(file.type, file.name);
+          if (!renderable && (m === 'image/heic' || m === 'image/heif') && window.heic2any) {
+            try {
+              const blob = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
+              const converted = new File([blob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+              if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+              item.previewUrl = URL.createObjectURL(converted);
+              item.previewOk = true;
+              // 保持上传原文件，不替换 file；只用于预览
+            } catch (e) {
+              // 转换失败则忽略，保持无预览
+            }
+          }
+
+          return item;
+        }
+
+        async function login () {
+          if (!state.username || !state.password) {
+            addLog('请输入用户名和密码', 'warn');
+            return;
+          }
+          state.logining = true;
+          try {
+            const resp = await axios.post(`${state.apiBase}/v1/system/auth/login`, {
+              username: state.username,
+              password: state.password
+            }, { headers: { 'Content-Type': 'application/json' } });
+            if (resp.data && resp.data.token) {
+              state.token = resp.data.token;
+              addLog('登录成功', 'success');
+            } else {
+              throw new Error('登录响应无 token');
+            }
+          } catch (err) {
+            addLog(`登录失败：${err.response?.data?.message || err.message}`, 'error');
+          } finally {
+            state.logining = false;
+          }
+        }
+
+        function authHeaders (extra = {}) {
+          const h = { ...extra };
+          if (state.token) h['Authorization'] = `Bearer ${state.token}`;
+          return h;
+        }
+
+        function onPickFiles (e) {
+          const files = Array.from(e.target.files || []);
+          addFiles(files);
+          e.target.value = '';
+        }
+
+        function onDropFiles (e) {
+          state.dragOver = false;
+          const files = Array.from(e.dataTransfer.files || []);
+          addFiles(files);
+        }
+
+        async function addFiles (files) {
+          const items = [];
+          for (const f of files) {
+            items.push(await makeItem(f));
+          }
+          state.items.unshift(...items);
+          addLog(`加入队列 ${items.length} 个文件`, 'info');
+        }
+
+        function remove (item) {
+          if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+          state.items = state.items.filter(x => x.id !== item.id);
+        }
+
+        function clearQueue () {
+          state.items.forEach(i => i.previewUrl && URL.revokeObjectURL(i.previewUrl));
+          state.items = [];
+        }
+
+        async function start (item) {
+          if (item.error) { addLog(`文件无效：${item.error}`, 'error'); return; }
+          item.status = 'uploading';
+          item.progress = 0;
+          item.speed = 0;
+          item.startAt = Date.now();
+          item.uploadedBytes = 0;
+          item.error = '';
+
+          try {
+            if (item.method === 'single') {
+              await uploadSingle(item);
+            } else {
+              await uploadMultipart(item);
+            }
+          } catch (err) {
+            if (item.status !== 'canceled') {
+              item.status = 'error';
+              item.error = err.response?.data?.message || err.message || String(err);
+              addLog(`上传失败：${item.file.name} - ${item.error}`, 'error');
+            }
+          }
+        }
+
+        function cancel (item) {
+          if (item.controller) item.controller.abort();
+          if (item.canceler) item.canceler('canceled');
+          item.status = 'canceled';
+          addLog(`已取消：${item.file.name}`, 'warn');
+        }
+
+        function retry (item) {
+          if (item.status === 'error' || item.status === 'canceled') {
+            item.error = '';
+            item.result = null;
+            item.uploadID = '';
+            item.mode = '';
+            item.partSize = 0;
+            item.partsView = [];
+            item.etags = {};
+            start(item);
+          }
+        }
+
+        async function uploadSingle (item) {
+          const file = item.file;
+
+          // 使用 multipart/form-data，字段名必须为 file
+          const fd = new FormData();
+          fd.append('file', file, file.name);
+          if (state.scene) fd.append('scene', state.scene);
+          if (file.type) fd.append('mime', file.type);
+          fd.append('filename', file.name);
+          fd.append('size', String(file.size));
+
+          const controller = new AbortController();
+          item.controller = controller;
+
+          const started = Date.now();
+          let lastLoaded = 0;
+          const resp = await axios.post(`${state.apiBase}/v1/system/upload/file`, fd, {
+            headers: authHeaders(), // 不要手动设置 Content-Type，浏览器会自动带 boundary
+            signal: controller.signal,
+            onUploadProgress: (e) => {
+              if (!e.total) return;
+              const loaded = e.loaded;
+              item.progress = Math.min(100, (loaded / e.total) * 100);
+              const now = Date.now();
+              const dt = (now - started) / 1000;
+              const dl = loaded - lastLoaded;
+              lastLoaded = loaded;
+              if (dt > 0) item.speed = dl / (dt || 1);
+            }
+          });
+
+          item.result = resp.data;
+          item.status = 'completed';
+          item.progress = 100;
+          addLog(`单文件上传完成：${file.name}`, 'success');
+        }
+
+        async function uploadMultipart (item) {
+          // 1) 初始化会话
+          const file = item.file;
+          const sha256 = await sha256HexOfFile(file).catch(() => '');
+          const initResp = await axios.post(`${state.apiBase}/v1/system/upload/multipart/init`, {
+            filename: file.name,
+            size: file.size,
+            mime: (file.type || guessMimeByExt(file.name) || 'application/octet-stream'),
+            scene: state.scene || '',
+            sha256: sha256 ? `sha256:${sha256}` : '',
+          }, { headers: authHeaders({ 'Content-Type': 'application/json' }) });
+
+          const session = initResp.data || {};
+          if (session.duplicated && session.key && session.mode !== undefined) {
+            // 命中去重，直接视为完成（后端已存在）
+            item.uploadID = session.uploadID || '';
+            item.mode = session.mode === 1 ? 'PROXY' : (session.mode === 2 ? 'DIRECT' : '');
+            item.partSize = session.partSize || 5 * 1024 * 1024;
+            item.result = { provider: 'local', key: session.key, url: '', size: file.size, mime: file.type, hash: sha256 ? `sha256:${sha256}` : '' };
+            item.status = 'completed';
+            item.progress = 100;
+            addLog(`命中去重，视为已上传：${file.name}`, 'success');
+            return;
+          }
+
+          item.uploadID = session.uploadID;
+          item.mode = session.mode === 1 ? 'PROXY' : (session.mode === 2 ? 'DIRECT' : '');
+          item.partSize = session.partSize || 5 * 1024 * 1024;
+          addLog(`分片会话初始化：uploadID=${item.uploadID} mode=${item.mode} partSize=${formatSize(item.partSize)}`, 'info');
+
+          if (item.mode === 'DIRECT') {
+            await uploadMultipartDirect(item);
+          } else {
+            await uploadMultipartProxy(item);
+          }
+        }
+
+        function computeParts (fileSize, partSize) {
+          const parts = [];
+          let partNumber = 1;
+          for (let offset = 0; offset < fileSize; offset += partSize) {
+            const size = Math.min(partSize, fileSize - offset);
+            parts.push({ partNumber, offset, size });
+            partNumber++;
+          }
+          return parts;
+        }
+
+        async function uploadMultipartProxy (item) {
+          const controller = new AbortController();
+          item.controller = controller;
+
+          const file = item.file;
+          const parts = computeParts(file.size, item.partSize);
+          item.partsView = parts.map(p => ({ partNumber: p.partNumber, etag: '', size: p.size, done: false }));
+
+          // 控制并发
+          const parallel = Math.max(1, Math.min(8, state.multipartParallel));
+          let inFlight = 0, idx = 0, completedBytes = 0;
+
+          await new Promise((resolve, reject) => {
+            const queueNext = () => {
+              if (controller.signal.aborted) return reject(new Error('canceled'));
+              while (inFlight < parallel && idx < parts.length) {
+                const p = parts[idx++];
+                inFlight++;
+                (async () => {
+                  try {
+                    const chunk = file.slice(p.offset, p.offset + p.size);
+                    const buf = await chunk.arrayBuffer();
+                    const base64 = bufferToBase64(buf);
+                    const resp = await axios.put(`${state.apiBase}/v1/system/upload/multipart/part`, {
+                      uploadID: item.uploadID,
+                      partNumber: p.partNumber,
+                      content: base64
+                    }, { headers: authHeaders({ 'Content-Type': 'application/json' }), signal: controller.signal });
+                    const data = resp.data || {};
+                    item.etags[p.partNumber] = data.etag || '';
+                    const pv = item.partsView.find(x => x.partNumber === p.partNumber);
+                    if (pv) { pv.etag = data.etag || ''; pv.done = true; }
+                    completedBytes += p.size;
+                    item.progress = Math.min(100, (completedBytes / file.size) * 100);
+                  } catch (e) {
+                    return reject(e);
+                  } finally {
+                    inFlight--;
+                    if (idx >= parts.length && inFlight === 0) {
+                      resolve();
+                    } else {
+                      queueNext();
+                    }
+                  }
+                })();
+              }
+            };
+            queueNext();
+          });
+
+          // 完成合并
+          const completedParts = Object.keys(item.etags)
+            .map(k => ({ partNumber: Number(k), etag: item.etags[k] }))
+            .sort((a, b) => a.partNumber - b.partNumber);
+
+          const comp = await axios.post(`${state.apiBase}/v1/system/upload/multipart/complete`, {
+            uploadID: item.uploadID,
+            parts: completedParts
+          }, { headers: authHeaders({ 'Content-Type': 'application/json' }) });
+
+          item.result = comp.data?.object || null;
+          item.status = 'completed';
+          item.progress = 100;
+          addLog(`分片（代理）完成：${file.name}`, 'success');
+        }
+
+        async function uploadMultipartDirect (item) {
+          const controller = new AbortController();
+          item.controller = controller;
+          const file = item.file;
+          const parts = computeParts(file.size, item.partSize);
+          item.partsView = parts.map(p => ({ partNumber: p.partNumber, etag: '', size: p.size, done: false }));
+
+          // 预签名 URL 批量申请（按窗口分批）
+          const parallel = Math.max(1, Math.min(8, state.multipartParallel));
+          const windowSize = 20;
+          let completedBytes = 0;
+
+          for (let i = 0; i < parts.length; i += windowSize) {
+            const batch = parts.slice(i, i + windowSize);
+            const presign = await axios.post(`${state.apiBase}/v1/system/upload/multipart/presign`, {
+              uploadID: item.uploadID,
+              partNumbers: batch.map(p => p.partNumber)
+            }, { headers: authHeaders({ 'Content-Type': 'application/json' }) });
+            const urls = presign.data?.items || [];
+            const urlMap = new Map(urls.map(u => [u.partNumber, u]));
+
+            let idx = 0, inFlight = 0;
+            await new Promise((resolve, reject) => {
+              const queueNext = () => {
+                if (controller.signal.aborted) return reject(new Error('canceled'));
+                while (inFlight < parallel && idx < batch.length) {
+                  const p = batch[idx++];
+                  const meta = urlMap.get(p.partNumber);
+                  if (!meta) return reject(new Error('presign item missing'));
+                  inFlight++;
+                  (async () => {
+                    try {
+                      const chunk = file.slice(p.offset, p.offset + p.size);
+                      const headers = meta.headers || {};
+                      const putResp = await axios.put(meta.url, chunk, { headers, signal: controller.signal });
+                      const etag = (putResp.headers['etag'] || putResp.headers['ETag'] || '').replaceAll('"', '');
+                      item.etags[p.partNumber] = etag;
+                      const pv = item.partsView.find(x => x.partNumber === p.partNumber);
+                      if (pv) { pv.etag = etag; pv.done = true; }
+                      completedBytes += p.size;
+                      item.progress = Math.min(100, (completedBytes / file.size) * 100);
+                    } catch (e) {
+                      return reject(e);
+                    } finally {
+                      inFlight--;
+                      if (idx >= batch.length && inFlight === 0) {
+                        resolve();
+                      } else {
+                        queueNext();
+                      }
+                    }
+                  })();
+                }
+              };
+              queueNext();
+            });
+          }
+
+          // 完成合并
+          const completedParts = Object.keys(item.etags)
+            .map(k => ({ partNumber: Number(k), etag: item.etags[k] }))
+            .sort((a, b) => a.partNumber - b.partNumber);
+
+          const comp = await axios.post(`${state.apiBase}/v1/system/upload/multipart/complete`, {
+            uploadID: item.uploadID,
+            parts: completedParts
+          }, { headers: authHeaders({ 'Content-Type': 'application/json' }) });
+          item.result = comp.data?.object || null;
+          item.status = 'completed';
+          item.progress = 100;
+          addLog(`分片（直传）完成：${file.name}`, 'success');
+        }
+
+        async function listParts (item) {
+          if (!item.uploadID) return;
+          const resp = await axios.get(`${state.apiBase}/v1/system/upload/multipart/${encodeURIComponent(item.uploadID)}/parts`, {
+            headers: authHeaders()
+          });
+          const parts = resp.data?.parts || [];
+          item.partsView = parts.map(p => ({ partNumber: p.partNumber, etag: p.etag, size: p.size, done: true }));
+          addLog(`查询已上传分片：${parts.length} 个`, 'info');
+        }
+
+        async function abort (item) {
+          if (!item.uploadID) return;
+          await axios.delete(`${state.apiBase}/v1/system/upload/multipart/abort`, {
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            data: { uploadID: item.uploadID }
+          });
+          addLog(`已中止会话：${item.uploadID}`, 'warn');
+        }
+
+        onMounted(() => {
+          restoreEnv();
+          if (state.env !== 'custom') applyEnvToApiBase();
+          addLog('页面加载完成，可配置 API Base 并登录', 'info');
+        });
+
+        return {
+          state,
+          logBox,
+          formatSize,
+          formatSpeed,
+          statusColor,
+          isPreviewable,
+          isImageRenderable,
+          isVideoRenderable,
+          actions: {
+            login,
+            onPickFiles,
+            onDropFiles,
+            clearQueue,
+            remove,
+            start,
+            cancel,
+            retry,
+            listParts,
+            abort,
+            onEnvChange: () => {
+              if (state.env !== 'custom') {
+                applyEnvToApiBase();
+              }
+              persistEnv();
+            },
+            onApiBaseBlur: () => {
+              if (state.env === 'custom') {
+                persistEnv();
+              }
+            }
+          }
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>
