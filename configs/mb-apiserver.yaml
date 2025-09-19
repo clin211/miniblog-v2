@@ -107,7 +107,7 @@ upload:
   # 最大上传大小
   maxSize: "20MB"
   # 允许的 MIME 类型
-  allowedMIMEs: [ "image/jpeg", "image/png", "image/gif", "image/heic", "image/heif", "application/pdf" ]
+  allowedMIMEs: [ "image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf" ]
   # 是否去重（按内容哈希）
   deduplicate: true
   # 对象键模板：{date:...} {sha256:N} {ext}

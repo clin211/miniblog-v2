@@ -65,7 +65,7 @@ func NewUploadOptions() *UploadOptions {
 	return &UploadOptions{
 		Provider:     "local",
 		MaxSize:      "20MB",
-		AllowedMIMEs: []string{"image/jpeg", "image/png", "application/pdf"},
+		AllowedMIMEs: []string{"image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"},
 		Deduplicate:  true,
 		KeyTemplate:  "{date:2006/01/02}/{sha256:16}{ext}",
 		Local: &LocalOptions{

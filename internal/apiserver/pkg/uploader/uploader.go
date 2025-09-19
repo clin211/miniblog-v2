@@ -98,13 +98,18 @@ func (l *localUploader) Upload(ctx context.Context, filename string, mimeType st
 		return nil, err
 	}
 
+	// 不做任何图片转换或衍生文件生成
+	var publicKey = key
+	var publicSize = n
+	var publicMIME = mimeType
+
 	// 构造 URL：
 	// - 对外访问优先使用 Local.BaseURL（包含协议/域名/路径），满足不同环境公网前缀不同的需求；
 	// - 若未配置 BaseURL，则回退为 Local.BasePath（仅路径），由前端拼接域名或同源访问。
 	var publicURL string
 	if l.cfg != nil && l.cfg.Local != nil && strings.TrimSpace(l.cfg.Local.BaseURL) != "" {
 		if uu, err := url.Parse(l.cfg.Local.BaseURL); err == nil {
-			uu.Path = strings.TrimRight(uu.Path, "/") + "/" + key
+			uu.Path = strings.TrimRight(uu.Path, "/") + "/" + publicKey
 			publicURL = uu.String()
 		}
 	}
@@ -123,16 +128,16 @@ func (l *localUploader) Upload(ctx context.Context, filename string, mimeType st
 			pathBase = "/static/uploads"
 		}
 		u, _ := url.Parse(pathBase)
-		u.Path = strings.TrimRight(u.Path, "/") + "/" + key
+		u.Path = strings.TrimRight(u.Path, "/") + "/" + publicKey
 		publicURL = u.String()
 	}
 
 	return &UploadedObject{
 		Provider: "local",
-		Key:      key,
+		Key:      publicKey,
 		URL:      publicURL,
-		Size:     n,
-		MIME:     mimeType,
+		Size:     publicSize,
+		MIME:     publicMIME,
 		Hash:     sumHex, // sha256
 		Metadata: map[string]string{},
 	}, nil
